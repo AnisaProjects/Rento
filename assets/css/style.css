@@ -5363,7 +5363,21 @@ h5 {
 .testimonial_wrap {
   padding: 40px 20px;
 }
+/* added new for nav bar second */
+/* User login dropdown fix - hover based, JS-independent */
+.user_login .dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  left: auto;
+  min-width: 180px;
+  z-index: 1000;
+}
 
+.user_login li.dropdown:hover .dropdown-menu,
+.user_login li.dropdown.open .dropdown-menu {
+  display: block;
+}
 
 
 }
