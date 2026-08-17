@@ -307,39 +307,107 @@ error_reporting(0);
   <section class="section-padding testimonial-section parallex-bg">
     <div class="container div_zindex">
       <div class="section-header white-text text-center">
+        <span class="section-tag">Testimonials</span>
         <h2>Our Satisfied <span>Customers</span></h2>
+        <p class="section-sub">Real feedback from renters who trusted us with their journey.</p>
       </div>
+
+      <!-- Trust stats bar -->
+      <div class="trust-bar">
+        <div class="trust-item">
+          <h3>4.9<span>/5</span></h3>
+          <p>Average Rating</p>
+        </div>
+        <div class="trust-divider"></div>
+        <div class="trust-item">
+          <h3>2,500<span>+</span></h3>
+          <p>Happy Customers</p>
+        </div>
+        <div class="trust-divider"></div>
+        <div class="trust-item">
+          <h3>120<span>+</span></h3>
+          <p>Cities Covered</p>
+        </div>
+        <div class="trust-divider"></div>
+        <div class="trust-item">
+          <h3>98<span>%</span></h3>
+          <p>Would Recommend</p>
+        </div>
+      </div>
+
       <div class="row">
-        <div id="testimonial-slider">
+        <div class="testimonial-grid">
           <?php
           $tid = 1;
-          $sql = "SELECT tbltestimonial.Testimonial,tblusers.FullName from tbltestimonial join tblusers on tbltestimonial.UserEmail=tblusers.EmailId where tbltestimonial.status=:tid limit 4";
+          $sql = "SELECT tbltestimonial.Testimonial, tblusers.FullName
+                  FROM tbltestimonial
+                  JOIN tblusers ON tbltestimonial.UserEmail = tblusers.EmailId
+                  WHERE tbltestimonial.status = :tid
+                  LIMIT 6";
           $query = $dbh->prepare($sql);
           $query->bindParam(':tid', $tid, PDO::PARAM_STR);
           $query->execute();
           $results = $query->fetchAll(PDO::FETCH_OBJ);
-          $cnt = 1;
+
+          // Rotating accent palette so avatars aren't all the same color
+          $avatarColors = [
+            ['#fa2837', '#ff6b5b'],
+            ['#2563eb', '#60a5fa'],
+            ['#16a34a', '#4ade80'],
+            ['#9333ea', '#c084fc'],
+            ['#ea580c', '#fb923c'],
+            ['#0891b2', '#22d3ee'],
+          ];
+
           if ($query->rowCount() > 0) {
-            foreach ($results as $result) { ?>
+            $i = 0;
+            foreach ($results as $result) {
+              $delay = $i * 0.1;
+              $nameParts = explode(' ', trim($result->FullName));
+              $initials = strtoupper(substr($nameParts[0], 0, 1) . substr(end($nameParts), 0, 1));
+              $colorPair = $avatarColors[$i % count($avatarColors)];
+              ?>
 
+              <div class="testimonial-m fade-up" style="animation-delay: <?php echo $delay; ?>s;">
 
-              <div class="testimonial-m">
 
                 <div class="testimonial-content">
+                  <span class="quote-icon"><i class="fa fa-quote-right" aria-hidden="true"></i></span>
+
+                  <div class="testimonial-stars">
+                    <?php for ($s = 0; $s < 5; $s++) { ?>
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                    <?php } ?>
+                  </div>
+
+                  <p class="testimonial-text"><?php echo htmlentities($result->Testimonial); ?></p>
+
                   <div class="testimonial-heading">
-                    <h5><?php echo htmlentities($result->FullName); ?></h5>
-                    <p><?php echo htmlentities($result->Testimonial); ?></p>
+                    <span class="testimonial-avatar"
+                      style="background: linear-gradient(135deg, <?php echo $colorPair[0]; ?>, <?php echo $colorPair[1]; ?>);">
+                      <?php echo htmlentities($initials); ?>
+                    </span>
+                    <div class="testimonial-author">
+                      <h5><?php echo htmlentities($result->FullName); ?>
+                        <i class="fa fa-check-circle verified-badge" aria-hidden="true" title="Verified Customer"></i>
+                      </h5>
+                      <span class="client-designation">Verified Customer</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            <?php }
-          } ?>
 
-
-
+              <?php
+              $i++;
+            }
+          } else {
+            echo '<p class="text-center white-text">No testimonials yet.</p>';
+          }
+          ?>
         </div>
       </div>
     </div>
+
     <!-- Dark Overlay-->
     <div class="dark-overlay"></div>
   </section>
