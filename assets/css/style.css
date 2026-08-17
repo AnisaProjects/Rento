@@ -1088,176 +1088,225 @@ nav.navbar {
 
 
 /*-----------------------------
-	3.4. Recently-Listed-Cars
+  3.4. Recently-Listed-Cars
 -----------------------------------*/
 .recent-tab {
-  margin: 0 auto;
+  margin: 0 auto 30px;
   text-align: center;
 }
+
 .recent-tab ul.nav-tabs {
-  background: #ffffff none repeat scroll 0 0;
+  background: #fff;
   border-radius: 30px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin: 0 auto;
-  display:inline-block;
+  display: inline-block;
+  border: none;
 }
+
 .recent-tab .nav.nav-tabs a {
-  background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
-  border: medium none;
+  background: transparent;
+  border: none;
   border-radius: 30px;
-  color: #222222;
+  color: #222;
   font-size: 15px;
-  line-height: 26px;
-  margin: 0 auto;
-  padding: 6px 32px;
-  position:relative
+  padding: 10px 34px;
+  display: inline-block;
+  transition: color 0.3s ease, background 0.3s ease;
 }
+
 .recent-tab .nav.nav-tabs li.active a {
-  border: medium none;
-  color: #ffffff;
+  color: #fff;
+  background: #fa2837;
+  box-shadow: 0 4px 14px rgba(250, 40, 55, 0.35);
 }
-.recent-tab .nav.nav-tabs li.active::after {
-  border-style: solid;
-  border-width: 12px;
-  bottom: -20px;
-  content: "";
-  height: 8px;
-  left: 0;
-  margin: 0 auto;
-  position: absolute;
-  right: 0;
-  width: 12px;
+
+/* GRID — every card is the same width & stretches to equal height */
+.car-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  align-items: stretch;
 }
+
+@media (max-width: 991px) {
+  .car-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .car-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .col-list-3 {
-  float: left;
-  padding: 0 15px;
-  width: 33%;
-}
-.col-list-3:nth-child(3n) {
-	clear:right;
-}
-.col-list-3:nth-child(3n+1) {
-	clear:left;
-}
-.recent-car-list {
-  background: #ffffff none repeat scroll 0 0;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  margin-top: 40px;
-}
-.car-info-box { position:relative;}
-.car-info-box ul {
-  background: rgba(0, 0, 0, 0.6) none repeat scroll 0 0;
-  bottom: 0;
-  margin: 0 auto;
-  padding: 0 15px;
-  position: absolute;
   width: 100%;
 }
-.car-info-box li {
-  color: #ffffff;
-  display: inline-block;
-  font-size: 13px;
-  line-height: 50px;
-  list-style: outside none none;
-  margin: 0 15px 0 auto;
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.car-info-box li .fa {
-  margin-right: 8px;
+
+.fade-up {
+  opacity: 0;
+  animation: fadeUp 0.6s ease forwards;
 }
-.car-info-box li:nth-last-child(1) {
-  margin-right: 0;
-}
-.car-title-m {
+
+/* CARD — flex column so footer content always lines up regardless of image */
+.recent-car-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  border-radius: 12px;
   overflow: hidden;
-  padding: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
+
+.recent-car-list:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.14);
+}
+
+/* Ribbon badge, positioned relative to the card, not the page */
+.car-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  background: #fa2837;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(250, 40, 55, 0.4);
+}
+
+/* Fixed-height image frame so mixed-size / transparent PNGs never break layout */
+.car-info-box {
+  position: relative;
+}
+
+.car-img-wrap {
+  display: block;
+  height: 210px;
+  background: linear-gradient(180deg, #f4f4f4 0%, #e8e8e8 100%);
+  overflow: hidden;
+}
+
+.car-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* fills the frame instead of floating in white space */
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.recent-car-list:hover .car-img-wrap img {
+  transform: scale(1.08);
+}
+
+/* Stats bar — ALWAYS visible now, with a real gradient scrim for legibility
+   on any image (light or dark) instead of relying on hover to appear */
+.car-stats {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 22px 16px 10px;
+  list-style: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+  display: flex;
+  justify-content: space-between;
+}
+
+.car-stats li {
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.car-stats li .fa {
+  margin-right: 6px;
+  opacity: 0.9;
+}
+
+/* Body — flex-grow so short/long descriptions never break card alignment */
+.car-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 18px 20px 20px;
+}
+
+.car-title-m {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
 .car-title-m h6 {
-  float: left;
-  margin: 0 auto;
-  max-width: 245px;
-}
-.car-title-m h6 a {
-  color: #111111;
-}
-.car-title-m .price {
-  color: #555555;
-  float: right;
+  margin: 0;
+  font-weight: 700;
   font-size: 16px;
+  line-height: 1.3;
+}
+
+.car-title-m h6 a {
+  color: #111;
+  transition: color 0.25s ease;
+}
+
+.recent-car-list:hover .car-title-m h6 a {
+  color: #fa2837;
+}
+
+.car-title-m .price {
+  flex-shrink: 0;
+  color: #fa2837;
+  font-size: 15px;
   font-weight: 800;
+  white-space: nowrap;
+}
+
+.car-title-m .price small {
+  font-weight: 400;
+  font-size: 11px;
+  color: #999;
+  margin-left: 2px;
 }
 
 .inventory_info_m {
-  padding: 0 20px 15px;
+  margin-top: auto;
+  /* pushes description to consistent baseline */
+  padding-top: 4px;
 }
+
 .inventory_info_m p {
   color: #9e9e9e;
-  line-height: 22px;
+  font-size: 13.5px;
+  line-height: 21px;
+  margin: 0;
 }
-.blog-info-box .share_article {
-	position:absolute;
-	top:15px;
-	left:15px;
-	overflow:hidden;
-}
-.blog-info-box .share_article p {
-	background:rgba(0, 0, 0, 0.5);
-	border:rgba(255, 255, 255, 0.5) solid 2px;
-	border-radius:50%;
-	width:35px;
-	height:35px;
-	text-align:center;
-	color:#fff;
-	line-height:30px;
-	cursor:pointer;
-	float:left;
-	margin:0;
-}
-.blog-info-box .share_article:hover p, .blog-info-box .share_article:hover ul li a {
-	background:#fff;
-	color:#000;
-}
-.blog-info-box .share_article:hover ul li a:hover {
-	border-radius:50%;
-	color:#fa2837;
-}
-.blog-info-box .share_article ul {
-	position:absolute;
-	background:none;
-	float:left;
-	width:auto;
-	opacity:0;
-	visibility:hidden;
-	transition-duration:0.3s;
-	 -moz-transition-duration:0.3s;
-	  -o-transition-duration:0.3s;
-	   -webkit-transition-duration:0.3s;
-	    -ms-transition-duration:0.3s;
-    transform:translateY(-100%);
-	 -moz-transform:translateY(-100%);
-	  -o-transform:translateY(-100%);
-	   -webkit-transform:translateY(-100%);
-	    -ms-transform:translateY(-100%);
-}
-.blog-info-box .share_article ul li {
-	height:35px;
-	width:35px;
-	line-height:35px;
-	background:rgba(0, 0, 0, 0.5);
-	border:0px;
-	
-}
-.blog-info-box .share_article:hover ul {
-	opacity:1;
-	visibility:visible;
-	position:relative;
-	transform:translateY(0%);
-	 -moz-transform:translateY(0%);
-	  -o-transform:translateY(0%);
-	   -webkit-transform:translateY(0%);
-	    -ms-transform:translateY(0%);
-}
-
-
 
 /*---------------------
 	3.5. Fun-Facts
