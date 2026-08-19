@@ -677,12 +677,13 @@ table thead th, table thead td {
   background: #fff none repeat scroll 0 0;
   box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
   padding: 30px 0;
-  transition-duration:0.3s;
-   -moz-transition-duration:0.3s;
-    -o-transition-duration:0.3s;
-     -webkit-transition-duration:0.3s;
-     -ms-transition-duration:0.3s;
+  transition-duration: 0.3s;
+  -moz-transition-duration: 0.3s;
+  -o-transition-duration: 0.3s;
+  -webkit-transition-duration: 0.3s;
+  -ms-transition-duration: 0.3s;
 }
+
 .nav-stacked.affix {
   background: #f5f5f5 none repeat scroll 0 0;
   top: 0;
@@ -690,45 +691,80 @@ table thead th, table thead td {
   z-index: 11;
   padding: 10px 0;
 }
+
 .logo {
-  float:left;
-} 
-.navbar-default .navbar-toggle:focus .icon-bar, .navbar-default .navbar-toggle:hover .icon-bar {
-	background:#fff;
+  float: left;
 }
+
+/* Logo size fix + subtle hover pop */
+.logo img {
+  max-height: 100px;
+  width: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.05);
+}
+
+.navbar-default .navbar-toggle:focus .icon-bar,
+.navbar-default .navbar-toggle:hover .icon-bar {
+  background: #fff;
+}
+
 .header_info {
   float: right;
   text-align: right;
+  margin-top: 30px;
 }
+
 .social-follow {
   display: inline-block;
   margin-left: 20px;
   margin-top: 0;
   vertical-align: middle;
 }
+
 .social-follow ul {
-	padding:0px;
-	margin:0px;
+  padding: 0px;
+  margin: 0px;
 }
+
 .social-follow ul li {
-	display:inline-block;
-	vertical-align:middle;
-	list-style:none;
-	margin:0px;
+  display: inline-block;
+  vertical-align: middle;
+  list-style: none;
+  margin: 0px;
 }
+
 .social-follow ul li a {
-	display:block;
-	font-size:25px;
-	color:#555;
+  display: block;
+  font-size: 25px;
+  color: #555;
 }
+
 .social-follow li i {
   margin-right: 5px;
 }
+
 .login_btn {
   display: inline-block;
   margin-left: 10px;
   vertical-align: middle;
 }
+
+/* Login/Register button hover lift */
+.login_btn a {
+  display: inline-block;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.login_btn a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
 .circle_icon {
   border: 1px solid #000;
   border-radius: 50%;
@@ -740,7 +776,15 @@ table thead th, table thead td {
   margin-right: 10px;
   text-align: center;
   width: 40px;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
+
+.header_widgets:hover .circle_icon {
+  background: #7ac142;
+  border-color: #7ac142;
+  color: #fff;
+}
+
 .uppercase_text {
   color: #111;
   font-size: 15px;
@@ -749,22 +793,27 @@ table thead th, table thead td {
   margin: 0;
   text-transform: uppercase;
 }
+
 .header_widgets {
   display: inline-block;
   width: 260px;
-  text-align:left;
+  text-align: left;
 }
+
 .header_widgets a {
-	color:#555;
+  color: #555;
 }
+
 .header_wrap {
   float: right;
 }
+
 .header_search {
   float: right;
   padding: 16px 0;
   position: relative;
 }
+
 #header-search-form::after {
   border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) #ffffff;
   border-style: solid;
@@ -773,15 +822,23 @@ table thead th, table thead td {
   position: absolute;
   right: 9px;
   top: -13px;
-  display:none;
+  display: none;
 }
+
 .header_search input {
   background: #ffffff none repeat scroll 0 0;
   border: 0 none;
   height: 38px;
   padding-right: 45px;
   width: 227px;
+  transition: box-shadow 0.3s ease;
 }
+
+.header_search input:focus {
+  box-shadow: 0 0 0 2px #7ac142;
+  outline: none;
+}
+
 .header_search button {
   background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
   border: 0 none;
@@ -796,45 +853,75 @@ table thead th, table thead td {
   -webkit-transform: translateY(-50%);
   -ms-transform: translateY(-50%);
 }
+
 #search_toggle {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 2px;
   cursor: pointer;
-  display:none;
+  display: none;
   margin-top: 1px;
   padding: 5px 10px;
 }
+
 .user_login {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 3px;
   float: left;
   margin: 18px 10px 17px 0;
 }
+
 .user_login ul {
-	padding:0px;
-	margin:0px;
+  padding: 0px;
+  margin: 0px;
 }
+
 .user_login ul li {
   line-height: 17px;
   list-style: outside none none;
   margin: 0;
   padding: 4px 15px 7px;
 }
-.user_login > ul > li a {
-	color:#fff;
-	font-size:12px;
-	font-weight:900;
-	text-transform:uppercase;
+
+.user_login>ul>li a {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
 }
-.user_login > ul > li a i {
-	margin:0 2px 0;
+
+.user_login>ul>li a i {
+  margin: 0 2px 0;
 }
+
 .user_login ul.dropdown-menu {
   background: #ffffff none repeat scroll 0 0;
   border-radius: 0;
   padding: 15px 0;
   top: 107%;
 }
+
+/* Nav links - underline slide-in on hover */
+.navbar-nav>li>a {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav>li>a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  width: 0%;
+  height: 2px;
+  background: #7ac142;
+  transition: width 0.3s ease;
+}
+
+.navbar-nav>li>a:hover::after,
+.navbar-nav>li.active>a::after {
+  width: 100%;
+}
+
 
 
 
@@ -1055,7 +1142,7 @@ nav.navbar {
 /*-------------------------
 	3.3. About-Us-Section
 -------------------------------*/
-.looking-car {
+/* .looking-car {
   border: 3px solid #e1e1e1;
   border-radius: 0 30px;
   padding: 58px 25px;
@@ -1084,7 +1171,7 @@ nav.navbar {
 .looking-cat-image img {
 	max-width:100%;
 }
-
+ */
 
 
 /*-----------------------------
@@ -1922,7 +2009,7 @@ nav.navbar {
 /*-----------------
 	3.12. Footer
 ------------------------*/
-.footer-top {
+/* .footer-top {
   background: #222222 none repeat scroll 0 0;
   color: #9d9d9d;
   padding: 80px 0;
@@ -2028,81 +2115,1201 @@ input.newsletter-input {
 }
 .back-top a:hover, .back-top a:focus {
 	color:#fff;
+} */
+/*-----------------------------------------
+  Design tokens — add near the top of your
+  main stylesheet (or keep scoped here).
+------------------------------------------*/
+:root {
+  --asphalt: #101114;
+  --panel: #17181D;
+  --panel-2: #1D1E25;
+  --line: rgba(255, 255, 255, .09);
+  --ash: #9497A6;
+  --paper: #F1EFE9;
+  --signal: #FF5A36;
+  /* taillight orange — primary accent   */
+  --signal-2: #FFB238;
+  /* headlight amber — secondary accent  */
+  --radius: 14px;
+}
+
+/* Optional: import the type pairing used in the redesign.
+   Add this to your <head>, or via @import here. */
+/* @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap'); */
+
+/*-----------------------------------------
+  Road-line divider (signature element) —
+  a dashed lane-marking line used between
+  sections instead of a plain <hr>.
+------------------------------------------*/
+.road {
+  height: 3px;
+  background: repeating-linear-gradient(90deg, var(--signal) 0 26px, transparent 26px 54px);
+  background-size: 54px 3px;
+  opacity: .55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .road {
+    animation: roadmove 1.6s linear infinite;
+  }
+}
+
+@keyframes roadmove {
+  to {
+    background-position: 54px 0;
+  }
+}
+
+/*-----------------------------------------
+  CTA — "Book your car"
+------------------------------------------*/
+.cta {
+  position: relative;
+  padding: 80px 0;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+
+.cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(255, 90, 54, .12), transparent 55%),
+    radial-gradient(circle at 10% 90%, rgba(255, 178, 56, .08), transparent 45%);
+  pointer-events: none;
+}
+
+.cta__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.cta__eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--signal);
+  margin-bottom: 14px;
+}
+
+.cta__heading {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.08;
+  color: var(--paper);
+  max-width: 560px;
+  margin: 0;
+}
+
+.cta__sub {
+  margin-top: 14px;
+  max-width: 460px;
+  color: var(--ash);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.btn-key {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--signal);
+  color: #181312;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 17px 30px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px -8px rgba(255, 90, 54, .55);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.btn-key i {
+  transition: transform .2s ease;
+}
+
+.btn-key:hover {
+  background: var(--signal-2);
+  color: #181312;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px -6px rgba(255, 178, 56, .55);
+}
+
+.btn-key:hover i {
+  transform: translateX(3px);
+}
+
+/*-----------------------------------------
+  Footer — replaces the old "3.12 Footer"
+  block from your stylesheet.
+------------------------------------------*/
+/*-----------------------------------------
+  FOOTER
+------------------------------------------*/
+
+.site-footer {
+  background: var(--panel);
+  color: var(--paper);
 }
 
 
+/*-----------------------------------------
+  Moving Road Line
+------------------------------------------*/
 
+.road {
+  height: 3px;
+
+  background:
+    repeating-linear-gradient(90deg,
+      var(--signal) 0 26px,
+      transparent 26px 54px);
+
+  background-size: 54px 3px;
+
+  opacity: .55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+
+  .road {
+    animation: roadmove 1.6s linear infinite;
+  }
+
+}
+
+@keyframes roadmove {
+
+  to {
+    background-position: 54px 0;
+  }
+
+}
+
+
+/*-----------------------------------------
+  Footer Top
+------------------------------------------*/
+
+.footer-top {
+  padding: 70px 0 55px;
+}
+
+
+/*-----------------------------------------
+  Main Footer Layout
+
+  BRAND | LINKS | NEWSLETTER
+------------------------------------------*/
+
+.footer-top__grid {
+  display: flex;
+  gap: 60px;
+  align-items: start;
+}
+
+
+/*-----------------------------------------
+  Brand Section
+------------------------------------------*/
+
+.f-brand {
+  min-width: 0;
+  max-width: 320px;
+}
+
+
+.f-brand__logo {
+
+  font-family: 'Space Grotesk', sans-serif;
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+  color: var(--paper);
+
+  line-height: 1;
+
+}
+
+
+.f-brand__logo span {
+  color: var(--signal);
+}
+
+
+.f-brand__tagline {
+
+  margin-top: 18px;
+
+  font-size: 14px;
+
+  line-height: 1.7;
+
+  color: var(--ash);
+
+  max-width: 310px;
+
+}
+
+
+/*-----------------------------------------
+  Social Icons
+------------------------------------------*/
+
+.f-social {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 24px;
+
+}
+
+
+.f-social a {
+
+  width: 36px;
+
+  height: 36px;
+
+  border: 1px solid var(--line);
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: var(--paper);
+
+  font-size: 14px;
+
+  text-decoration: none;
+
+  transition:
+    background .2s ease,
+    border-color .2s ease,
+    transform .2s ease,
+    color .2s ease;
+
+}
+
+
+.f-social a:hover {
+
+  background: var(--signal);
+
+  border-color: var(--signal);
+
+  color: #181312;
+
+  transform: translateY(-2px);
+
+}
+
+
+/*-----------------------------------------
+  Footer Links Area
+
+  ABOUT US | LEGAL
+------------------------------------------*/
+
+.f-links {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(130px, 1fr) minmax(130px, 1fr) minmax(280px, 1.7fr);
+
+  gap: 45px;
+
+  align-items: start;
+
+  min-width: 0;
+
+}
+
+
+/*-----------------------------------------
+  Individual Footer Column
+------------------------------------------*/
+
+.f-col {
+
+  min-width: 0;
+
+  text-align: left;
+
+}
+
+
+/*-----------------------------------------
+  Footer Heading
+------------------------------------------*/
+
+.f-col h6 {
+
+  color: var(--paper);
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  letter-spacing: .12em;
+
+  text-transform: uppercase;
+
+  margin: 0 0 24px;
+
+}
+
+
+/*-----------------------------------------
+  Footer List
+------------------------------------------*/
+
+.f-col ul {
+
+  list-style: none;
+
+  margin: 0;
+
+  padding: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 14px;
+
+  width: 100%;
+
+}
+
+
+.f-col ul li {
+
+  width: 100%;
+
+  text-align: left;
+
+  margin: 0;
+
+  padding: 0;
+
+}
+
+
+/*-----------------------------------------
+  Footer Links
+------------------------------------------*/
+
+.f-col ul li a {
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  color: var(--ash);
+
+  text-decoration: none;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  transition:
+    color .2s ease,
+    transform .2s ease;
+
+}
+
+
+/* Small orange line */
+
+.f-col ul li a::before {
+
+  content: "";
+
+  width: 6px;
+
+  height: 1px;
+
+  background: var(--signal);
+
+  display: inline-block;
+
+  flex-shrink: 0;
+
+  transition: width .2s ease;
+
+}
+
+
+.f-col ul li a:hover {
+
+  color: var(--paper);
+
+  transform: translateX(2px);
+
+}
+
+
+.f-col ul li a:hover::before {
+
+  width: 12px;
+
+}
+
+
+/*-----------------------------------------
+  Newsletter
+------------------------------------------*/
+
+.f-newsletter {
+
+  min-width: 0;
+
+}
+
+
+.f-newsletter p.hint {
+
+  font-size: 12px;
+
+  line-height: 1.6;
+
+  color: var(--ash);
+
+  margin: 12px 0 0;
+
+  max-width: 360px;
+
+}
+
+
+/*-----------------------------------------
+  Newsletter Form
+------------------------------------------*/
+
+.newsletter-form {
+
+  display: flex;
+
+  width: 100%;
+
+  min-height: 44px;
+
+  border: 1px solid var(--line);
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, .02);
+
+}
+
+
+/*-----------------------------------------
+  Newsletter Input
+------------------------------------------*/
+
+input.newsletter-input {
+
+  flex: 1;
+
+  min-width: 0;
+
+  border: 0;
+
+  outline: none;
+
+  background: transparent;
+
+  padding: 13px 15px;
+
+  color: var(--paper);
+
+  font-size: 13px;
+
+}
+
+
+input.newsletter-input::placeholder {
+
+  color: #6B6E7A;
+
+}
+
+
+/*-----------------------------------------
+  Newsletter Button
+------------------------------------------*/
+
+.newsletter-btn {
+
+  flex-shrink: 0;
+
+  border: 0;
+
+  background: var(--signal);
+
+  color: #181312;
+
+  font-weight: 600;
+
+  font-size: 13px;
+
+  padding: 0 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  cursor: pointer;
+
+  transition:
+    background .2s ease,
+    transform .2s ease;
+
+}
+
+
+.newsletter-btn:hover {
+
+  background: var(--signal-2);
+
+}
+
+
+.newsletter-btn i {
+
+  font-size: 14px;
+
+}
+
+
+/*-----------------------------------------
+  Footer Bottom
+------------------------------------------*/
+
+.footer-bottom {
+
+  border-top: 1px solid var(--line);
+
+  padding: 22px 0;
+
+}
+
+
+.footer-bottom__row {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+
+  gap: 15px;
+
+}
+
+
+.copy-right {
+
+  font-size: 13px;
+
+  color: var(--ash);
+
+  margin: 0;
+
+}
+
+
+.connect {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+}
+
+
+.connect p {
+
+  font-size: 13px;
+
+  color: var(--ash);
+
+  margin: 0;
+
+}
+
+
+.connect .f-social {
+
+  margin-top: 0;
+
+}
+
+
+.connect .f-social a {
+
+  width: 30px;
+
+  height: 30px;
+
+  font-size: 12px;
+
+}
+
+
+/*-----------------------------------------
+  Back To Top Button
+------------------------------------------*/
+
+.back-top {
+
+  position: fixed;
+
+  right: 26px;
+
+  bottom: 26px;
+
+  width: 44px;
+
+  height: 44px;
+
+  border-radius: 50%;
+
+  background: var(--signal);
+
+  color: #181312;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  box-shadow:
+    0 8px 22px -6px rgba(236, 122, 29, 0.6);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transform: translateY(10px);
+
+  transition:
+    opacity .25s ease,
+    transform .25s ease,
+    background .2s ease;
+
+  z-index: 50;
+
+}
+
+
+.back-top.show {
+
+  opacity: 1;
+
+  pointer-events: auto;
+
+  transform: translateY(0);
+
+}
+
+
+.back-top:hover {
+
+  background: var(--signal-2);
+
+  color: #181312;
+
+}
+
+
+/*=========================================
+  TABLET
+=========================================*/
+
+@media (max-width: 1100px) {
+
+  .footer-top__grid {
+
+    grid-template-columns:
+      240px 1fr;
+
+    gap: 50px;
+
+  }
+
+
+  .f-links {
+
+    grid-column: 2;
+
+    grid-template-columns:
+      140px 140px minmax(240px, 1fr);
+
+    gap: 30px;
+
+  }
+
+}
+
+
+/*=========================================
+  MOBILE / TABLET
+=========================================*/
+
+@media (max-width: 860px) {
+
+  .footer-top {
+
+    padding: 55px 0 45px;
+
+  }
+
+
+  .footer-top__grid {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 40px;
+
+  }
+
+
+  .f-brand {
+
+    max-width: 100%;
+
+  }
+
+
+  .f-brand__tagline {
+
+    max-width: 500px;
+
+  }
+
+
+  .f-links {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 35px;
+
+  }
+
+
+  .f-newsletter {
+
+    grid-column: 1 / -1;
+
+  }
+
+
+  .footer-bottom__row {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+  }
+
+}
+
+
+/*=========================================
+  SMALL MOBILE
+=========================================*/
+
+@media (max-width: 520px) {
+
+  .footer-top {
+
+    padding: 45px 0 35px;
+
+  }
+
+
+  .f-links {
+
+    grid-template-columns: 1fr;
+
+    gap: 32px;
+
+  }
+
+
+  .f-newsletter {
+
+    grid-column: auto;
+
+  }
+
+
+  .newsletter-form {
+
+    flex-direction: column;
+
+    border: 0;
+
+    overflow: visible;
+
+    gap: 10px;
+
+    background: transparent;
+
+  }
+
+
+  input.newsletter-input {
+
+    width: 100%;
+
+    min-height: 44px;
+
+    border: 1px solid var(--line);
+
+    border-radius: 10px;
+
+    box-sizing: border-box;
+
+  }
+
+
+  .newsletter-btn {
+
+    min-height: 44px;
+
+    border-radius: 10px;
+
+    width: 100%;
+
+  }
+
+
+  .connect {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 8px;
+
+  }
+
+
+  .back-top {
+
+    right: 18px;
+
+    bottom: 18px;
+
+  }
+
+}
 
 /*=======================
 	 4. Home-Page-2
 ================================*/
 
 
-/*-----------------
-	4.1. Header
-------------------------*/
-.header_style2 {
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.3);
-  background:#fff;
-  transition-duration:0.3s;
-   -moz-transition-duration:0.3s;
-    -o-transition-duration:0.3s;
-     -webkit-transition-duration:0.3s;
-      -ms-transition-duration:0.3s;
+/*================
+	 2. Header
+===========================*/
+
+.default-header {
+  background: #fff none repeat scroll 0 0;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
+  padding: 30px 0;
+  transition-duration: 0.3s;
+  -moz-transition-duration: 0.3s;
+  -o-transition-duration: 0.3s;
+  -webkit-transition-duration: 0.3s;
+  -ms-transition-duration: 0.3s;
 }
-.header_style2 #navigation_bar {
+
+.nav-stacked.affix {
+  background: #f5f5f5 none repeat scroll 0 0;
+  top: 0;
+  width: 100%;
+  z-index: 11;
+  padding: 10px 0;
+}
+
+.logo {
+  float: left;
+}
+
+/* Logo size fix + subtle hover pop */
+.logo img {
+  max-height: 90px;
+  width: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.05);
+}
+
+.navbar-default .navbar-toggle:focus .icon-bar,
+.navbar-default .navbar-toggle:hover .icon-bar {
   background: #fff;
-  text-align:center;
 }
-.header_style2 .navbar-default .navbar-nav > li {
-	margin:0;
+
+.header_info {
+  float: right;
+  text-align: right;
+  margin-top: 30px;
 }
-.header_style2 .navbar-default .navbar-nav > li > a {
-  color: #111;
-  padding:30px 18px;
-}
-.header_style2 .user_login i {
-	font-size:24px;
-	color:#111;
-}
-.header_style2 .logo {
-  margin: 20px 0;
-}
-.header_style2 .user_login {
-  margin: 29px 10px 20px 0;
-}
-.header_style2 .login_btn {
-  margin: 28px 0;
-}
-.header_style2 .navbar-default .navbar-nav > li.dropdown > a::after {
-  right: 0;
-}
-.header_style2 .navbar-nav > li, .header_style2 .navbar-nav {
+
+.social-follow {
   display: inline-block;
-  float: none;
-}
-.header_style2 .navbar-default .navbar-nav > li.dropdown > a::after {
-  top: 34%;
-}
-
-@media (min-width:992px) {
-.header_style2 #navigation.collapse.navbar-collapse {
-  display: inline-block !important;
-  float: none;
-  width: auto !important;
-}
-.header_style2 {
-  padding:6px 0;
+  margin-left: 20px;
+  margin-top: 0;
+  vertical-align: middle;
 }
 
+.social-follow ul {
+  padding: 0px;
+  margin: 0px;
 }
 
-.header_style2.nav-stacked.affix {
-	padding:0px;
+.social-follow ul li {
+  display: inline-block;
+  vertical-align: middle;
+  list-style: none;
+  margin: 0px;
 }
 
+.social-follow ul li a {
+  display: block;
+  font-size: 25px;
+  color: #555;
+}
 
+.social-follow li i {
+  margin-right: 5px;
+}
 
+.login_btn {
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+/* Login/Register button - orange, matches footer accent */
+.login_btn a {
+  display: inline-block;
+  background: #ff5a36;
+  color: #fff;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s ease;
+  box-shadow: 0 8px 22px -6px rgba(255, 90, 54, .5);
+}
+
+.login_btn a:hover {
+  background: #e64a28;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -6px rgba(255, 90, 54, .65);
+}
+
+.circle_icon {
+  border: 1px solid #000;
+  border-radius: 50%;
+  color: #555;
+  float: left;
+  font-size: 17px;
+  height: 40px;
+  line-height: 35px;
+  margin-right: 10px;
+  text-align: center;
+  width: 40px;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.header_widgets:hover .circle_icon {
+  background: #ff5a36;
+  border-color: #ff5a36;
+  color: #fff;
+}
+
+.uppercase_text {
+  color: #111;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 17px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.header_widgets {
+  display: inline-block;
+  width: 260px;
+  text-align: left;
+}
+
+.header_widgets a {
+  color: #555;
+}
+
+.header_wrap {
+  float: right;
+}
+
+.header_search {
+  float: right;
+  padding: 16px 0;
+  position: relative;
+}
+
+#header-search-form::after {
+  border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) #ffffff;
+  border-style: solid;
+  border-width: 7px;
+  content: "";
+  position: absolute;
+  right: 9px;
+  top: -13px;
+  display: none;
+}
+
+.header_search input {
+  background: #ffffff none repeat scroll 0 0;
+  border: 0 none;
+  height: 38px;
+  padding-right: 45px;
+  width: 227px;
+  transition: box-shadow 0.3s ease;
+}
+
+.header_search input:focus {
+  box-shadow: 0 0 0 2px #ff5a36;
+  outline: none;
+}
+
+.header_search button {
+  background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+  border: 0 none;
+  color: #555555;
+  font-size: 14px;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+}
+
+#search_toggle {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  cursor: pointer;
+  display: none;
+  margin-top: 1px;
+  padding: 5px 10px;
+}
+
+.user_login {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  float: left;
+  margin: 18px 10px 17px 0;
+}
+
+.user_login ul {
+  padding: 0px;
+  margin: 0px;
+}
+
+.user_login ul li {
+  line-height: 17px;
+  list-style: outside none none;
+  margin: 0;
+  padding: 4px 15px 7px;
+}
+
+.user_login>ul>li a {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.user_login>ul>li a i {
+  margin: 0 2px 0;
+}
+
+.user_login ul.dropdown-menu {
+  background: #ffffff none repeat scroll 0 0;
+  border-radius: 0;
+  padding: 15px 0;
+  top: 107%;
+}
+
+/* Nav links - underline slide-in on hover, orange accent */
+.navbar-nav>li>a {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav>li>a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  width: 0%;
+  height: 2px;
+  background: #ff5a36;
+  transition: width 0.3s ease;
+}
+
+.navbar-nav>li>a:hover::after,
+.navbar-nav>li.active>a::after {
+  width: 100%;
+}
 /*--------------------
 	4.2. Banner
 ---------------------------*/
@@ -5592,3 +6799,165 @@ h5 {
 }
 
 
+/*=========================================
+  ABOUT US PAGE — Modern Override
+  (uses the --asphalt/--signal design tokens
+  already defined in :root above)
+=========================================*/
+
+/*-----------------------------------------
+  Hero / Page Header
+------------------------------------------*/
+.page-header {
+  position: relative;
+  background-blend-mode: normal;
+}
+
+.page-header .dark-overlay {
+  background: linear-gradient(180deg,
+      rgba(16, 17, 20, 0.55) 0%,
+      rgba(16, 17, 20, 0.85) 100%);
+}
+
+.page-header_wrap {
+  padding: 130px 0 90px;
+}
+
+.page-heading {
+  animation: fadeUp 0.7s ease forwards;
+}
+
+.page-heading h1,
+.page-heading h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* Small orange eyebrow line above the heading */
+.page-heading::before {
+  content: "ABOUT RENTO";
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--signal, #ff5a36);
+  margin-bottom: 14px;
+}
+
+/*-----------------------------------------
+  Breadcrumb — pill style instead of plain text
+------------------------------------------*/
+.coustom-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 22px;
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+.coustom-breadcrumb li {
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 4px;
+  opacity: 0.85;
+}
+
+.coustom-breadcrumb li:last-child {
+  opacity: 1;
+  color: var(--signal, #ff5a36);
+  font-weight: 700;
+}
+
+.coustom-breadcrumb a::after {
+  content: "\f105";
+  /* fa-angle-right */
+  margin-left: 10px;
+  opacity: 0.6;
+}
+
+/*-----------------------------------------
+  About-Us content section
+------------------------------------------*/
+.about_us.section-padding {
+  padding: 100px 0;
+  background: #fff;
+}
+
+.about_us .section-header {
+  max-width: 720px;
+  margin: 0 auto 45px;
+  padding-bottom: 0;
+}
+
+/* Orange eyebrow tag above the H2, matches the CTA/footer section-tag look */
+.about_us .section-header::before {
+  content: "WHO WE ARE";
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--signal, #ff5a36);
+  background: rgba(255, 90, 54, 0.08);
+  border: 1px solid rgba(255, 90, 54, 0.25);
+  padding: 6px 18px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.about_us .section-header h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 36px;
+  margin-bottom: 22px;
+}
+
+/* Body copy — card treatment instead of raw centered text */
+.about_us .section-header p {
+  position: relative;
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.85;
+  color: #5a5a5a;
+  background: #fafafa;
+  border-left: 3px solid var(--signal, #ff5a36);
+  border-radius: 0 var(--radius, 14px) var(--radius, 14px) 0;
+  padding: 28px 32px;
+  margin: 0 auto 22px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about_us .section-header p:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+.about_us .section-header p:first-of-type {
+  font-weight: 600;
+  color: #222;
+}
+
+@media (max-width: 767px) {
+  .page-header_wrap {
+    padding: 90px 0 55px;
+  }
+
+  .page-heading h1,
+  .page-heading h2 {
+    font-size: 32px;
+  }
+
+  .about_us .section-header h2 {
+    font-size: 26px;
+  }
+
+  .about_us .section-header p {
+    padding: 20px 22px;
+    font-size: 15px;
+  }
+}
