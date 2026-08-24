@@ -79,14 +79,14 @@ include('includes/config.php');
           <section class="page-header aboutus_page aboutus-hero">
             <div class="container">
               <div class="page-header_wrap">
-                <span class="aboutus-hero__kicker">EST. 2015 &mdash; KATHMANDU</span>
+                <span class="aboutus-hero__kicker">EST. 2022 &mdash; KATHMANDU</span>
                 <div class="page-heading">
                   <h1>
                     <?php echo htmlentities($result->PageName); ?>
                   </h1>
                 </div>
                 <ul class="coustom-breadcrumb">
-                  <li><a href="#">Home</a></li>
+                  <li><a href="./index.php">Home</a></li>
                   <li>
                     <?php echo htmlentities($result->PageName); ?>
                   </li>
