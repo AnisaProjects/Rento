@@ -4668,7 +4668,158 @@ table.info-tabel tr td {
   height: 420px;
 }
 
+/*=========================================
+  GENERIC CONTENT PAGE
+  Used by page.php for any type != aboutus
+  (faqs, contactus, terms, privacy, ...)
 
+  Reuses the --asphalt / --signal / --radius
+  design tokens already defined in :root
+  inside style.css — no duplication needed,
+  just load this file after style.css.
+=========================================*/
+
+.content-page {
+  background: #fafafa;
+  padding: 90px 0;
+}
+
+.content-page .container {
+  display: flex;
+  justify-content: center;
+}
+
+/*-----------------------------------------
+  Card
+------------------------------------------*/
+.content-page__card {
+  position: relative;
+  width: 100%;
+  max-width: 820px;
+  background: #fff;
+  border-radius: var(--radius, 14px);
+  border-left: 4px solid var(--signal, #ff5a36);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.07);
+  padding: 50px 48px 46px;
+  text-align: left;
+  animation: contentPageIn 0.5s ease forwards;
+}
+
+@keyframes contentPageIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*-----------------------------------------
+  Icon badge
+------------------------------------------*/
+.content-page__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 90, 54, 0.1);
+  color: var(--signal, #ff5a36);
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+/*-----------------------------------------
+  Eyebrow / type badge
+------------------------------------------*/
+.content-page__badge {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--signal, #ff5a36);
+  margin-bottom: 10px;
+}
+
+/*-----------------------------------------
+  Title
+------------------------------------------*/
+.content-page__title {
+  font-size: 30px;
+  line-height: 1.25;
+  color: #111;
+  margin-bottom: 26px;
+}
+
+/*-----------------------------------------
+  Body copy (raw admin-entered HTML)
+------------------------------------------*/
+.content-page__body {
+  font-size: 16px;
+  line-height: 1.85;
+  color: #5a5a5a;
+}
+
+.content-page__body p {
+  margin: 0 0 16px;
+}
+
+.content-page__body p:last-child {
+  margin-bottom: 0;
+}
+
+.content-page__body ul,
+.content-page__body ol {
+  margin: 0 0 16px 20px;
+}
+
+.content-page__body a {
+  color: var(--signal, #ff5a36);
+  text-decoration: underline;
+}
+
+/*-----------------------------------------
+  Empty state (no row found in tblpages)
+------------------------------------------*/
+.content-page__card--empty {
+  text-align: center;
+  border-left-color: #ddd;
+  color: #9a9a9a;
+  padding: 60px 40px;
+}
+
+.content-page__card--empty i {
+  display: block;
+  font-size: 40px;
+  margin-bottom: 16px;
+  color: #cfcfcf;
+}
+
+.content-page__card--empty p {
+  font-size: 15px;
+  margin: 0;
+}
+
+/*-----------------------------------------
+  Responsive
+------------------------------------------*/
+@media (max-width: 767px) {
+  .content-page {
+    padding: 55px 0;
+  }
+
+  .content-page__card {
+    padding: 34px 24px 32px;
+  }
+
+  .content-page__title {
+    font-size: 24px;
+  }
+}
 
 /*=================
 	11. FAQ-Page
