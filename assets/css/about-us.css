@@ -1,0 +1,482 @@
+/*=========================================
+  ABOUT US — "The Route So Far"
+  Scoped to about2-* classes / .aboutus-hero
+  so nothing here leaks onto other pages.
+=========================================*/
+
+:root {
+    --a2-paper: #F6F3EC;
+    --a2-paper-2: #EDE7D8;
+    --a2-ink: #201D1A;
+    --a2-rust: #C1440E;
+    --a2-rust-dim: #A23A0C;
+    --a2-moss: #45503A;
+    --a2-moss-2: #38412F;
+    --a2-line: #DCD4C0;
+    --a2-radius: 4px;
+}
+
+/*-----------------------------------------
+  IMPORTANT: kills the leftover
+  ".page-heading::before { content: 'ABOUT RENTO' }"
+  rule from the old style.css, which was
+  injecting that label onto EVERY page that
+  uses .page-heading, not just this one.
+  This is a safety net — the real fix is to
+  delete that rule from style.css (see notes).
+------------------------------------------*/
+.page-heading::before {
+    content: none !important;
+}
+
+.about2-eyebrow {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: var(--a2-rust);
+    margin-bottom: 14px;
+}
+
+.about2-eyebrow--light {
+    color: #E9C9A6;
+}
+
+/*-----------------------------------------
+  Scroll-reveal (used by assets/js/about-us.js)
+------------------------------------------*/
+.reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* Stagger children inside the route/checklist lists a little */
+.about2-route li.reveal,
+.about2-checklist li.reveal {
+    transition-delay: calc(var(--reveal-index, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        transition: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/*-----------------------------------------
+  Hero overrides (scoped to this page only)
+------------------------------------------*/
+.aboutus-hero .dark-overlay {
+    background: linear-gradient(180deg, rgba(32, 29, 26, 0.35) 0%, rgba(32, 29, 26, 0.82) 100%);
+}
+
+.aboutus-hero__kicker {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: #E9C9A6;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
+}
+
+.aboutus-hero .page-heading h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+}
+
+.aboutus-hero .coustom-breadcrumb {
+    background: rgba(246, 243, 236, 0.12);
+    border-color: rgba(246, 243, 236, 0.25);
+}
+
+.aboutus-hero .coustom-breadcrumb li:last-child {
+    color: var(--a2-rust);
+}
+
+/*-----------------------------------------
+  1. Intro
+------------------------------------------*/
+.about2-intro {
+    background: var(--a2-paper);
+    padding: 90px 0 60px;
+}
+
+.about2-intro__grid {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+.about2-intro__headline {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 36px;
+    line-height: 1.22;
+    color: var(--a2-ink);
+    margin: 0;
+}
+
+.about2-intro__body p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #4a453f;
+    margin-bottom: 14px;
+}
+
+.about2-intro__body p:first-child {
+    font-size: 17.5px;
+    color: var(--a2-ink);
+}
+
+/*-----------------------------------------
+  2. Mission & Vision — short, side by side
+------------------------------------------*/
+.about2-mv {
+    background: var(--a2-paper);
+    padding: 10px 0 70px;
+}
+
+.about2-mv__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.about2-mv__card {
+    background: #fff;
+    border: 1px solid var(--a2-line);
+    border-radius: var(--a2-radius);
+    padding: 32px 34px;
+}
+
+.about2-mv__card--dark {
+    background: var(--a2-moss-2);
+    border-color: var(--a2-moss-2);
+}
+
+.about2-mv__card p {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--a2-ink);
+    margin: 0;
+}
+
+.about2-mv__card--dark p {
+    color: var(--a2-paper);
+}
+
+/*-----------------------------------------
+  3. Single stat / odometer counter
+------------------------------------------*/
+.about2-stat {
+    background: var(--a2-ink);
+    padding: 46px 0;
+}
+
+.about2-stat__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.about2-stat__count {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--a2-paper);
+}
+
+.about2-counter__suffix {
+    color: var(--a2-rust);
+}
+
+.about2-stat__row p {
+    font-size: 14px;
+    color: #B9B2A3;
+    margin: 0;
+}
+
+/*-----------------------------------------
+  Dashed road divider between sections
+------------------------------------------*/
+.about2-hr {
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--a2-rust) 0 22px, transparent 22px 46px);
+    opacity: 0.5;
+}
+
+/*-----------------------------------------
+  4. Journey / milestone route
+------------------------------------------*/
+.about2-journey {
+    background: var(--a2-paper);
+    padding: 80px 0 90px;
+}
+
+.about2-journey__head {
+    max-width: 480px;
+    margin-bottom: 50px;
+}
+
+.about2-journey__head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0;
+    color: var(--a2-ink);
+}
+
+.about2-route {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.about2-route::before {
+    content: "";
+    position: absolute;
+    left: 74px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: repeating-linear-gradient(180deg, var(--a2-rust) 0 10px, transparent 10px 20px);
+    opacity: 0.55;
+}
+
+.about2-route li {
+    display: grid;
+    grid-template-columns: 74px 1fr;
+    gap: 30px;
+    padding: 0 0 42px;
+    position: relative;
+}
+
+.about2-route li:last-child {
+    padding-bottom: 0;
+}
+
+.about2-route__year {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--a2-rust);
+    text-align: right;
+    padding-top: 4px;
+}
+
+.about2-route__stop {
+    position: relative;
+    padding-left: 26px;
+}
+
+.about2-route__stop::before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: 8px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--a2-paper);
+    border: 2px solid var(--a2-rust);
+}
+
+.about2-route__stop h5 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    margin: 0 0 6px;
+    color: var(--a2-ink);
+}
+
+.about2-route__stop p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #6a655b;
+    margin: 0;
+    max-width: 480px;
+}
+
+/*-----------------------------------------
+  5. Manifest / standards checklist (dark)
+------------------------------------------*/
+.about2-manifest {
+    background: var(--a2-moss-2);
+    padding: 80px 0;
+    color: var(--a2-paper);
+}
+
+.about2-manifest__head {
+    max-width: 480px;
+    margin-bottom: 44px;
+}
+
+.about2-manifest__head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0;
+    color: var(--a2-paper);
+}
+
+.about2-checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 60px;
+}
+
+.about2-checklist li {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 16px;
+    padding: 24px 0;
+    border-top: 1px solid rgba(246, 243, 236, 0.14);
+}
+
+.about2-checklist__num {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: #E9C9A6;
+    padding-top: 3px;
+}
+
+.about2-checklist h5 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    color: var(--a2-paper);
+}
+
+.about2-checklist p {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: #B9C0AC;
+    margin: 0;
+}
+
+/*-----------------------------------------
+  6. CTA
+------------------------------------------*/
+.about2-cta {
+    background: var(--a2-rust);
+    padding: 70px 0;
+}
+
+.about2-cta__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.about2-cta h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 32px;
+    color: var(--a2-paper);
+    margin: 0 0 8px;
+    max-width: 480px;
+}
+
+.about2-cta p {
+    color: rgba(246, 243, 236, 0.85);
+    font-size: 15px;
+    margin: 0;
+    max-width: 420px;
+}
+
+.about2-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--a2-ink);
+    color: var(--a2-paper);
+    font-weight: 600;
+    font-size: 15px;
+    padding: 17px 30px;
+    border-radius: var(--a2-radius);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.about2-btn:hover {
+    background: #000;
+    color: var(--a2-paper);
+    transform: translateY(-2px);
+}
+
+/*-----------------------------------------
+  Responsive
+------------------------------------------*/
+@media (max-width: 991px) {
+    .about2-intro__grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .about2-mv__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .about2-checklist {
+        grid-template-columns: 1fr;
+    }
+
+    .about2-route::before {
+        left: 54px;
+    }
+
+    .about2-route li {
+        grid-template-columns: 54px 1fr;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .about2-intro__headline {
+        font-size: 28px;
+    }
+
+    .about2-stat__count {
+        font-size: 42px;
+    }
+
+    .about2-cta__inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .about2-route::before {
+        left: 5px;
+    }
+
+    .about2-route li {
+        grid-template-columns: 20px 1fr;
+        gap: 14px;
+    }
+
+    .about2-route__year {
+        display: none;
+    }
+}
