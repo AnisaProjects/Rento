@@ -2133,6 +2133,18 @@ input.newsletter-input {
   /* headlight amber — secondary accent  */
   --radius: 14px;
 }
+/*-----------------------------------------
+  Primary button override — matches the
+  orange/signal theme (was red #fa2837).
+------------------------------------------*/
+.btn {
+  background: var(--signal);
+}
+
+.btn:hover,
+.btn:focus {
+  background-color: var(--signal-2);
+}
 
 /* Optional: import the type pairing used in the redesign.
    Add this to your <head>, or via @import here. */
