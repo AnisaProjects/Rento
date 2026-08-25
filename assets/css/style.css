@@ -4804,6 +4804,347 @@ table.info-tabel tr td {
   margin: 0;
 }
 
+/*=========================================
+  CAR LISTING PAGE — Modern Grid
+  Uses the --asphalt/--signal/--radius design
+  tokens already defined in :root in style.css.
+  Append this block to the end of style.css.
+=========================================*/
+
+.listing-page--modern {
+  padding: 70px 0;
+  background: #fafafa;
+}
+
+/*-----------------------------------------
+  Toolbar (listing count)
+------------------------------------------*/
+.listing-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: var(--radius, 14px);
+  padding: 16px 22px;
+  margin-bottom: 26px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.listing-toolbar__count {
+  margin: 0;
+  font-size: 15px;
+  color: #777;
+}
+
+.listing-toolbar__count span {
+  color: #111;
+  font-weight: 800;
+}
+
+/*-----------------------------------------
+  Listing grid + card
+------------------------------------------*/
+.listing-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.listing-card {
+  display: flex;
+  background: #fff;
+  border-radius: var(--radius, 14px);
+  overflow: hidden;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.listing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
+}
+
+.listing-card__img {
+  flex: 0 0 320px;
+  display: block;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f4f4f4 0%, #e8e8e8 100%);
+}
+
+.listing-card__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+  min-height: 220px;
+}
+
+.listing-card:hover .listing-card__img img {
+  transform: scale(1.06);
+}
+
+.listing-card__body {
+  flex: 1;
+  padding: 26px 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+.listing-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.listing-card__brand {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--signal, #ff5a36);
+  margin-bottom: 6px;
+}
+
+.listing-card__title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.listing-card__title a {
+  color: #111;
+  transition: color 0.25s ease;
+}
+
+.listing-card:hover .listing-card__title a {
+  color: var(--signal, #ff5a36);
+}
+
+.listing-card__price {
+  flex-shrink: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--signal, #ff5a36);
+  white-space: nowrap;
+}
+
+.listing-card__price small {
+  font-size: 12px;
+  font-weight: 400;
+  color: #999;
+  margin-left: 2px;
+}
+
+.listing-card__desc {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: #8b8b8b;
+}
+
+.listing-card__stats {
+  display: flex;
+  gap: 22px;
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid #eee;
+}
+
+.listing-card__stats li {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.listing-card__stats li .fa {
+  margin-right: 6px;
+  color: var(--signal, #ff5a36);
+}
+
+.listing-card__btn {
+  margin-top: auto;
+  align-self: flex-start;
+  padding-top: 18px;
+  padding-bottom: 0;
+}
+
+.listing-card__btn {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 26px;
+}
+
+/*-----------------------------------------
+  Sidebar widgets — shared shell
+------------------------------------------*/
+.filter-widget,
+.recent-widget {
+  background: #fff;
+  border-radius: var(--radius, 14px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  padding: 26px 24px;
+  margin-bottom: 26px;
+}
+
+.filter-widget__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.filter-widget__head h5 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.filter-widget__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 90, 54, 0.1);
+  color: var(--signal, #ff5a36);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.filter-widget__form .form-group {
+  margin-bottom: 16px;
+}
+
+.filter-widget__form .form-control {
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.filter-widget__form .btn.btn-block {
+  border-radius: 8px;
+}
+
+/*-----------------------------------------
+  Recently listed cars widget
+------------------------------------------*/
+.recent-widget__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recent-widget__list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  margin: 0;
+}
+
+.recent-widget__list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.recent-widget__list li:first-child {
+  padding-top: 0;
+}
+
+.recent-widget__img {
+  flex: 0 0 68px;
+  width: 68px;
+  height: 54px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: block;
+  background: #f4f4f4;
+}
+
+.recent-widget__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.recent-widget__list li:hover .recent-widget__img img {
+  transform: scale(1.1);
+}
+
+.recent-widget__info a {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.35;
+}
+
+.recent-widget__info a:hover {
+  color: var(--signal, #ff5a36);
+}
+
+.recent-widget__brand {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--signal, #ff5a36);
+  margin-bottom: 2px;
+}
+
+.recent-widget__price {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: #999;
+}
+
+.recent-widget__price small {
+  font-size: 11px;
+}
+
+/*-----------------------------------------
+  Responsive
+------------------------------------------*/
+@media (max-width: 991px) {
+  .listing-card {
+    flex-direction: column;
+  }
+
+  .listing-card__img {
+    flex: none;
+    width: 100%;
+    height: 220px;
+  }
+}
+
+@media (max-width: 767px) {
+  .listing-page--modern {
+    padding: 45px 0;
+  }
+
+  .listing-card__body {
+    padding: 20px;
+  }
+
+  .listing-card__top {
+    flex-direction: column;
+  }
+
+  .listing-card__price {
+    font-size: 19px;
+  }
+
+  .filter-widget,
+  .recent-widget {
+    padding: 20px;
+  }
+}
 /*-----------------------------------------
   Responsive
 ------------------------------------------*/
