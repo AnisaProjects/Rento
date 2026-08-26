@@ -37,7 +37,7 @@
                   data-dismiss="modal">Login / Register</a> </div>
             <?php } else {
 
-              echo "Welcome To Nine Nepal Car rental ";
+              echo "WELCOME TO RENTO";
             } ?>
           </div>
         </div>

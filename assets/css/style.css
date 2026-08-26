@@ -976,7 +976,120 @@ table thead td {
   margin-top: 1px;
   padding: 5px 10px;
 }
+/* .user_login {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  float: left;
+  margin: 18px 10px 17px 0;
+}
 
+.user_login ul {
+  padding: 0px;
+  margin: 0px;
+}
+
+.user_login ul li {
+  line-height: 17px;
+  list-style: outside none none;
+  margin: 0;
+  padding: 4px 15px 7px;
+}
+
+.user_login>ul>li a {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.user_login>ul>li a i {
+  margin: 0 2px 0;
+}
+
+.user_login ul.dropdown-menu {
+  background: #ffffff none repeat scroll 0 0;
+  border-radius: 0;
+  padding: 8px 0;
+  top: 107%;
+}
+
+.user_login .dropdown-menu {
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Reset the inherited <li> padding just inside the dropdown,
+   so every row's spacing comes only from the <a> below */
+.user_login .dropdown-menu>li {
+  padding: 0;
+  margin: 0;
+}
+
+.user_login .dropdown-menu>li>a {
+  display: block;
+  color: #111;
+  font-weight: 400;
+  text-transform: none;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 11px 20px;
+  white-space: nowrap;
+}
+
+.user_login .dropdown-menu>li>a:hover {
+  background: #f5f5f5;
+  color: #ff5a36;
+}
+
+.user_login .dropdown-menu>li:not(:last-child)>a {
+  border-bottom: 1px solid #f0f0f0;
+}
+/* .user_login {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  float: left;
+  margin: 18px 10px 17px 0;
+}
+
+.user_login ul {
+  padding: 0px;
+  margin: 0px;
+}
+
+.user_login ul li {
+  line-height: 17px;
+  list-style: outside none none;
+  margin: 0;
+  padding: 4px 15px 7px;
+}
+
+.user_login>ul>li a {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.user_login>ul>li a i {
+  margin: 0 2px 0;
+}
+
+.user_login ul.dropdown-menu {
+  background: #ffffff none repeat scroll 0 0;
+  border-radius: 0;
+  padding: 15px 0;
+  top: 107%;
+}
+.user_login .dropdown-menu>li>a {
+  color: #111;
+  font-weight: 400;
+  text-transform: none;
+} */
+
+/* .user_login .dropdown-menu {
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+} */ */
 .user_login {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 3px;
@@ -1014,6 +1127,35 @@ table thead td {
   top: 107%;
 }
 
+.user_login .dropdown-menu {
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.user_login .dropdown-menu>li {
+  padding: 0;
+  margin: 0;
+}
+
+.user_login .dropdown-menu>li>a {
+  display: block;
+  color: #111;
+  font-weight: 400;
+  text-transform: none;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 11px 20px;
+  white-space: nowrap;
+}
+
+.user_login .dropdown-menu>li>a:hover {
+  background: #f5f5f5;
+  color: #ff5a36;
+}
+
+.user_login .dropdown-menu>li:not(:last-child)>a {
+  border-bottom: 1px solid #f0f0f0;
+}
 /* Nav links - underline slide-in on hover */
 .navbar-nav>li>a {
   position: relative;
@@ -1037,7 +1179,40 @@ table thead td {
 }
 
 
+/* --- Fix: gap between ANISHA toggle & search box, and dropdown positioning
+   for ALL screen sizes (not just the 992-1200px media query) --- */
 
+.header_wrap {
+  display: flex;
+  align-items: center;
+}
+
+.user_login {
+  margin: 18px 40px 17px 0;
+  /* 24px bata 40px banayeko — gap thap badyo */
+}
+
+.header_search {
+  margin-left: 4px;
+}
+
+.user_login .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: auto;
+  margin-top: 6px;
+  /* small gap below the toggle */
+  min-width: 190px;
+  z-index: 1000;
+}
+
+.user_login.open .dropdown-menu,
+.user_login li.dropdown.open .dropdown-menu,
+.user_login li.dropdown:hover .dropdown-menu {
+  display: block;
+}
 
 
 /*----------------------------------
