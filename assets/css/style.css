@@ -976,50 +976,7 @@ table thead td {
   margin-top: 1px;
   padding: 5px 10px;
 }
-/* .user_login {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-  float: left;
-  margin: 18px 10px 17px 0;
-}
 
-.user_login ul {
-  padding: 0px;
-  margin: 0px;
-}
-
-.user_login ul li {
-  line-height: 17px;
-  list-style: outside none none;
-  margin: 0;
-  padding: 4px 15px 7px;
-}
-
-.user_login>ul>li a {
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.user_login>ul>li a i {
-  margin: 0 2px 0;
-}
-
-.user_login ul.dropdown-menu {
-  background: #ffffff none repeat scroll 0 0;
-  border-radius: 0;
-  padding: 8px 0;
-  top: 107%;
-}
-
-.user_login .dropdown-menu {
-  min-width: 200px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-/* Reset the inherited <li> padding just inside the dropdown,
-   so every row's spacing comes only from the <a> below */
 .user_login .dropdown-menu>li {
   padding: 0;
   margin: 0;
@@ -1044,52 +1001,7 @@ table thead td {
 .user_login .dropdown-menu>li:not(:last-child)>a {
   border-bottom: 1px solid #f0f0f0;
 }
-/* .user_login {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-  float: left;
-  margin: 18px 10px 17px 0;
-}
 
-.user_login ul {
-  padding: 0px;
-  margin: 0px;
-}
-
-.user_login ul li {
-  line-height: 17px;
-  list-style: outside none none;
-  margin: 0;
-  padding: 4px 15px 7px;
-}
-
-.user_login>ul>li a {
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.user_login>ul>li a i {
-  margin: 0 2px 0;
-}
-
-.user_login ul.dropdown-menu {
-  background: #ffffff none repeat scroll 0 0;
-  border-radius: 0;
-  padding: 15px 0;
-  top: 107%;
-}
-.user_login .dropdown-menu>li>a {
-  color: #111;
-  font-weight: 400;
-  text-transform: none;
-} */
-
-/* .user_login .dropdown-menu {
-  min-width: 200px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-} */ */
 .user_login {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 3px;
