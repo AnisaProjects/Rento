@@ -21,6 +21,8 @@ $pageIcon = isset($pageIcons[$pagetype]) ? $pageIcons[$pagetype] : 'fa-info-circ
 <html lang="en">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Car Rental Portal | Page details</title>
   <!--Bootstrap -->
@@ -36,7 +38,6 @@ $pageIcon = isset($pageIcons[$pagetype]) ? $pageIcons[$pagetype] : 'fa-info-circ
       rel="stylesheet">
   <?php } else { ?>
     <!-- Modular styling for every other content page: faqs, contact-us, terms, privacy, etc. -->
-    <link rel="stylesheet" href="assets/css/content-page.css" type="text/css">
   <?php } ?>
 
   <!--OWL Carousel slider-->
@@ -244,7 +245,6 @@ $pageIcon = isset($pageIcons[$pagetype]) ? $pageIcons[$pagetype] : 'fa-info-circ
   <script src="assets/js/owl.carousel.min.js"></script>
 
   <?php if ($isAboutUs) { ?>
-    <script src="assets/js/site-interactions.js"></script>
     <script src="assets/js/about-us.js"></script>
   <?php } ?>
 
