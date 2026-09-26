@@ -27,6 +27,8 @@ if (isset($_POST['send'])) {
 <html lang="en">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Car Rental|| Contact Us Page</title>
   <!--Bootstrap -->

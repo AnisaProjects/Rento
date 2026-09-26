@@ -19,6 +19,8 @@ if(isset($_POST['getRecommendations'])) {
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Car Rental Portal | AI Car Recommendations</title>
 <!--Bootstrap -->
 <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css">

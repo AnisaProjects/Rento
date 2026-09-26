@@ -7,6 +7,8 @@ error_reporting(0);
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Car Rental Portal | Car Listing</title>
 <!--Bootstrap -->
