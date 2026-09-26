@@ -236,11 +236,7 @@ if(isset($_POST['getRecommendations'])) {
         <div class="row">
           <?php 
           $recommendationEngine = new CarRecommendationEngine($dbh);
-          $userPreferences = [];
-          if($userEmail) {
-              $pastRentals = $recommendationEngine->getUserPastRentals($userEmail);
-              $userPreferences = $recommendationEngine->calculateUserPreferences($pastRentals);
-          }
+          $userPreferences = $recommendationEngine->getUserPreferences($userEmail);
           
           foreach($recommendations as $index => $car): 
               $explanations = $recommendationEngine->getRecommendationExplanation($car, $userPreferences);

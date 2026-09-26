@@ -37,14 +37,34 @@ class CarRecommendationEngine {
     }
     
     /**
+     * Preferences learned from a user's confirmed rentals (empty values for guests)
+     */
+    public function getUserPreferences($userEmail) {
+        return $this->calculateUserPreferences($this->getUserPastRentals($userEmail));
+    }
+    
+    /**
+     * Preference values used when there is no rental history
+     */
+    private function emptyPreferences() {
+        return [
+            'avgPrice' => 0,
+            'preferredBrands' => [],
+            'preferredFeatures' => [],
+            'avgSeating' => 0
+        ];
+    }
+    
+    /**
      * Get user's past rental history
      */
     private function getUserPastRentals($userEmail) {
         if (!$userEmail) return [];
         
-        $sql = "SELECT v.*, b.FromDate, b.ToDate 
+        $sql = "SELECT v.*, br.BrandName, b.FromDate, b.ToDate 
                 FROM tblbooking b 
                 JOIN tblvehicles v ON b.VehicleId = v.id 
+                LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand 
                 WHERE b.userEmail = :email AND b.Status = 1
                 ORDER BY b.PostingDate DESC";
         
@@ -184,12 +204,7 @@ class CarRecommendationEngine {
      * Calculate user preferences from past rentals
      */
     private function calculateUserPreferences($pastRentals) {
-        $preferences = [
-            'avgPrice' => 0,
-            'preferredBrands' => [],
-            'preferredFeatures' => [],
-            'avgSeating' => 0
-        ];
+        $preferences = $this->emptyPreferences();
         
         $totalPrice = 0;
         $totalSeating = 0;
@@ -318,6 +333,7 @@ class CarRecommendationEngine {
      * Get recommendation explanation
      */
     public function getRecommendationExplanation($car, $userPreferences) {
+        $userPreferences = array_merge($this->emptyPreferences(), $userPreferences ?: []);
         $explanations = [];
         
         if ($userPreferences['avgPrice'] > 0) {
