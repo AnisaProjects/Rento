@@ -125,7 +125,7 @@ if(isset($_POST['getRecommendations'])) {
         <h1>AI Car Recommendations</h1>
       </div>
       <ul class="coustom-breadcrumb">
-        <li><a href="index.php">Home</a></li>
+        <li><a href="./">Home</a></li>
         <li>AI Recommendations</li>
       </ul>
     </div>
@@ -273,11 +273,11 @@ if(isset($_POST['getRecommendations'])) {
               <?php endif; ?>
               
               <div class="text-center mt-3">
-                <a href="vehical-details.php?vhid=<?php echo htmlentities($car->id); ?>" 
+                <a href="<?php echo htmlentities(vehicle_url($car->id, $car->BrandName ?? '', $car->VehiclesTitle ?? '')); ?>" 
                    class="btn btn-primary btn-sm">
                   <i class="fa fa-eye"></i> View Details
                 </a>
-                <a href="vehical-details.php?vhid=<?php echo htmlentities($car->id); ?>" 
+                <a href="<?php echo htmlentities(vehicle_url($car->id, $car->BrandName ?? '', $car->VehiclesTitle ?? '')); ?>" 
                    class="btn btn-outline-primary btn-sm ms-2">
                   <i class="fa fa-calendar"></i> Book Now
                 </a>
@@ -294,7 +294,7 @@ if(isset($_POST['getRecommendations'])) {
           <i class="fa fa-magnifying-glass"></i>
           <h4>No cars found matching your criteria</h4>
           <p>Try adjusting your budget or car type preferences to get better recommendations.</p>
-          <a href="car-recommendation.php" class="btn btn-primary">
+          <a href="car-recommendation" class="btn btn-primary">
             <i class="fa fa-rotate"></i> Try Again
           </a>
         </div>

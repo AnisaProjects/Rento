@@ -4,12 +4,24 @@ include('includes/config.php');
 require_once('includes/dynamic_pricing.php');
 
 // Unknown or missing vehicle id: show the "page not found" page.
-$vehicleCheck = $dbh->prepare("SELECT id FROM tblvehicles WHERE id = :vhid");
+$vehicleCheck = $dbh->prepare("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblbrands.BrandName FROM tblvehicles LEFT JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE tblvehicles.id = :vhid");
 $vehicleCheck->bindValue(':vhid', intval($_GET['vhid'] ?? 0), PDO::PARAM_INT);
 $vehicleCheck->execute();
-if (!$vehicleCheck->fetch()) {
+$checkedVehicle = $vehicleCheck->fetch(PDO::FETCH_OBJ);
+if (!$checkedVehicle) {
   require __DIR__ . '/404.php';
   exit;
+}
+
+// Every car has one address, car/<brand-model>-<id>. Old links (vehical-details.php?vhid=)
+// and outdated names redirect to it permanently.
+if (in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) {
+  $canonicalPath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/'
+    . vehicle_url($checkedVehicle->id, $checkedVehicle->BrandName, $checkedVehicle->VehiclesTitle);
+  if (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== $canonicalPath) {
+    header('Location: ' . $canonicalPath, true, 301);
+    exit;
+  }
 }
 $requestedFromDate = isset($_POST['fromdate']) && $_POST['fromdate'] != '' ? $_POST['fromdate'] : date('Y-m-d', strtotime('+1 day'));
 $requestedToDate = isset($_POST['todate']) && $_POST['todate'] != '' ? $_POST['todate'] : date('Y-m-d', strtotime('+2 day'));
@@ -61,14 +73,14 @@ if (isset($_POST['submit'])) {
       $lastInsertId = $dbh->lastInsertId();
       if ($lastInsertId) {
         echo "<script>alert('Booking successfull.');</script>";
-        echo "<script type='text/javascript'> document.location = 'my-booking.php'; </script>";
+        echo "<script type='text/javascript'> document.location = 'my-booking'; </script>";
       } else {
         echo "<script>alert('Something went wrong. Please try again');</script>";
-        echo "<script type='text/javascript'> document.location = 'car-listing.php'; </script>";
+        echo "<script type='text/javascript'> document.location = 'car-listing'; </script>";
       }
     } else {
       echo "<script>alert('Car already booked for these days');</script>";
-      echo "<script type='text/javascript'> document.location = 'car-listing.php'; </script>";
+      echo "<script type='text/javascript'> document.location = 'car-listing'; </script>";
     }
   }
 
@@ -414,7 +426,7 @@ if (isset($_POST['submit'])) {
               <div class="col-list-3">
                 <div class="recent-car-list">
                   <div class="car-info-box">
-                    <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>" class="car-img-wrap">
+                    <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>" class="car-img-wrap">
                       <?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '(min-width: 992px) 360px, (min-width: 576px) 50vw, 100vw']); ?>
                     </a>
                     <ul class="car-stats">
@@ -427,7 +439,7 @@ if (isset($_POST['submit'])) {
                   </div>
                   <div class="car-body">
                     <div class="car-title-m">
-                      <h6><a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>">
+                      <h6><a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>">
                           <?php echo htmlentities($result->BrandName); ?> ,
                           <?php echo htmlentities($result->VehiclesTitle); ?></a></h6>
                       <span class="price"><?php echo format_price($result->PricePerDay); ?><small>/Day</small></span>

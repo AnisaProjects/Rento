@@ -29,7 +29,7 @@ include('includes/config.php');
           <h1>Car Listing</h1>
         </div>
         <ul class="coustom-breadcrumb">
-          <li><a href="index.php">Home</a></li>
+          <li><a href="./">Home</a></li>
           <li>Car Listing</li>
         </ul>
       </div>
@@ -71,7 +71,7 @@ include('includes/config.php');
                   : null;
                 ?>
                 <div class="listing-card">
-                  <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>" class="listing-card__img">
+                  <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>" class="listing-card__img">
                     <?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '(min-width: 992px) 300px, (min-width: 768px) 40vw, 100vw']); ?>
                   </a>
                   <div class="listing-card__body">
@@ -80,7 +80,7 @@ include('includes/config.php');
                         <span class="listing-card__brand"><?php echo htmlentities($result->BrandName); ?></span>
                         <h5 class="listing-card__title">
                           <a
-                            href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>"><?php echo htmlentities($result->VehiclesTitle); ?></a>
+                            href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>"><?php echo htmlentities($result->VehiclesTitle); ?></a>
                         </h5>
                       </div>
                       <div class="listing-card__price">
@@ -100,7 +100,7 @@ include('includes/config.php');
                       <li><i class="fa fa-car" aria-hidden="true"></i><?php echo htmlentities($result->FuelType); ?></li>
                     </ul>
 
-                    <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>"
+                    <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>"
                       class="btn listing-card__btn">
                       View Details <span class="angle_arrow"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
                     </a>
@@ -120,7 +120,7 @@ include('includes/config.php');
               <span class="filter-widget__icon"><i class="fa fa-filter" aria-hidden="true"></i></span>
               <h5>Find Your Car</h5>
             </div>
-            <form class="filter-widget__form" action="search-brandresult.php" method="post">
+            <form class="filter-widget__form" action="search-brandresult" method="post">
 <?php echo csrf_field(); ?>
               <div class="form-group select">
                 <select class="form-control" name="brand" required>
@@ -170,11 +170,11 @@ include('includes/config.php');
               if ($query->rowCount() > 0) {
                 foreach ($results as $result) { ?>
                   <li>
-                    <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>" class="recent-widget__img">
+                    <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>" class="recent-widget__img">
                       <?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '120px']); ?>
                     </a>
                     <div class="recent-widget__info">
-                      <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>">
+                      <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>">
                         <span class="recent-widget__brand"><?php echo htmlentities($result->BrandName); ?></span>
                         <?php echo htmlentities($result->VehiclesTitle); ?>
                       </a>

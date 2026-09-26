@@ -76,14 +76,14 @@ foreach($results as $result)
           <div class="product-listing-img"><?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['class' => 'img-fluid', 'sizes' => '(min-width: 992px) 300px, (min-width: 768px) 40vw, 100vw']); ?> </a> 
           </div>
           <div class="product-listing-content">
-            <h5><a href="vehical-details.php?vhid=<?php echo htmlentities($result->id);?>"><?php echo htmlentities($result->BrandName);?> , <?php echo htmlentities($result->VehiclesTitle);?></a></h5>
+            <h5><a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>"><?php echo htmlentities($result->BrandName);?> , <?php echo htmlentities($result->VehiclesTitle);?></a></h5>
             <p class="list-price"><?php echo format_price_per_day($result->PricePerDay); ?></p>
             <ul>
               <li><i class="fa fa-user" aria-hidden="true"></i><?php echo htmlentities($result->SeatingCapacity);?> seats</li>
               <li><i class="fa fa-calendar" aria-hidden="true"></i><?php echo htmlentities($result->ModelYear);?> model</li>
               <li><i class="fa fa-car" aria-hidden="true"></i><?php echo htmlentities($result->FuelType);?></li>
             </ul>
-            <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id);?>" class="btn">View Details <span class="angle_arrow"><i class="fa fa-angle-right" aria-hidden="true"></i></span></a>
+            <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>" class="btn">View Details <span class="angle_arrow"><i class="fa fa-angle-right" aria-hidden="true"></i></span></a>
           </div>
         </div>
       <?php }} ?>
@@ -148,8 +148,8 @@ foreach($results as $result)
 {  ?>
 
               <li class="gray-bg">
-                <div class="recent_post_img"> <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id);?>"><?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '120px']); ?></a> </div>
-                <div class="recent_post_title"> <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id);?>"><?php echo htmlentities($result->BrandName);?> , <?php echo htmlentities($result->VehiclesTitle);?></a>
+                <div class="recent_post_img"> <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>"><?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '120px']); ?></a> </div>
+                <div class="recent_post_title"> <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>"><?php echo htmlentities($result->BrandName);?> , <?php echo htmlentities($result->VehiclesTitle);?></a>
                   <p class="widget_price"><?php echo format_price_per_day($result->PricePerDay); ?></p>
                 </div>
               </li>

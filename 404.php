@@ -5,15 +5,11 @@ require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/config.php';
 http_response_code(404);
 
-// For ErrorDocument requests the browser's URL is the missing one (maybe in a
-// sub-folder), so resolve every relative link from the site root.
-$siteBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
 
 <head>
-  <base href="<?php echo htmlentities($siteBase); ?>">
   <?php
   $pageTitle = 'Page Not Found';
   $pageDescription = 'The page you were looking for could not be found. Browse the Rento fleet or search for a car.';
@@ -35,7 +31,7 @@ $siteBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/')
           <h1>Page Not Found</h1>
         </div>
         <ul class="coustom-breadcrumb">
-          <li><a href="index.php">Home</a></li>
+          <li><a href="./">Home</a></li>
           <li>404</li>
         </ul>
       </div>
@@ -55,7 +51,7 @@ $siteBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/')
           <p>The page you were looking for doesn't exist, or the car is no longer listed. Try a search, or pick a car
             from the listing.</p>
 
-          <form class="notfound__search" action="search.php" method="post" role="search">
+          <form class="notfound__search" action="search" method="post" role="search">
             <?php echo csrf_field(); ?>
             <label class="visually-hidden" for="notfound-search">Search cars</label>
             <input type="text" id="notfound-search" name="searchdata" class="form-control"
@@ -64,8 +60,8 @@ $siteBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/')
           </form>
 
           <div class="notfound__links">
-            <a href="index.php" class="btn">Go to Home</a>
-            <a href="car-listing.php" class="btn notfound__btn-outline">Browse all cars</a>
+            <a href="./" class="btn">Go to Home</a>
+            <a href="car-listing" class="btn notfound__btn-outline">Browse all cars</a>
           </div>
         </div>
       </div>

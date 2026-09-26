@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 if (empty($_SESSION['login'])) {
-  header('location:index.php');
+  header('Location: ./');
 } else {
   ?><!DOCTYPE HTML>
   <html lang="en">
@@ -87,11 +87,11 @@ if (empty($_SESSION['login'])) {
                       <li>
                         <h4 style="color:red">Booking No #<?php echo htmlentities($result->BookingNumber); ?></h4>
                         <div class="vehicle_img"> <a
-                            href="vehical-details.php?vhid=<?php echo htmlentities($result->vid); ?>"><?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '160px']); ?></a>
+                            href="<?php echo htmlentities(vehicle_url($result->vid, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>"><?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '160px']); ?></a>
                         </div>
                         <div class="vehicle_title">
 
-                          <h6><a href="vehical-details.php?vhid=<?php echo htmlentities($result->vid); ?>">
+                          <h6><a href="<?php echo htmlentities(vehicle_url($result->vid, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>">
                               <?php echo htmlentities($result->BrandName); ?> ,
                               <?php echo htmlentities($result->VehiclesTitle); ?></a></h6>
                           <p><b>From </b> <?php echo htmlentities($result->FromDate); ?> <b>To </b>

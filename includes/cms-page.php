@@ -61,7 +61,7 @@ $pageIcon = isset($pageIcons[$pagetype]) ? $pageIcons[$pagetype] : 'fa fa-circle
                 <h1><?php echo htmlentities($result->PageName); ?></h1>
               </div>
               <ul class="coustom-breadcrumb">
-                <li><a href="./index.php">Home</a></li>
+                <li><a href="./">Home</a></li>
                 <li><?php echo htmlentities($result->PageName); ?></li>
               </ul>
             </div>
@@ -116,7 +116,7 @@ $pageIcon = isset($pageIcons[$pagetype]) ? $pageIcons[$pagetype] : 'fa fa-circle
                 <h1><?php echo htmlentities($result->PageName); ?></h1>
               </div>
               <ul class="coustom-breadcrumb">
-                <li><a href="index.php">Home</a></li>
+                <li><a href="./">Home</a></li>
                 <li><?php echo htmlentities($result->PageName); ?></li>
               </ul>
             </div>
@@ -151,7 +151,7 @@ $pageIcon = isset($pageIcons[$pagetype]) ? $pageIcons[$pagetype] : 'fa fa-circle
             <h1><?php echo htmlentities(ucfirst($pagetype ?: 'Page')); ?></h1>
           </div>
           <ul class="coustom-breadcrumb">
-            <li><a href="index.php">Home</a></li>
+            <li><a href="./">Home</a></li>
             <li><?php echo htmlentities(ucfirst($pagetype ?: 'Page')); ?></li>
           </ul>
         </div>

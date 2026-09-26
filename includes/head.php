@@ -5,9 +5,17 @@
 //   $pageUsesCarousel  true on pages with an Owl carousel (optional)
 //   $pageStyles        extra stylesheet URLs loaded after style.css (optional)
 $pageTitle = $pageTitle ?? 'Car Rental in Nepal';
+
+// Pages shown at a deeper clean URL (car/..., or a missing URL in any folder) resolve
+// relative links from the site root. Pages at the root don't need (or get) a <base>.
+$siteBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
+$requestDir = preg_replace('#[^/]*$#', '', (string)parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
 $pageDescription = $pageDescription ?? 'Rento: rent a verified car anywhere in Nepal. Browse the fleet, compare daily prices in rupees and book online.';
 ?>
 <meta charset="utf-8">
+<?php if ($requestDir !== $siteBase) { ?>
+<base href="<?php echo htmlentities($siteBase); ?>">
+<?php } ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?php echo htmlentities($pageTitle); ?> | Rento</title>
 <meta name="description" content="<?php echo htmlentities($pageDescription); ?>">

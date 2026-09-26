@@ -11,7 +11,7 @@
             <p class="cta__sub">From city runs in Kathmandu to mountain roads beyond — pick a car, pick a date, and go.
                 No hidden fees, no waiting around.</p>
         </div>
-        <a href="car-listing.php" class="btn-key">
+        <a href="car-listing" class="btn-key">
             <span>Book Your Car</span>
             <i class="fa fa-angle-right" aria-hidden="true"></i>
         </a>

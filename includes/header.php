@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row">
         <div class="col-5 col-sm-3 col-md-2">
-          <div class="logo"> <a href="index.php"><img src="assets/images/rentoindia_logo.jpeg" alt="Rento" /></a> </div>
+          <div class="logo"> <a href="./"><img src="assets/images/rentoindia_logo.jpeg" alt="Rento" /></a> </div>
         </div>
         <div class="col-7 col-sm-9 col-md-10">
           <div class="header_info">
@@ -80,12 +80,12 @@
                 </a>
 
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="profile.php">Profile Settings</a></li>
-                  <li><a class="dropdown-item" href="update-password.php">Update Password</a></li>
-                  <li><a class="dropdown-item" href="my-booking.php">My Booking</a></li>
-                  <li><a class="dropdown-item" href="post-testimonial.php">Post a Testimonial</a></li>
-                  <li><a class="dropdown-item" href="my-testimonials.php">My Testimonial</a></li>
-                  <li><a class="dropdown-item" href="logout.php">Sign Out</a></li>
+                  <li><a class="dropdown-item" href="profile">Profile Settings</a></li>
+                  <li><a class="dropdown-item" href="update-password">Update Password</a></li>
+                  <li><a class="dropdown-item" href="my-booking">My Booking</a></li>
+                  <li><a class="dropdown-item" href="post-testimonial">Post a Testimonial</a></li>
+                  <li><a class="dropdown-item" href="my-testimonials">My Testimonial</a></li>
+                  <li><a class="dropdown-item" href="logout">Sign Out</a></li>
                 </ul>
 
               </li>
@@ -95,7 +95,7 @@
         <?php } ?>
         <div class="header_search">
           <button type="button" id="search_toggle" aria-label="Show search" aria-controls="header-search-form"><i class="fa fa-magnifying-glass" aria-hidden="true"></i></button>
-          <form action="search.php" method="post" id="header-search-form">
+          <form action="search" method="post" id="header-search-form">
 <?php echo csrf_field(); ?>
             <input type="text" placeholder="Search..." name="searchdata" class="form-control" required="true" aria-label="Search cars">
             <button type="submit" aria-label="Search"><i class="fa fa-magnifying-glass" aria-hidden="true"></i></button>
@@ -106,19 +106,19 @@
       <div class="collapse navbar-collapse" id="navigation">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link<?php echo ($current_page == 'index.php') ? ' active" aria-current="page' : ''; ?>" href="index.php">Home</a>
+            <a class="nav-link<?php echo ($current_page == 'index.php') ? ' active" aria-current="page' : ''; ?>" href="./">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link<?php echo ($current_page == 'about-us.php') ? ' active" aria-current="page' : ''; ?>" href="about-us.php">About Us</a>
+            <a class="nav-link<?php echo ($current_page == 'about-us.php') ? ' active" aria-current="page' : ''; ?>" href="about-us">About Us</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link<?php echo ($current_page == 'car-listing.php') ? ' active" aria-current="page' : ''; ?>" href="car-listing.php">Car Listing</a>
+            <a class="nav-link<?php echo ($current_page == 'car-listing.php') ? ' active" aria-current="page' : ''; ?>" href="car-listing">Car Listing</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link<?php echo ($current_page == 'faqs.php') ? ' active" aria-current="page' : ''; ?>" href="faqs.php">FAQs</a>
+            <a class="nav-link<?php echo ($current_page == 'faqs.php') ? ' active" aria-current="page' : ''; ?>" href="faqs">FAQs</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link<?php echo ($current_page == 'contact-us.php') ? ' active" aria-current="page' : ''; ?>" href="contact-us.php">Contact Us</a>
+            <a class="nav-link<?php echo ($current_page == 'contact-us.php') ? ' active" aria-current="page' : ''; ?>" href="contact-us">Contact Us</a>
           </li>
         </ul>
       </div>

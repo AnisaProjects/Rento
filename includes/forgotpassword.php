@@ -11,7 +11,7 @@
           <div class="forgotpassword_wrap">
             <div class="col-md-12">
               <!-- Requests a time-limited reset link; the new password is set on reset-password.php -->
-              <form name="chngpwd" method="post" action="reset-password.php">
+              <form name="chngpwd" method="post" action="reset-password">
 <?php echo csrf_field(); ?>
                 <div class="form-group">
                   <label class="visually-hidden" for="forgot-email">Email address</label>

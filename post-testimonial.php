@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 if (empty($_SESSION['login'])) {
-  header('location:index.php');
+  header('Location: ./');
 } else {
   if (isset($_POST['submit'])) {
     $testimonoial = $_POST['testimonial'];

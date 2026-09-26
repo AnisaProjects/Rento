@@ -68,4 +68,20 @@ function vehicle_image(?string $file, string $alt, array $opts = []): string
     return '<picture><source type="image/webp" srcset="' . htmlentities(implode(', ', $sources)) . '" sizes="'
         . htmlentities($opts['sizes'] ?? '100vw') . '">' . $img . '</picture>';
 }
+
+// URL-friendly name: "Maruti Suzuki Wagon R" => "maruti-suzuki-wagon-r".
+function vehicle_slug(?string $brand, ?string $title): string
+{
+    $name = vehicle_display_name($brand, $title);
+    $ascii = function_exists('iconv') ? (@iconv('UTF-8', 'ASCII//TRANSLIT', $name) ?: $name) : $name;
+    return trim(preg_replace('/[^a-z0-9]+/', '-', strtolower($ascii)), '-');
+}
+
+// Clean URL of a vehicle page, relative to the site root: "car/maruti-suzuki-wagon-r-1".
+// The number at the end is the id; the name part is only for people and search engines.
+function vehicle_url($id, ?string $brand = null, ?string $title = null): string
+{
+    $slug = vehicle_slug($brand, $title);
+    return 'car/' . ($slug === '' ? '' : $slug . '-') . (int)$id;
+}
 ?>

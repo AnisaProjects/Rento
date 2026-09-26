@@ -55,7 +55,7 @@ if (isset($_POST['update'])) {
 
     if (APP_DEV_MODE) {
       $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-      $devResetLink = $scheme . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/reset-password.php?token=' . $newToken;
+      $devResetLink = $scheme . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/reset-password?token=' . $newToken;
     }
     // TODO: when a mail server is available, email the link here instead of showing it.
   }
@@ -166,7 +166,7 @@ if (isset($_POST['update'])) {
           <h1>Reset Password</h1>
         </div>
         <ul class="coustom-breadcrumb">
-          <li><a href="index.php">Home</a></li>
+          <li><a href="./">Home</a></li>
           <li>Reset Password</li>
         </ul>
       </div>
@@ -194,7 +194,7 @@ if (isset($_POST['update'])) {
           ?>
 
           <?php if ($showResetForm) { ?>
-            <form name="resetpwd" method="post" action="reset-password.php" onSubmit="return resetpassword_valid();">
+            <form name="resetpwd" method="post" action="reset-password" onSubmit="return resetpassword_valid();">
 <?php echo csrf_field(); ?>
               <input type="hidden" name="token" value="<?php echo htmlentities($token); ?>">
               <div class="form-group">

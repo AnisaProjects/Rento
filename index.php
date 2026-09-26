@@ -157,7 +157,7 @@ include('includes/config.php');
                       <?php } ?>
 
                       <div class="car-info-box">
-                        <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>" class="car-img-wrap">
+                        <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>" class="car-img-wrap">
                           <?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '(min-width: 992px) 360px, (min-width: 576px) 50vw, 100vw']); ?>
                         </a>
                         <ul class="car-stats">
@@ -173,7 +173,7 @@ include('includes/config.php');
 
                       <div class="car-body">
                         <div class="car-title-m">
-                          <h6><a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>">
+                          <h6><a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>">
                               <?php echo htmlentities($result->VehiclesTitle); ?></a></h6>
                           <span class="price"><?php echo format_price($result->PricePerDay); ?><small>/Day</small></span>
                         </div>
