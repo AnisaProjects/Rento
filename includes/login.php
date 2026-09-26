@@ -5,48 +5,57 @@ if (isset($_POST['login'])) {
   $email = trim($_POST['email']);
   $password = (string)($_POST['password'] ?? '');
 
-  $sql = "SELECT id, EmailId, Password, FullName
-            FROM tblusers
-            WHERE EmailId = :email";
-
-  $query = $dbh->prepare($sql);
-
-  $query->bindParam(':email', $email, PDO::PARAM_STR);
-
-  $query->execute();
-
-  $result = $query->fetch(PDO::FETCH_OBJ);
-
-  // Old MD5 hashes are accepted once and replaced with a bcrypt hash.
-  $validLogin = $result && password_check_and_upgrade($password, $result->Password, function ($newHash) use ($dbh, $result) {
-    $upgrade = $dbh->prepare("UPDATE tblusers SET Password = :password WHERE id = :id");
-    $upgrade->bindParam(':password', $newHash, PDO::PARAM_STR);
-    $upgrade->bindParam(':id', $result->id, PDO::PARAM_INT);
-    $upgrade->execute();
-  });
-
-  if ($validLogin) {
-
-    session_login_regenerate();
-
-    // Store login information in session
-    $_SESSION['login'] = $result->EmailId;
-    $_SESSION['fname'] = $result->FullName;
-
-    // Redirect to current page
-    $currentpage = json_encode($_SERVER['REQUEST_URI'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
-
+  if (rate_limit_exceeded($dbh, 'login', $email)) {
     echo "<script type='text/javascript'>
-                document.location = $currentpage;
+                alert(" . json_encode(RATE_LIMIT_MESSAGE) . ");
               </script>";
-
-    exit();
-
   } else {
 
-    echo "<script type='text/javascript'>
-                alert('Invalid Email or Password');
-              </script>";
+    $sql = "SELECT id, EmailId, Password, FullName
+              FROM tblusers
+              WHERE EmailId = :email";
+
+    $query = $dbh->prepare($sql);
+
+    $query->bindParam(':email', $email, PDO::PARAM_STR);
+
+    $query->execute();
+
+    $result = $query->fetch(PDO::FETCH_OBJ);
+
+    // Old MD5 hashes are accepted once and replaced with a bcrypt hash.
+    $validLogin = $result && password_check_and_upgrade($password, $result->Password, function ($newHash) use ($dbh, $result) {
+      $upgrade = $dbh->prepare("UPDATE tblusers SET Password = :password WHERE id = :id");
+      $upgrade->bindParam(':password', $newHash, PDO::PARAM_STR);
+      $upgrade->bindParam(':id', $result->id, PDO::PARAM_INT);
+      $upgrade->execute();
+    });
+
+    if ($validLogin) {
+
+      rate_limit_clear($dbh, 'login', $email);
+      session_login_regenerate();
+
+      // Store login information in session
+      $_SESSION['login'] = $result->EmailId;
+      $_SESSION['fname'] = $result->FullName;
+
+      // Redirect to current page
+      $currentpage = json_encode($_SERVER['REQUEST_URI'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+
+      echo "<script type='text/javascript'>
+                  document.location = $currentpage;
+                </script>";
+
+      exit();
+
+    } else {
+
+      rate_limit_record($dbh, 'login', $email);
+      echo "<script type='text/javascript'>
+                  alert('Invalid Email or Password');
+                </script>";
+    }
   }
 }
 

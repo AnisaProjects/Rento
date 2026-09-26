@@ -14,6 +14,12 @@ define('DB_NAME', 'rento');
 // Set it to false on any server that real users can reach.
 define('APP_DEV_MODE', true);
 
+// Rate limiting (includes/rate_limit.php): failed logins and reset requests allowed
+// per IP and per email within the window; the registration email check is per IP.
+define('RATE_LIMIT_MAX_ATTEMPTS', 5);
+define('RATE_LIMIT_WINDOW_MINUTES', 15);
+define('RATE_LIMIT_EMAIL_CHECKS', 20);
+
 // Dynamic (AI) pricing. While false, every page shows the base PricePerDay and the
 // Python model is never called. Phase 4 turns this back on with proper data.
 define('PRICING_ENABLED', false);
@@ -46,4 +52,6 @@ try {
 } catch (PDOException $e) {
     rento_fatal('DB connection failed: ' . $e->getMessage());
 }
+
+require_once __DIR__ . '/rate_limit.php';
 ?>

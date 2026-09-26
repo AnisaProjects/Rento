@@ -29,10 +29,17 @@ function find_reset_request(PDO $dbh, string $token)
 if (isset($_POST['update'])) {
   // Step 1: the Forgot Password modal posts the email here.
   $email = trim((string)($_POST['email'] ?? ''));
-  $query = $dbh->prepare("SELECT id FROM tblusers WHERE EmailId=:email");
-  $query->bindParam(':email', $email, PDO::PARAM_STR);
-  $query->execute();
-  $user = $query->fetch(PDO::FETCH_OBJ);
+  $user = false;
+  if (rate_limit_exceeded($dbh, 'password_reset', $email)) {
+    $error = RATE_LIMIT_MESSAGE;
+  } else {
+    // Every request counts, not only failures, so the form can't be used to flood an inbox.
+    rate_limit_record($dbh, 'password_reset', $email);
+    $query = $dbh->prepare("SELECT id FROM tblusers WHERE EmailId=:email");
+    $query->bindParam(':email', $email, PDO::PARAM_STR);
+    $query->execute();
+    $user = $query->fetch(PDO::FETCH_OBJ);
+  }
 
   if ($user) {
     // Only the newest link for a user works.
@@ -54,7 +61,7 @@ if (isset($_POST['update'])) {
     // TODO: when a mail server is available, email the link here instead of showing it.
   }
   // Same message whether or not the email exists, so this form can't be used to discover accounts.
-  $msg = "If that email is registered, a password reset link has been sent to it. The link is valid for " . RESET_TOKEN_TTL_MINUTES . " minutes.";
+  if (!$error) $msg = "If that email is registered, a password reset link has been sent to it. The link is valid for " . RESET_TOKEN_TTL_MINUTES . " minutes.";
 } elseif (isset($_POST['resetpassword'])) {
   // Step 3: save the new password.
   $reset = find_reset_request($dbh, $token);

@@ -3,6 +3,12 @@ require_once("includes/config.php");
 // code user email availablity
 if (!empty($_POST["emailid"])) {
 	$email = $_POST["emailid"];
+	// Per IP: this endpoint reveals whether an email is registered, so repeated lookups are throttled.
+	if (rate_limit_exceeded($dbh, 'email_check', null, RATE_LIMIT_EMAIL_CHECKS)) {
+		echo "<span style='color:red'> " . htmlentities(RATE_LIMIT_MESSAGE) . "</span>";
+		exit;
+	}
+	rate_limit_record($dbh, 'email_check');
 	if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
 
 		echo "error : You did not enter a valid email.";

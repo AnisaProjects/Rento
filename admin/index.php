@@ -4,6 +4,12 @@ include('includes/config.php');
 if(isset($_POST['login']))
 {
 $email=$_POST['username'];
+if(rate_limit_exceeded($dbh, 'admin_login', $email))
+{
+echo "<script>alert(" . json_encode(RATE_LIMIT_MESSAGE) . ");</script>";
+}
+else
+{
 $sql ="SELECT id,UserName,Password FROM admin WHERE UserName=:email";
 $query= $dbh -> prepare($sql);
 $query-> bindParam(':email', $email, PDO::PARAM_STR);
@@ -18,13 +24,16 @@ $upgrade->execute();
 });
 if($validLogin)
 {
+rate_limit_clear($dbh, 'admin_login', $email);
 session_login_regenerate();
 $_SESSION['alogin']=$admin->UserName;
 echo "<script type='text/javascript'> document.location = 'dashboard.php'; </script>";
 } else{
   
+  rate_limit_record($dbh, 'admin_login', $email);
   echo "<script>alert('Invalid Details');</script>";
 
+}
 }
 
 }
