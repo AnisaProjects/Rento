@@ -159,8 +159,7 @@ error_reporting(0);
 
                       <div class="car-info-box">
                         <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>" class="car-img-wrap">
-                          <img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>"
-                            alt="<?php echo htmlentities($result->VehiclesTitle); ?>">
+                          <?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '(min-width: 992px) 360px, (min-width: 576px) 50vw, 100vw']); ?>
                         </a>
                         <ul class="car-stats">
                           <li><i class="fa fa-car" aria-hidden="true"></i><?php echo htmlentities($result->FuelType); ?>

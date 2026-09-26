@@ -118,20 +118,15 @@ if (isset($_POST['submit'])) {
 
       <section class="vehicle-slider-wrap">
         <div id="listing_img_slider" class="owl-carousel">
-          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>" class="img-fluid"
-              alt="image"></div>
-          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage2); ?>" class="img-fluid"
-              alt="image"></div>
-          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage3); ?>" class="img-fluid"
-              alt="image"></div>
-          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage4); ?>" class="img-fluid"
-              alt="image"></div>
+          <div><?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 1', ['class' => 'img-fluid', 'sizes' => '100vw', 'lazy' => false]); ?></div>
+          <div><?php echo vehicle_image($result->Vimage2, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 2', ['class' => 'img-fluid', 'sizes' => '100vw']); ?></div>
+          <div><?php echo vehicle_image($result->Vimage3, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 3', ['class' => 'img-fluid', 'sizes' => '100vw']); ?></div>
+          <div><?php echo vehicle_image($result->Vimage4, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 4', ['class' => 'img-fluid', 'sizes' => '100vw']); ?></div>
           <?php if ($result->Vimage5 == "") {
 
           } else {
             ?>
-            <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage5); ?>" class="img-fluid"
-                alt="image"></div>
+            <div><?php echo vehicle_image($result->Vimage5, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 5', ['class' => 'img-fluid', 'sizes' => '100vw']); ?></div>
           <?php } ?>
         </div>
       </section>
@@ -412,8 +407,7 @@ if (isset($_POST['submit'])) {
                 <div class="recent-car-list">
                   <div class="car-info-box">
                     <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>" class="car-img-wrap">
-                      <img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>"
-                        alt="<?php echo htmlentities($result->VehiclesTitle); ?>">
+                      <?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '(min-width: 992px) 360px, (min-width: 576px) 50vw, 100vw']); ?>
                     </a>
                     <ul class="car-stats">
                       <li><i class="fa fa-car" aria-hidden="true"></i><?php echo htmlentities($result->FuelType); ?></li>

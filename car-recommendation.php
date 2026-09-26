@@ -25,6 +25,7 @@ if(isset($_POST['getRecommendations'])) {
   include('includes/head.php');
   ?>
   <style>
+.recommendation-card__img { height: 200px; object-fit: cover; width: 100%; }
 .recommendation-card {
     border: 2px solid #e9ecef;
     border-radius: 10px;
@@ -220,9 +221,7 @@ if(isset($_POST['getRecommendations'])) {
               
               <div class="text-center mb-3">
                 <?php if($car->Vimage1): ?>
-                <img src="admin/img/vehicleimages/<?php echo htmlentities($car->Vimage1); ?>" 
-                     class="img-fluid rounded" style="height: 200px; object-fit: cover; width: 100%;" 
-                     alt="<?php echo htmlentities($car->VehiclesTitle); ?>">
+                <?php echo vehicle_image($car->Vimage1, vehicle_display_name($car->BrandName ?? '', $car->VehiclesTitle), ['class' => 'img-fluid rounded recommendation-card__img', 'sizes' => '(min-width: 992px) 360px, (min-width: 576px) 50vw, 100vw']); ?>
                 <?php else: ?>
                 <div class="bg-light d-flex align-items-center justify-content-center" 
                      style="height: 200px; border-radius: 8px;">

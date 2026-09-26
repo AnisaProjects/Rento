@@ -1,0 +1,2 @@
+# Command-line tools only: nothing in this folder is served to browsers.
+Require all denied

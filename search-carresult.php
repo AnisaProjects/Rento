@@ -81,8 +81,7 @@ error_reporting(0);
                 ?>
                 <div class="listing-card">
                   <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>" class="listing-card__img">
-                    <img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>"
-                      alt="<?php echo htmlentities($result->VehiclesTitle); ?>">
+                    <?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '(min-width: 992px) 300px, (min-width: 768px) 40vw, 100vw']); ?>
                   </a>
                   <div class="listing-card__body">
                     <div class="listing-card__top">
@@ -184,8 +183,7 @@ error_reporting(0);
                 foreach ($results as $result) { ?>
                   <li>
                     <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>" class="recent-widget__img">
-                      <img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>"
-                        alt="<?php echo htmlentities($result->VehiclesTitle); ?>">
+                      <?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '120px']); ?>
                     </a>
                     <div class="recent-widget__info">
                       <a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>">

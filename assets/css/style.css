@@ -37,6 +37,13 @@ label {
   width: 100%;
 }
 
+/* Photos carry width/height attributes (to reserve space while loading). Keep their
+   aspect ratio unless a component sets a height; :where() keeps specificity at 0. */
+:where(img[width][height]) {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Bootstrap 3 kept the browser's arrow on selects (the .select wrapper draws its own). */
 
 select.form-control {

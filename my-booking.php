@@ -88,8 +88,7 @@ if (strlen($_SESSION['login']) == 0) {
                       <li>
                         <h4 style="color:red">Booking No #<?php echo htmlentities($result->BookingNumber); ?></h4>
                         <div class="vehicle_img"> <a
-                            href="vehical-details.php?vhid=<?php echo htmlentities($result->vid); ?>"><img
-                              src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>" alt="image"></a>
+                            href="vehical-details.php?vhid=<?php echo htmlentities($result->vid); ?>"><?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '160px']); ?></a>
                         </div>
                         <div class="vehicle_title">
 
