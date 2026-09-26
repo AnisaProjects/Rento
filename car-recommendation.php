@@ -156,11 +156,11 @@ if(isset($_POST['getRecommendations'])) {
                   <div class="budget-slider">
                     <input type="range" class="form-range" id="budget" name="budget" 
                            min="200" max="5000" value="1000" 
-                           oninput="document.getElementById('budgetValue').textContent = 'Rs. ' + this.value">
+                           oninput="document.getElementById('budgetValue').textContent = 'Rs ' + Number(this.value).toLocaleString('en-US')">
                     <div class="d-flex justify-content-between">
-                      <small>Rs. 200</small>
-                      <span id="budgetValue" class="badge text-bg-light">Rs. 1000</span>
-                      <small>Rs. 5000</small>
+                      <small>Rs 200</small>
+                      <span id="budgetValue" class="badge text-bg-light">Rs 1,000</span>
+                      <small>Rs 5,000</small>
                     </div>
                   </div>
                 </div>
@@ -236,7 +236,7 @@ if(isset($_POST['getRecommendations'])) {
               <div class="row text-center mb-3">
                 <div class="col-4">
                   <small class="text-muted">Price/Day</small>
-                  <div class="h5 text-primary">Rs. <?php echo htmlentities($car->PricePerDay); ?></div>
+                  <div class="h5 text-primary"><?php echo format_price($car->PricePerDay); ?></div>
                 </div>
                 <div class="col-4">
                   <small class="text-muted">Seating</small>
@@ -322,7 +322,7 @@ if(isset($_POST['getRecommendations'])) {
 <script>
 // Budget slider functionality
 document.getElementById('budget').addEventListener('input', function() {
-    document.getElementById('budgetValue').textContent = 'Rs. ' + this.value;
+    document.getElementById('budgetValue').textContent = 'Rs ' + Number(this.value).toLocaleString('en-US');
 });
 
 // Smooth scrolling for anchor links

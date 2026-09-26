@@ -176,8 +176,7 @@ error_reporting(0);
                         <div class="car-title-m">
                           <h6><a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>">
                               <?php echo htmlentities($result->VehiclesTitle); ?></a></h6>
-                          <span class="price">Rs.
-                            <?php echo number_format($result->PricePerDay); ?><small>/Day</small></span>
+                          <span class="price"><?php echo format_price($result->PricePerDay); ?><small>/Day</small></span>
                         </div>
                         <div class="inventory_info_m">
                           <p><?php echo htmlentities($overview); ?></p>

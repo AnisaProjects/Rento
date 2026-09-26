@@ -142,7 +142,7 @@ if (isset($_POST['submit'])) {
             </div>
             <div class="col-md-3">
               <div class="price_info">
-                <p>$<?php echo number_format((float) $displayPrice, 2); ?> </p>Per Day
+                <p><?php echo format_price($displayPrice); ?> </p>Per Day
                 <?php if (($pricingQuote['status'] ?? '') === 'model'): ?>
                   <small class="text-muted">Dynamic price
                     (<?php echo sprintf('%+0.1f%%', (($pricingQuote['multiplier'] ?? 1) - 1) * 100); ?>)</small>
@@ -422,7 +422,7 @@ if (isset($_POST['submit'])) {
                       <h6><a href="vehical-details.php?vhid=<?php echo htmlentities($result->id); ?>">
                           <?php echo htmlentities($result->BrandName); ?> ,
                           <?php echo htmlentities($result->VehiclesTitle); ?></a></h6>
-                      <span class="price">$<?php echo number_format($result->PricePerDay); ?><small>/Day</small></span>
+                      <span class="price"><?php echo format_price($result->PricePerDay); ?><small>/Day</small></span>
                     </div>
                     <div class="inventory_info_m">
                       <p><?php echo htmlentities($overview); ?></p>

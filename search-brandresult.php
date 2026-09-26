@@ -93,7 +93,7 @@ error_reporting(0);
                                                 </h5>
                                             </div>
                                             <div class="listing-card__price">
-                                                $<?php echo htmlentities($result->PricePerDay); ?><small>/day</small>
+                                                <?php echo format_price($result->PricePerDay); ?><small>/day</small>
                                             </div>
                                         </div>
 
@@ -196,7 +196,7 @@ error_reporting(0);
                                                     class="recent-widget__brand"><?php echo htmlentities($result->BrandName); ?></span>
                                                 <?php echo htmlentities($result->VehiclesTitle); ?>
                                             </a>
-                                            <p class="recent-widget__price">$<?php echo htmlentities($result->PricePerDay); ?>
+                                            <p class="recent-widget__price"><?php echo format_price($result->PricePerDay); ?>
                                                 <small>/ Day</small>
                                             </p>
                                         </div>

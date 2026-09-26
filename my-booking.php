@@ -137,11 +137,11 @@ if (strlen($_SESSION['login']) == 0) {
                           <td><?php echo htmlentities($result->FromDate); ?></td>
                           <td> <?php echo htmlentities($result->ToDate); ?></td>
                           <td><?php echo htmlentities($tds = $result->totaldays); ?></td>
-                          <td> <?php echo htmlentities($ppd = $result->PricePerDay); ?></td>
+                          <td> <?php $ppd = $result->PricePerDay; echo format_price($ppd); ?></td>
                         </tr>
                         <tr>
                           <th colspan="4" style="text-align:center;"> Grand Total</th>
-                          <th><?php echo htmlentities($tds * $ppd); ?></th>
+                          <th><?php echo format_price($tds * $ppd); ?></th>
                         </tr>
                       </table>
                       <hr />
