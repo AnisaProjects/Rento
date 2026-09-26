@@ -178,8 +178,8 @@ error_reporting(0);
                         <form class="filter-widget__form" action="search-brandresult.php" method="post">
 <?php echo csrf_field(); ?>
                             <div class="form-group select">
-                                <select class="form-control" name="brand">
-                                    <option>Select Brand</option>
+                                <select class="form-control" name="brand" required>
+                                    <option value="">Select Brand</option>
                                     <?php $sql = "SELECT * from  tblbrands ";
                                     $query = $dbh->prepare($sql);
                                     $query->execute();
@@ -195,8 +195,8 @@ error_reporting(0);
                                 </select>
                             </div>
                             <div class="form-group select">
-                                <select class="form-control" name="fueltype">
-                                    <option>Select Fuel Type</option>
+                                <select class="form-control" name="fueltype" required>
+                                    <option value="">Select Fuel Type</option>
                                     <option value="Petrol">Petrol</option>
                                     <option value="Diesel">Diesel</option>
                                     <option value="CNG">CNG</option>
