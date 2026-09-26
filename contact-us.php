@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/security.php';
 error_reporting(0);
 include('includes/config.php');
 if (isset($_POST['send'])) {
@@ -124,6 +124,7 @@ if (isset($_POST['send'])) {
               <div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php } ?>
           <div class="contact_form gray-bg">
             <form method="post">
+<?php echo csrf_field(); ?>
               <div class="form-group">
                 <label class="control-label">Full Name <span>*</span></label>
                 <input type="text" name="fullname" class="form-control white_bg" id="fullname" required>

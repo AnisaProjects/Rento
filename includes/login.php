@@ -77,6 +77,7 @@ if (isset($_POST['login'])) {
             <div class="col-md-12 col-sm-6">
 
               <form method="post">
+<?php echo csrf_field(); ?>
 
                 <!-- Email -->
                 <div class="form-group">

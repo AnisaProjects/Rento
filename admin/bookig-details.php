@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/security.php';
 error_reporting(0);
 include('includes/config.php');
 if(strlen($_SESSION['alogin'])==0)
@@ -210,6 +210,7 @@ echo htmlentities('Confirmed');
 									</tbody>
 								</table>
 								<form method="post">
+<?php echo csrf_field(); ?>
 	   <input name="Submit2" type="submit" class="txtbox4" value="Print" onClick="return f3();" style="cursor: pointer;"  />
 	</form>
 

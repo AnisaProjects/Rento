@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/security.php';
 error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['login']) == 0) {
@@ -145,6 +145,7 @@ if (strlen($_SESSION['login']) == 0) {
                 <div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php } else if ($msg) { ?>
                   <div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php } ?>
               <form method="post">
+<?php echo csrf_field(); ?>
 
 
                 <div class="form-group">

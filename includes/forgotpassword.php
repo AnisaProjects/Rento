@@ -47,6 +47,7 @@ if (isset($_POST['update'])) {
           <div class="forgotpassword_wrap">
             <div class="col-md-12">
               <form name="chngpwd" method="post" onSubmit="return [forgotpassword_valid();">
+<?php echo csrf_field(); ?>
                 <div class="form-group">
                   <input type="email" name="email" class="form-control" placeholder="Your Email address*" required="">
                 </div>

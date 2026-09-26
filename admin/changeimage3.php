@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/security.php';
 error_reporting(0);
 include('includes/config.php');
 if(strlen($_SESSION['alogin'])==0)
@@ -95,6 +95,7 @@ $msg="Image updated successfully";
 									<div class="panel-heading">Vehicle Image 3 Details</div>
 									<div class="panel-body">
 										<form method="post" class="form-horizontal" enctype="multipart/form-data">
+<?php echo csrf_field(); ?>
 										
 											
   	        	  <?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php } 

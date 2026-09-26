@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 require_once('includes/dynamic_pricing.php');
 error_reporting(0);
@@ -355,6 +355,7 @@ if (isset($_POST['submit'])) {
               <h5>Book Now</h5>
             </div>
             <form class="filter-widget__form" method="post">
+<?php echo csrf_field(); ?>
               <div class="form-group">
                 <label>From Date</label>
                 <input type="date" class="form-control" name="fromdate" placeholder="From Date" required>

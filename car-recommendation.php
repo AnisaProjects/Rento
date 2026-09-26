@@ -1,5 +1,5 @@
 <?php 
-session_start();
+require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 include('includes/recommendation_engine.php');
 error_reporting(0);
@@ -178,6 +178,7 @@ if(isset($_POST['getRecommendations'])) {
           <p class="mb-4">Our AI analyzes your preferences and budget to suggest the perfect car for you.</p>
           
           <form method="post" action="">
+<?php echo csrf_field(); ?>
             <div class="row">
               <div class="col-md-4">
                 <div class="form-group">

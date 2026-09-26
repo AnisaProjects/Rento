@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/security.php';
 include('includes/config.php');
 if(isset($_POST['login']))
 {
@@ -56,6 +56,7 @@ echo "<script type='text/javascript'> document.location = 'dashboard.php'; </scr
 						<div class="well row pt-2x pb-3x bk-light">
 							<div class="col-md-8 col-md-offset-2">
 								<form method="post">
+<?php echo csrf_field(); ?>
 
 									<label for="" class="text-uppercase text-sm">Your Username </label>
 									<input type="text" placeholder="Username" name="username" class="form-control mb">

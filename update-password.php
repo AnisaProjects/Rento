@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/security.php';
 error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['login']) == 0) {
@@ -277,6 +277,7 @@ if (strlen($_SESSION['login']) == 0) {
                   </div>
 
                   <form name="chngpwd" method="post" onSubmit="return updatepassword_valid();">
+<?php echo csrf_field(); ?>
                     <?php if ($error) { ?>
                       <div class="errorWrap"><strong>ERROR</strong>: <?php echo htmlentities($error); ?></div>
                     <?php } else if ($msg) { ?>

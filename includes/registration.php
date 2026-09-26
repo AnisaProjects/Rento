@@ -60,6 +60,7 @@ if (isset($_POST['signup'])) {
           <div class="signup_wrap">
             <div class="col-md-12 col-sm-6">
               <form method="post" name="signup" onSubmit="return registration_valid();">
+<?php echo csrf_field(); ?>
                 <div class="form-group">
                   <input type="text" class="form-control" name="fullname" placeholder="Full Name" required="required">
                 </div>

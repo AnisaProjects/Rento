@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/security.php';
 error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
@@ -110,6 +110,7 @@ if (strlen($_SESSION['alogin']) == 0) {
 										<div class="panel-body">
 											<form method="post" name="chngpwd" class="form-horizontal"
 												onSubmit="return changepassword_valid();">
+<?php echo csrf_field(); ?>
 
 
 												<?php if ($error) { ?>

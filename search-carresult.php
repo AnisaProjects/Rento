@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 error_reporting(0);
 ?>
@@ -170,6 +170,7 @@ error_reporting(0);
               <h5>Find Your Car</h5>
             </div>
             <form class="filter-widget__form" action="search-carresult.php" method="post">
+<?php echo csrf_field(); ?>
               <div class="form-group select">
                 <select class="form-control" name="brand">
                   <option>Select Brand</option>

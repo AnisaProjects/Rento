@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/security.php';
 error_reporting(0);
 include('includes/config.php');
 if(strlen($_SESSION['alogin'])==0)
@@ -143,6 +143,7 @@ foreach($results as $result)
 {	?>
 
 <form method="post" class="form-horizontal" enctype="multipart/form-data">
+<?php echo csrf_field(); ?>
 <div class="form-group">
 <label class="col-sm-2 control-label">Vehicle Title<span style="color:red">*</span></label>
 <div class="col-sm-4">

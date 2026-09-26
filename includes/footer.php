@@ -163,6 +163,7 @@ if (isset($_POST['emailsubscibe'])) {
           <h6>Subscribe Newsletter</h6>
 
           <form method="post">
+<?php echo csrf_field(); ?>
 
             <div class="newsletter-form">
 

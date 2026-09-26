@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/security.php';
 error_reporting(0);
 include('includes/config.php');
 if (strlen($_SESSION['login']) == 0) {
@@ -276,6 +276,7 @@ if (strlen($_SESSION['login']) == 0) {
                   </div>
 
                   <form method="post">
+<?php echo csrf_field(); ?>
                     <div class="form-group">
                       <label class="control-label"><i class="fa fa-user"></i>Full Name</label>
                       <input class="form-control white_bg" name="fullname"
