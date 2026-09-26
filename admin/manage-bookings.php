@@ -7,9 +7,9 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-if(isset($_REQUEST['eid']))
+if(isset($_POST['eid']))
 	{
-$eid=intval($_GET['eid']);
+$eid=intval($_POST['eid']);
 $status="2";
 $sql = "UPDATE tblbooking SET Status=:status WHERE  id=:eid";
 $query = $dbh->prepare($sql);
@@ -21,9 +21,9 @@ $msg="Booking Successfully Cancelled";
 }
 
 
-if(isset($_REQUEST['aeid']))
+if(isset($_POST['aeid']))
 	{
-$aeid=intval($_GET['aeid']);
+$aeid=intval($_POST['aeid']);
 $status=1;
 
 $sql = "UPDATE tblbooking SET Status=:status WHERE  id=:aeid";
@@ -164,10 +164,10 @@ echo htmlentities('Confirmed');
  }
 										?></td>
 											<td><?php echo htmlentities($result->PostingDate);?></td>
-										<td><a href="manage-bookings.php?aeid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you really want to Confirm this booking')"> Confirm</a> /
+										<td><form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Confirm this booking');"><?php echo csrf_field(); ?><input type="hidden" name="aeid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"> Confirm</button></form> /
 
 
-<a href="manage-bookings.php?eid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you really want to Cancel this Booking')"> Cancel</a>
+<form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Cancel this Booking');"><?php echo csrf_field(); ?><input type="hidden" name="eid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"> Cancel</button></form>
 </td>
 
 										</tr>

@@ -773,4 +773,21 @@ li {
     flex-direction: column;
     gap: 0;
   }
+}/****************************
+*      Row actions           *
+****************************/
+/* Delete / confirm / cancel / status actions are small POST forms styled like the old links. */
+.inline-action {
+  display: inline;
+  margin: 0;
+}
+.inline-action .link-action {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: #37a6c4;
+  cursor: pointer;
+}
+.inline-action .link-action:hover {
+  color: #5db9d1;
 }

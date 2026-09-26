@@ -8,9 +8,9 @@ header('location:index.php');
 }
 else{
 
-if(isset($_REQUEST['del']))
+if(isset($_POST['del']))
 	{
-$delid=intval($_GET['del']);
+$delid=intval($_POST['del']);
 $sql = "delete from tblvehicles  WHERE  id=:delid";
 $query = $dbh->prepare($sql);
 $query -> bindParam(':delid',$delid, PDO::PARAM_STR);
@@ -131,8 +131,8 @@ foreach($results as $result)
 											<td><?php echo htmlentities($result->PricePerDay);?></td>
 											<td><?php echo htmlentities($result->FuelType);?></td>
 												<td><?php echo htmlentities($result->ModelYear);?></td>
-		<td><a href="edit-vehicle.php?id=<?php echo $result->id;?>"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
-<a href="manage-vehicles.php?del=<?php echo $result->id;?>" onclick="return confirm('Do you want to delete');"><i class="fa fa-close"></i></a></td>
+		<td><a href="edit-vehicle.php?id=<?php echo htmlentities($result->id);?>"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
+<form method="post" class="inline-action" onsubmit="return confirm('Do you want to delete');"><?php echo csrf_field(); ?><input type="hidden" name="del" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"><i class="fa fa-close"></i></button></form></td>
 										</tr>
 										<?php $cnt=$cnt+1; }} ?>
 										

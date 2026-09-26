@@ -7,9 +7,9 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-if(isset($_GET['del']))
+if(isset($_POST['del']))
 {
-$id=$_GET['del'];
+$id=intval($_POST['del']);
 $sql = "delete from  tblsubscribers  WHERE id=:id";
 $query = $dbh->prepare($sql);
 $query -> bindParam(':id',$id, PDO::PARAM_STR);
@@ -127,7 +127,7 @@ foreach($results as $result)
 										<td>
 
 
-<a href="manage-subscribers.php?del=<?php echo $result->id;?>" onclick="return confirm('Do you want to delete');"><i class="fa fa-close"></i></a>
+<form method="post" class="inline-action" onsubmit="return confirm('Do you want to delete');"><?php echo csrf_field(); ?><input type="hidden" name="del" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"><i class="fa fa-close"></i></button></form>
 </td>
 
 										</tr>

@@ -7,9 +7,9 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-if(isset($_REQUEST['eid']))
+if(isset($_POST['eid']))
 	{
-$eid=intval($_GET['eid']);
+$eid=intval($_POST['eid']);
 $status="2";
 $sql = "UPDATE tblbooking SET Status=:status WHERE  id=:eid";
 $query = $dbh->prepare($sql);
@@ -17,13 +17,13 @@ $query -> bindParam(':status',$status, PDO::PARAM_STR);
 $query-> bindParam(':eid',$eid, PDO::PARAM_STR);
 $query -> execute();
   echo "<script>alert('Booking Successfully Cancelled');</script>";
-echo "<script type='text/javascript'> document.location = 'canceled-bookings.php; </script>";
+echo "<script type='text/javascript'> document.location = 'canceled-bookings.php'; </script>";
 }
 
 
-if(isset($_REQUEST['aeid']))
+if(isset($_POST['aeid']))
 	{
-$aeid=intval($_GET['aeid']);
+$aeid=intval($_POST['aeid']);
 $status=1;
 
 $sql = "UPDATE tblbooking SET Status=:status WHERE  id=:aeid";
@@ -199,9 +199,9 @@ echo htmlentities('Confirmed');
 									<?php if($result->Status==0){ ?>
 										<tr>	
 										<td style="text-align:center" colspan="4">
-				<a href="bookig-details.php?aeid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you really want to Confirm this booking')" class="btn btn-primary"> Confirm Booking</a> 
+				<form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Confirm this booking');"><?php echo csrf_field(); ?><input type="hidden" name="aeid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="btn btn-primary"> Confirm Booking</button></form> 
 
-<a href="bookig-details.php?eid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you really want to Cancel this Booking')" class="btn btn-danger"> Cancel Booking</a>
+<form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Cancel this Booking');"><?php echo csrf_field(); ?><input type="hidden" name="eid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="btn btn-danger"> Cancel Booking</button></form>
 </td>
 </tr>
 <?php } ?>

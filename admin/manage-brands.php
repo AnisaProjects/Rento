@@ -7,14 +7,14 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-if(isset($_GET['del']))
+if(isset($_POST['del']))
 {
-$id=$_GET['del'];
+$id=intval($_POST['del']);
 $sql = "delete from tblbrands  WHERE id=:id";
 $query = $dbh->prepare($sql);
 $query -> bindParam(':id',$id, PDO::PARAM_STR);
 $query -> execute();
-$msg="Page data updated  successfully";
+$msg="Brand deleted successfully";
 
 }
 
@@ -128,8 +128,8 @@ foreach($results as $result)
 											<td><?php echo htmlentities($result->BrandName);?></td>
 											<td><?php echo htmlentities($result->CreationDate);?></td>
 											<td><?php echo htmlentities($result->UpdationDate);?></td>
-<td><a href="edit-brand.php?id=<?php echo $result->id;?>"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
-<a href="manage-brands.php?del=<?php echo $result->id;?>" onclick="return confirm('Do you want to delete');"><i class="fa fa-close"></i></a></td>
+<td><a href="edit-brand.php?id=<?php echo htmlentities($result->id);?>"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
+<form method="post" class="inline-action" onsubmit="return confirm('Do you want to delete');"><?php echo csrf_field(); ?><input type="hidden" name="del" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"><i class="fa fa-close"></i></button></form></td>
 										</tr>
 										<?php $cnt=$cnt+1; }} ?>
 										

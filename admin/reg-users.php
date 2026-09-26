@@ -7,15 +7,31 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-if(isset($_GET['del']))
+if(isset($_POST['del']))
 {
-$id=$_GET['del'];
-$sql = "delete from tblbrands  WHERE id=:id";
+$id=intval($_POST['del']);
+// Users with bookings are kept so the booking history keeps its customer details.
+$sql = "SELECT COUNT(*) FROM tblbooking WHERE userEmail=(SELECT EmailId FROM tblusers WHERE id=:id)";
 $query = $dbh->prepare($sql);
-$query -> bindParam(':id',$id, PDO::PARAM_STR);
+$query -> bindParam(':id',$id, PDO::PARAM_INT);
 $query -> execute();
-$msg="Page data updated  successfully";
-
+$bookingCount=(int)$query->fetchColumn();
+if($bookingCount > 0)
+{
+$error="This user has ".$bookingCount." booking(s) and cannot be deleted.";
+}
+else
+{
+$sql = "DELETE FROM tblpasswordresets WHERE UserId=:id";
+$query = $dbh->prepare($sql);
+$query -> bindParam(':id',$id, PDO::PARAM_INT);
+$query -> execute();
+$sql = "DELETE FROM tblusers WHERE id=:id";
+$query = $dbh->prepare($sql);
+$query -> bindParam(':id',$id, PDO::PARAM_INT);
+$query -> execute();
+$msg = $query->rowCount() > 0 ? "User deleted successfully" : "";
+}
 }
 
 
@@ -103,7 +119,7 @@ $msg="Page data updated  successfully";
 										<th>City</th>
 										<th>Country</th>
 										<th>Reg Date</th>
-										
+										<th>Action</th>
 										</tr>
 									</thead>
 									<tfoot>
@@ -117,6 +133,7 @@ $msg="Page data updated  successfully";
 										<th>City</th>
 										<th>Country</th>
 										<th>Reg Date</th>
+										<th>Action</th>
 										</tr>
 									</tfoot>
 									<tbody>
@@ -140,6 +157,7 @@ foreach($results as $result)
 											<td><?php echo htmlentities($result->City);?></td>
 											<td><?php echo htmlentities($result->Country);?></td>
 											<td><?php echo htmlentities($result->RegDate);?></td>
+											<td><form method="post" class="inline-action" onsubmit="return confirm('Do you want to delete this user');"><?php echo csrf_field(); ?><input type="hidden" name="del" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"><i class="fa fa-close"></i></button></form></td>
 										</tr>
 										<?php $cnt=$cnt+1; }} ?>
 										

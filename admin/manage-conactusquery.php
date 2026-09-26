@@ -7,9 +7,9 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-if(isset($_REQUEST['eid']))
+if(isset($_POST['eid']))
 	{
-$eid=intval($_GET['eid']);
+$eid=intval($_POST['eid']);
 $status=1;
 $sql = "UPDATE tblcontactusquery SET status=:status WHERE  id=:eid";
 $query = $dbh->prepare($sql);
@@ -138,7 +138,7 @@ foreach($results as $result)
 	?><td>Read</td>
 <?php } else {?>
 
-<td><a href="manage-conactusquery.php?eid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you really want to read')" >Pending</a>
+<td><form method="post" class="inline-action" onsubmit="return confirm('Do you really want to read');"><?php echo csrf_field(); ?><input type="hidden" name="eid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action">Pending</button></form>
 </td>
 <?php } ?>
 										</tr>

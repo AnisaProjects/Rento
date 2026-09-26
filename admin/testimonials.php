@@ -7,9 +7,9 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-if(isset($_REQUEST['eid']))
+if(isset($_POST['eid']))
 	{
-$eid=intval($_GET['eid']);
+$eid=intval($_POST['eid']);
 $status="0";
 $sql = "UPDATE tbltestimonial SET status=:status WHERE  id=:eid";
 $query = $dbh->prepare($sql);
@@ -21,9 +21,9 @@ $msg="Testimonial Successfully Inacrive";
 }
 
 
-if(isset($_REQUEST['aeid']))
+if(isset($_POST['aeid']))
 	{
-$aeid=intval($_GET['aeid']);
+$aeid=intval($_POST['aeid']);
 $status=1;
 
 $sql = "UPDATE tbltestimonial SET status=:status WHERE  id=:aeid";
@@ -147,10 +147,10 @@ foreach($results as $result)
 											<td><?php echo htmlentities($result->PostingDate);?></td>
 										<td><?php if($result->status=="" || $result->status==0)
 {
-	?><a href="testimonials.php?aeid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you really want to Active')"> Inactive</a>
+	?><form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Active');"><?php echo csrf_field(); ?><input type="hidden" name="aeid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"> Inactive</button></form>
 <?php } else {?>
 
-<a href="testimonials.php?eid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you really want to Inactive')"> Active</a>
+<form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Inactive');"><?php echo csrf_field(); ?><input type="hidden" name="eid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"> Active</button></form>
 </td>
 <?php } ?></td>
 										</tr>
