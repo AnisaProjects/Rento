@@ -3,6 +3,10 @@
 # No directory listings anywhere.
 Options -Indexes
 
+# Branded "page not found" page. Denied files (403) get it too, so they look missing.
+ErrorDocument 404 /Rento/404.php
+ErrorDocument 403 /Rento/404.php
+
 # Hidden files and folders: .git, .gitignore, .DS_Store, .user.ini, ...
 RedirectMatch 404 "/\.(?!well-known/)"
 

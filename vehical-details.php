@@ -2,6 +2,15 @@
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 require_once('includes/dynamic_pricing.php');
+
+// Unknown or missing vehicle id: show the "page not found" page.
+$vehicleCheck = $dbh->prepare("SELECT id FROM tblvehicles WHERE id = :vhid");
+$vehicleCheck->bindValue(':vhid', intval($_GET['vhid'] ?? 0), PDO::PARAM_INT);
+$vehicleCheck->execute();
+if (!$vehicleCheck->fetch()) {
+  require __DIR__ . '/404.php';
+  exit;
+}
 $requestedFromDate = isset($_POST['fromdate']) && $_POST['fromdate'] != '' ? $_POST['fromdate'] : date('Y-m-d', strtotime('+1 day'));
 $requestedToDate = isset($_POST['todate']) && $_POST['todate'] != '' ? $_POST['todate'] : date('Y-m-d', strtotime('+2 day'));
 // Returns true for a real calendar date in Y-m-d format.

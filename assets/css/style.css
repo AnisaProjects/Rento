@@ -2975,6 +2975,53 @@ input.newsletter-input::placeholder {
 }
 
 /*-----------------------------------------
+  404 page (404.php)
+------------------------------------------*/
+.notfound__search {
+  display: flex;
+  gap: 10px;
+  margin: 24px 0 18px;
+}
+
+.notfound__search .form-control {
+  flex: 1;
+  height: 46px;
+}
+
+.notfound__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.content-page__body .notfound__links .btn {
+  margin: 0;
+  color: #fff;
+  text-decoration: none;
+}
+
+.content-page__body .notfound__links .btn.notfound__btn-outline {
+  background: transparent;
+  border: 2px solid var(--rento-primary);
+  color: var(--rento-primary);
+}
+
+.content-page__body .notfound__links .btn.notfound__btn-outline:hover {
+  background: var(--rento-primary);
+  color: #fff;
+}
+
+@media (max-width: 575px) {
+  .notfound__search {
+    flex-direction: column;
+  }
+
+  .notfound__search .form-control {
+    flex: none;
+  }
+}
+
+/*-----------------------------------------
   Empty state (no row found in tblpages)
 ------------------------------------------*/
 
