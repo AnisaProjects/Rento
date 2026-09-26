@@ -10,3 +10,9 @@ RedirectMatch 404 "/\.(?!well-known/)"
 <FilesMatch "\.(?i:sql|csv|pkl|py|pyc|pt|parquet|joblib|log|md|ini|sh|bak|lock)$">
     Require all denied
 </FilesMatch>
+
+# Compress text responses. Only active once mod_deflate is loaded in MAMP's httpd.conf
+# (it ships with MAMP but is commented out); until then this block does nothing.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
+</IfModule>
