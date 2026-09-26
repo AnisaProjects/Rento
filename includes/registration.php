@@ -64,13 +64,12 @@ if (isset($_POST['signup'])) {
     return true;
   }
 </script>
-<div class="modal fade" id="signupform">
+<div class="modal fade" id="signupform" tabindex="-1" aria-labelledby="signupform-title" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-            aria-hidden="true">&times;</span></button>
-        <h3 class="modal-title">Sign Up</h3>
+        <h3 class="modal-title" id="signupform-title">Sign Up</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="row">
@@ -79,23 +78,28 @@ if (isset($_POST['signup'])) {
               <form method="post" name="signup" onSubmit="return registration_valid();">
 <?php echo csrf_field(); ?>
                 <div class="form-group">
-                  <input type="text" class="form-control" name="fullname" placeholder="Full Name" required="required">
+                  <label class="visually-hidden" for="signup-fullname">Full name</label>
+                  <input id="signup-fullname" type="text" class="form-control" name="fullname" placeholder="Full Name" required="required">
                 </div>
                 <div class="form-group">
-                  <input type="text" class="form-control" name="mobileno" placeholder="Mobile Number" maxlength="10"
+                  <label class="visually-hidden" for="signup-mobile">Mobile number</label>
+                  <input id="signup-mobile" type="text" class="form-control" name="mobileno" placeholder="Mobile Number" maxlength="10"
                     required="required">
                 </div>
                 <div class="form-group">
+                  <label class="visually-hidden" for="emailid">Email address</label>
                   <input type="email" class="form-control" name="emailid" id="emailid" onBlur="checkAvailability()"
                     placeholder="Email Address" required="required">
                   <span id="user-availability-status" style="font-size:12px;"></span>
                 </div>
                 <div class="form-group">
-                  <input type="password" class="form-control" name="password" placeholder="Password"
+                  <label class="visually-hidden" for="signup-password">Password</label>
+                  <input id="signup-password" type="password" class="form-control" name="password" placeholder="Password"
                     required="required">
                 </div>
                 <div class="form-group">
-                  <input type="password" class="form-control" name="confirmpassword" placeholder="Confirm Password"
+                  <label class="visually-hidden" for="signup-confirmpassword">Confirm password</label>
+                  <input id="signup-confirmpassword" type="password" class="form-control" name="confirmpassword" placeholder="Confirm Password"
                     required="required">
                 </div>
                 <div class="form-group checkbox">
@@ -112,7 +116,7 @@ if (isset($_POST['signup'])) {
         </div>
       </div>
       <div class="modal-footer text-center">
-        <p>Already got an account? <a href="#loginform" data-toggle="modal" data-dismiss="modal">Login Here</a></p>
+        <p>Already got an account? <a href="#loginform" data-bs-toggle="modal">Login Here</a></p>
       </div>
     </div>
   </div>

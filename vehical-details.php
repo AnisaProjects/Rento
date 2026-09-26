@@ -73,49 +73,21 @@ if (isset($_POST['submit'])) {
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>Car Rental | Vehicle Details</title>
-  <!--Bootstrap -->
-  <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css">
-  <!--Custome Style -->
-  <link rel="stylesheet" href="assets/css/style.css" type="text/css">
-  <!--OWL Carousel slider-->
-  <link rel="stylesheet" href="assets/css/owl.carousel.css" type="text/css">
-  <link rel="stylesheet" href="assets/css/owl.transitions.css" type="text/css">
-  <!--slick-slider -->
-  <link href="assets/css/slick.css" rel="stylesheet">
-  <!--bootstrap-slider -->
-  <link href="assets/css/bootstrap-slider.min.css" rel="stylesheet">
-  <!--FontAwesome Font Style -->
-  <link href="assets/css/font-awesome.min.css" rel="stylesheet">
-
-  <!-- SWITCHER -->
-  <link rel="stylesheet" id="switcher-css" type="text/css" href="assets/switcher/css/switcher.css" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/red.css" title="red" media="all"
-    data-default-color="true" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/orange.css" title="orange" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/blue.css" title="blue" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/pink.css" title="pink" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/green.css" title="green" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/purple.css" title="purple" media="all" />
-  <link rel="apple-touch-icon-precomposed" sizes="144x144"
-    href="assets/images/favicon-icon/apple-touch-icon-144-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="114x114"
-    href="assets/images/favicon-icon/apple-touch-icon-114-precomposed.html">
-  <link rel="apple-touch-icon-precomposed" sizes="72x72"
-    href="assets/images/favicon-icon/apple-touch-icon-72-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" href="assets/images/favicon-icon/apple-touch-icon-57-precomposed.png">
-  <link rel="shortcut icon" href="assets/images/favicon-icon/favicon.png">
-  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+  <?php
+  // Title and description name the car being viewed.
+  $metaQuery = $dbh->prepare("SELECT tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblbrands.BrandName FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE tblvehicles.id = :vhid");
+  $metaQuery->bindValue(':vhid', intval($_GET['vhid'] ?? 0), PDO::PARAM_INT);
+  $metaQuery->execute();
+  $metaVehicle = $metaQuery->fetch(PDO::FETCH_OBJ);
+  $pageTitle = $metaVehicle ? vehicle_display_name($metaVehicle->BrandName, $metaVehicle->VehiclesTitle) : 'Vehicle Details';
+  $pageDescription = $metaVehicle ? 'Rent the ' . $pageTitle . ' in Nepal from ' . format_price_per_day($metaVehicle->PricePerDay) . '. See photos, features and availability, and book online.' : null;
+  $pageUsesCarousel = true;
+  include('includes/head.php');
+  ?>
 </head>
 
 <body>
 
-  <!-- Start Switcher -->
-  <?php include('includes/colorswitcher.php'); ?>
-  <!-- /Switcher -->
 
   <!--Header-->
   <?php include('includes/header.php'); ?>
@@ -145,20 +117,20 @@ if (isset($_POST['submit'])) {
       ?>
 
       <section class="vehicle-slider-wrap">
-        <div id="listing_img_slider">
-          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>" class="img-responsive"
+        <div id="listing_img_slider" class="owl-carousel">
+          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage1); ?>" class="img-fluid"
               alt="image"></div>
-          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage2); ?>" class="img-responsive"
+          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage2); ?>" class="img-fluid"
               alt="image"></div>
-          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage3); ?>" class="img-responsive"
+          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage3); ?>" class="img-fluid"
               alt="image"></div>
-          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage4); ?>" class="img-responsive"
+          <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage4); ?>" class="img-fluid"
               alt="image"></div>
           <?php if ($result->Vimage5 == "") {
 
           } else {
             ?>
-            <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage5); ?>" class="img-responsive"
+            <div><img src="admin/img/vehicleimages/<?php echo htmlentities($result->Vimage5); ?>" class="img-fluid"
                 alt="image"></div>
           <?php } ?>
         </div>
@@ -192,7 +164,7 @@ if (isset($_POST['submit'])) {
                     <h5><?php echo htmlentities($result->ModelYear); ?></h5>
                     <p>Reg.Year</p>
                   </li>
-                  <li> <i class="fa fa-cogs" aria-hidden="true"></i>
+                  <li> <i class="fa fa-gears" aria-hidden="true"></i>
                     <h5><?php echo htmlentities($result->FuelType); ?></h5>
                     <p>Fuel Type</p>
                   </li>
@@ -207,24 +179,24 @@ if (isset($_POST['submit'])) {
                 <div class="listing_detail_wrap">
                   <!-- Nav tabs -->
                   <ul class="nav nav-tabs gray-bg" role="tablist">
-                    <li role="presentation" class="active"><a href="#vehicle-overview " aria-controls="vehicle-overview"
-                        role="tab" data-toggle="tab">Vehicle Overview </a></li>
+                    <li role="presentation"><a href="#vehicle-overview" class="active" aria-controls="vehicle-overview"
+                        role="tab" data-bs-toggle="tab" aria-selected="true">Vehicle Overview</a></li>
 
                     <li role="presentation"><a href="#accessories" aria-controls="accessories" role="tab"
-                        data-toggle="tab">Accessories</a></li>
+                        data-bs-toggle="tab" aria-selected="false">Accessories</a></li>
                   </ul>
 
                   <!-- Tab panes -->
                   <div class="tab-content">
                     <!-- vehicle-overview -->
-                    <div role="tabpanel" class="tab-pane active" id="vehicle-overview">
+                    <div role="tabpanel" class="tab-pane fade show active" id="vehicle-overview">
 
                       <p><?php echo htmlentities($result->VehiclesOverview); ?></p>
                     </div>
 
 
                     <!-- Accessories -->
-                    <div role="tabpanel" class="tab-pane" id="accessories">
+                    <div role="tabpanel" class="tab-pane fade" id="accessories">
                       <!--Accessories-->
                       <table>
                         <thead>
@@ -239,7 +211,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -249,7 +221,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -259,7 +231,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -272,7 +244,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -282,7 +254,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -292,7 +264,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -302,7 +274,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -312,7 +284,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
                           <tr>
@@ -321,7 +293,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -331,7 +303,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -341,7 +313,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -351,7 +323,7 @@ if (isset($_POST['submit'])) {
                               ?>
                               <td><i class="fa fa-check" aria-hidden="true"></i></td>
                             <?php } else { ?>
-                              <td><i class="fa fa-close" aria-hidden="true"></i></td>
+                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
                             <?php } ?>
                           </tr>
 
@@ -372,7 +344,7 @@ if (isset($_POST['submit'])) {
 
           <div class="booking-widget">
             <div class="filter-widget__head">
-              <span class="filter-widget__icon"><i class="fa fa-calendar-check-o" aria-hidden="true"></i></span>
+              <span class="filter-widget__icon"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i></span>
               <h5>Book Now</h5>
             </div>
             <form class="filter-widget__form" method="post">
@@ -395,7 +367,7 @@ if (isset($_POST['submit'])) {
                   <input type="submit" class="btn btn-block" name="submit" value="Book Now">
                 </div>
               <?php } else { ?>
-                <a href="#loginform" class="btn btn-block uppercase" data-toggle="modal" data-dismiss="modal">Login to
+                <a href="#loginform" class="btn btn-block uppercase" data-bs-toggle="modal">Login to
                   Book</a>
               <?php } ?>
             </form>
@@ -403,10 +375,10 @@ if (isset($_POST['submit'])) {
             <div class="booking-widget__share">
               <span>Share this car</span>
               <div class="booking-widget__share-icons">
-                <a href="#" aria-label="Share on Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                <a href="#" aria-label="Share on Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-                <a href="#" aria-label="Share on LinkedIn"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
-                <a href="#" aria-label="Share on Google Plus"><i class="fa fa-google-plus" aria-hidden="true"></i></a>
+                <a href="#" aria-label="Share on Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
+                <a href="#" aria-label="Share on Twitter"><i class="fa-brands fa-twitter" aria-hidden="true"></i></a>
+                <a href="#" aria-label="Share on LinkedIn"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
+                <a href="#" aria-label="Share on Google Plus"><i class="fa-brands fa-google-plus-g" aria-hidden="true"></i></a>
               </div>
             </div>
           </div>
@@ -480,9 +452,6 @@ if (isset($_POST['submit'])) {
   <?php include('includes/footer.php'); ?>
   <!-- /Footer-->
 
-  <!--Back to top-->
-  <div id="back-top" class="back-top"> <a href="#top"><i class="fa fa-angle-up" aria-hidden="true"></i> </a> </div>
-  <!--/Back to top-->
 
   <!--Login-Form -->
   <?php include('includes/login.php'); ?>
@@ -496,26 +465,18 @@ if (isset($_POST['submit'])) {
   <!--Forgot-password-Form -->
   <?php include('includes/forgotpassword.php'); ?>
 
-  <script src="assets/js/jquery.min.js"></script>
-  <script src="assets/js/bootstrap.min.js"></script>
-  <script src="assets/js/interface.js"></script>
-  <script src="assets/switcher/js/switcher.js"></script>
-  <script src="assets/js/bootstrap-slider.min.js"></script>
-  <script src="assets/js/slick.min.js"></script>
-  <script src="assets/js/owl.carousel.min.js"></script>
+  <?php include('includes/scripts.php'); ?>
 
   <script>
     $(document).ready(function () {
-      $('#listing_img_slider').slick({
+      $('#listing_img_slider').owlCarousel({
+        items: 1,
+        loop: true,
+        nav: true,
         dots: true,
-        arrows: true,
-        infinite: true,
-        speed: 400,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        adaptiveHeight: false,
-        prevArrow: '<button type="button" class="vslider-arrow vslider-arrow--prev"><i class="fa fa-angle-left" aria-hidden="true"></i></button>',
-        nextArrow: '<button type="button" class="vslider-arrow vslider-arrow--next"><i class="fa fa-angle-right" aria-hidden="true"></i></button>'
+        smartSpeed: 400,
+        navText: ['<i class="fa fa-angle-left" aria-hidden="true"></i><span class="visually-hidden">Previous photo</span>',
+          '<i class="fa fa-angle-right" aria-hidden="true"></i><span class="visually-hidden">Next photo</span>']
       });
     });
   </script>

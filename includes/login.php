@@ -63,7 +63,7 @@ if (isset($_POST['login'])) {
 
 
 <!-- Login Modal -->
-<div class="modal fade" id="loginform">
+<div class="modal fade" id="loginform" tabindex="-1" aria-labelledby="loginform-title" aria-hidden="true">
 
   <div class="modal-dialog" role="document">
 
@@ -72,13 +72,8 @@ if (isset($_POST['login'])) {
       <!-- Header -->
       <div class="modal-header">
 
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-
-          <span aria-hidden="true">&times;</span>
-
-        </button>
-
-        <h3 class="modal-title">Login</h3>
+        <h3 class="modal-title" id="loginform-title">Login</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
       </div>
 
@@ -98,7 +93,8 @@ if (isset($_POST['login'])) {
                 <!-- Email -->
                 <div class="form-group">
 
-                  <input type="email" class="form-control" name="email" placeholder="Email address*" required>
+                  <label class="visually-hidden" for="login-email">Email address</label>
+                  <input id="login-email" type="email" class="form-control" name="email" placeholder="Email address*" required>
 
                 </div>
 
@@ -106,7 +102,8 @@ if (isset($_POST['login'])) {
                 <!-- Password -->
                 <div class="form-group">
 
-                  <input type="password" class="form-control" name="password" placeholder="Password*" required>
+                  <label class="visually-hidden" for="login-password">Password</label>
+                  <input id="login-password" type="password" class="form-control" name="password" placeholder="Password*" required>
 
                 </div>
 
@@ -146,13 +143,13 @@ if (isset($_POST['login'])) {
 
         <p>
           Don't have an account?
-          <a href="#signupform" data-toggle="modal" data-dismiss="modal">
+          <a href="#signupform" data-bs-toggle="modal">
             Signup Here
           </a>
         </p>
 
         <p>
-          <a href="#forgotpassword" data-toggle="modal" data-dismiss="modal">
+          <a href="#forgotpassword" data-bs-toggle="modal">
             Forgot Password?
           </a>
         </p>

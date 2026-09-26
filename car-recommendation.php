@@ -19,41 +19,12 @@ if(isset($_POST['getRecommendations'])) {
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Car Rental Portal | AI Car Recommendations</title>
-<!--Bootstrap -->
-<link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css">
-<!--Custome Style -->
-<link rel="stylesheet" href="assets/css/style.css" type="text/css">
-<!--OWL Carousel slider-->
-<link rel="stylesheet" href="assets/css/owl.carousel.css" type="text/css">
-<link rel="stylesheet" href="assets/css/owl.transitions.css" type="text/css">
-<!--slick-slider -->
-<link href="assets/css/slick.css" rel="stylesheet">
-<!--bootstrap-slider -->
-<link href="assets/css/bootstrap-slider.min.css" rel="stylesheet">
-<!--FontAwesome Font Style -->
-<link href="assets/css/font-awesome.min.css" rel="stylesheet">
-
-<!-- SWITCHER -->
-<link rel="stylesheet" id="switcher-css" type="text/css" href="assets/switcher/css/switcher.css" media="all" />
-<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/red.css" title="red" media="all" data-default-color="true" />
-<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/orange.css" title="orange" media="all" />
-<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/blue.css" title="blue" media="all" />
-<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/pink.css" title="pink" media="all" />
-<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/green.css" title="green" media="all" />
-<link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/purple.css" title="purple" media="all" />
-
-<!-- Fav and touch icons -->
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/images/favicon-icon/apple-touch-icon-144-precomposed.png">
-<link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/images/favicon-icon/apple-touch-icon-114-precomposed.html">
-<link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/images/favicon-icon/apple-touch-icon-72-precomposed.png">
-<link rel="apple-touch-icon-precomposed" href="assets/images/favicon-icon/apple-touch-icon-57-precomposed.png">
-<link rel="shortcut icon" href="assets/images/favicon-icon/favicon.png">
-<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
-
-<style>
+  <?php
+  $pageTitle = 'AI Car Recommendations';
+  $pageDescription = 'Tell Rento your budget and car type and get personalised car recommendations.';
+  include('includes/head.php');
+  ?>
+  <style>
 .recommendation-card {
     border: 2px solid #e9ecef;
     border-radius: 10px;
@@ -142,10 +113,6 @@ if(isset($_POST['getRecommendations'])) {
 </head>
 
 <body>
-<!-- Start Switcher -->
-<?php include('includes/colorswitcher.php');?>
-<!-- /Switcher -->  
-
 <!--Header--> 
 <?php include('includes/header.php');?>
 <!-- /Header -->
@@ -186,12 +153,12 @@ if(isset($_POST['getRecommendations'])) {
                 <div class="form-group">
                   <label for="budget" class="form-label">Your Budget (per day)</label>
                   <div class="budget-slider">
-                    <input type="range" class="form-control-range" id="budget" name="budget" 
+                    <input type="range" class="form-range" id="budget" name="budget" 
                            min="200" max="5000" value="1000" 
                            oninput="document.getElementById('budgetValue').textContent = 'Rs. ' + this.value">
                     <div class="d-flex justify-content-between">
                       <small>Rs. 200</small>
-                      <span id="budgetValue" class="badge badge-light">Rs. 1000</span>
+                      <span id="budgetValue" class="badge text-bg-light">Rs. 1000</span>
                       <small>Rs. 5000</small>
                     </div>
                   </div>
@@ -214,7 +181,7 @@ if(isset($_POST['getRecommendations'])) {
                 <div class="form-group">
                   <label class="form-label">&nbsp;</label>
                   <button type="submit" name="getRecommendations" class="btn btn-light btn-block">
-                    <i class="fa fa-magic"></i> Get AI Recommendations
+                    <i class="fa fa-wand-magic-sparkles"></i> Get AI Recommendations
                   </button>
                 </div>
               </div>
@@ -313,7 +280,7 @@ if(isset($_POST['getRecommendations'])) {
                   <i class="fa fa-eye"></i> View Details
                 </a>
                 <a href="vehical-details.php?vhid=<?php echo htmlentities($car->id); ?>" 
-                   class="btn btn-outline-primary btn-sm ml-2">
+                   class="btn btn-outline-primary btn-sm ms-2">
                   <i class="fa fa-calendar"></i> Book Now
                 </a>
               </div>
@@ -326,11 +293,11 @@ if(isset($_POST['getRecommendations'])) {
       <?php elseif(isset($_POST['getRecommendations'])): ?>
       <div class="col-md-12">
         <div class="no-recommendations">
-          <i class="fa fa-search"></i>
+          <i class="fa fa-magnifying-glass"></i>
           <h4>No cars found matching your criteria</h4>
           <p>Try adjusting your budget or car type preferences to get better recommendations.</p>
           <a href="car-recommendation.php" class="btn btn-primary">
-            <i class="fa fa-refresh"></i> Try Again
+            <i class="fa fa-rotate"></i> Try Again
           </a>
         </div>
       </div>
@@ -345,27 +312,13 @@ if(isset($_POST['getRecommendations'])) {
 <?php include('includes/footer.php');?>
 <!-- /Footer-->
 
-<!--Back to top-->
-<div id="back-top" class="back-top"> <a href="#top"><i class="fa fa-angle-up"></i> </a></div>
-<!--/Back to top-->
-
 <!--Login-Form -->
 <?php include('includes/login.php');?>
 <!--/Login-Form -->
 
 <!--Register-Form -->
 <?php include('includes/registration.php');?>
-<!--/Register-Form -->
-
-<!-- Scripts -->
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/js/bootstrap.min.js"></script>
-<script src="assets/js/interface.js"></script>
-<!--bootstrap-slider-JS-->
-<script src="assets/js/bootstrap-slider.min.js"></script>
-<!--Slider-JS-->
-<script src="assets/js/slick.min.js"></script>
-<script src="assets/js/owl.carousel.min.js"></script>
+<?php include('includes/scripts.php'); ?>
 
 <script>
 // Budget slider functionality

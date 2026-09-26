@@ -30,7 +30,7 @@
 
 .about2-eyebrow {
     display: inline-block;
-    font-family: 'Space Mono', monospace;
+    font-family: var(--rento-font-body);
     font-size: 12px;
     letter-spacing: 0.16em;
     color: var(--a2-rust);
@@ -72,7 +72,7 @@
 
 .aboutus-hero__kicker {
     display: inline-block;
-    font-family: 'Space Mono', monospace;
+    font-family: var(--rento-font-body);
     font-size: 12px;
     letter-spacing: 0.18em;
     color: #E9C9A6;
@@ -82,7 +82,7 @@
 }
 
 .aboutus-hero .page-heading h1 {
-    font-family: 'Fraunces', serif;
+    font-family: var(--rento-font-heading);
     font-weight: 600;
 }
 
@@ -108,7 +108,7 @@
 }
 
 .about2-intro__headline {
-    font-family: 'Fraunces', serif;
+    font-family: var(--rento-font-heading);
     font-weight: 600;
     font-size: 42px;
     line-height: 1.22;
@@ -155,7 +155,7 @@
 }
 
 .about2-intro__body p:first-of-type::first-letter {
-    font-family: 'Fraunces', serif;
+    font-family: var(--rento-font-heading);
     font-weight: 700;
     font-size: 50px;
     line-height: 0.75;
@@ -207,7 +207,7 @@
 }
 
 .about2-mv__card p {
-    font-family: 'Fraunces', serif;
+    font-family: var(--rento-font-heading);
     font-weight: 500;
     font-size: 19px;
     line-height: 1.5;

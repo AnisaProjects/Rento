@@ -2,10 +2,10 @@
   <div class="default-header">
     <div class="container">
       <div class="row">
-        <div class="col-sm-3 col-md-2">
-          <div class="logo"> <a href="index.php"><img src="assets/images/rentoindia_logo.jpeg" alt="image" /></a> </div>
+        <div class="col-5 col-sm-3 col-md-2">
+          <div class="logo"> <a href="index.php"><img src="assets/images/rentoindia_logo.jpeg" alt="Rento" /></a> </div>
         </div>
-        <div class="col-sm-9 col-md-10">
+        <div class="col-7 col-sm-9 col-md-10">
           <div class="header_info">
             <?php
             $sql = "SELECT EmailId,ContactNo from tblcontactusinfo";
@@ -31,10 +31,9 @@
             <div class="social-follow">
 
             </div>
-            <?php if (strlen($_SESSION['login']) == 0) {
+            <?php if (empty($_SESSION['login'])) {
               ?>
-              <div class="login_btn"> <a href="#loginform" class="btn btn-xs uppercase" data-toggle="modal"
-                  data-dismiss="modal">Login / Register</a> </div>
+              <div class="login_btn"> <a href="#loginform" class="btn btn-xs uppercase" data-bs-toggle="modal">Login / Register</a> </div>
             <?php } else {
 
               echo "WELCOME TO RENTO";
@@ -46,21 +45,21 @@
   </div>
 
   <!-- Navigation -->
-  <nav id="navigation_bar" class="navbar navbar-default">
+  <nav id="navigation_bar" class="navbar navbar-expand-md">
     <div class="container">
-      <div class="navbar-header">
-        <button id="menu_slide" data-target="#navigation" aria-expanded="false" data-toggle="collapse"
-          class="navbar-toggle collapsed" type="button"> <span class="sr-only">Toggle navigation</span> <span
-            class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
-      </div>
+      <button id="menu_slide" class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false">
+        <span class="visually-hidden">Toggle navigation</span>
+        <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+      </button>
       <div class="header_wrap">
         <?php if (isset($_SESSION['login']) && !empty($_SESSION['login'])) { ?>
 
           <div class="user_login">
             <ul>
               <li class="dropdown">
-                <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="fa fa-user-circle" aria-hidden="true"></i>
+                <a href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                  <i class="fa fa-circle-user" aria-hidden="true"></i>
 
                   <?php
                   $user_email = $_SESSION['login'];
@@ -81,12 +80,12 @@
                 </a>
 
                 <ul class="dropdown-menu">
-                  <li><a href="profile.php">Profile Settings</a></li>
-                  <li><a href="update-password.php">Update Password</a></li>
-                  <li><a href="my-booking.php">My Booking</a></li>
-                  <li><a href="post-testimonial.php">Post a Testimonial</a></li>
-                  <li><a href="my-testimonials.php">My Testimonial</a></li>
-                  <li><a href="logout.php">Sign Out</a></li>
+                  <li><a class="dropdown-item" href="profile.php">Profile Settings</a></li>
+                  <li><a class="dropdown-item" href="update-password.php">Update Password</a></li>
+                  <li><a class="dropdown-item" href="my-booking.php">My Booking</a></li>
+                  <li><a class="dropdown-item" href="post-testimonial.php">Post a Testimonial</a></li>
+                  <li><a class="dropdown-item" href="my-testimonials.php">My Testimonial</a></li>
+                  <li><a class="dropdown-item" href="logout.php">Sign Out</a></li>
                 </ul>
 
               </li>
@@ -95,32 +94,31 @@
 
         <?php } ?>
         <div class="header_search">
-          <div id="search_toggle"><i class="fa fa-search" aria-hidden="true"></i></div>
+          <button type="button" id="search_toggle" aria-label="Show search" aria-controls="header-search-form"><i class="fa fa-magnifying-glass" aria-hidden="true"></i></button>
           <form action="search.php" method="post" id="header-search-form">
 <?php echo csrf_field(); ?>
-            <input type="text" placeholder="Search..." name="searchdata" class="form-control" required="true">
-            <button type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+            <input type="text" placeholder="Search..." name="searchdata" class="form-control" required="true" aria-label="Search cars">
+            <button type="submit" aria-label="Search"><i class="fa fa-magnifying-glass" aria-hidden="true"></i></button>
           </form>
         </div>
       </div>
       <?php $current_page = basename($_SERVER['PHP_SELF']); ?>
       <div class="collapse navbar-collapse" id="navigation">
-        <ul class="nav navbar-nav">
-          <li class="<?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">
-            <a href="index.php">Home</a>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link<?php echo ($current_page == 'index.php') ? ' active" aria-current="page' : ''; ?>" href="index.php">Home</a>
           </li>
-          <li
-            class="<?php echo ($current_page == 'page.php' && ($_GET['type'] ?? '') == 'aboutus') ? 'active' : ''; ?>">
-            <a href="page.php?type=aboutus">About Us</a>
+          <li class="nav-item">
+            <a class="nav-link<?php echo ($current_page == 'page.php' && ($_GET['type'] ?? '') == 'aboutus') ? ' active" aria-current="page' : ''; ?>" href="page.php?type=aboutus">About Us</a>
           </li>
-          <li class="<?php echo ($current_page == 'car-listing.php') ? 'active' : ''; ?>">
-            <a href="car-listing.php">Car Listing</a>
+          <li class="nav-item">
+            <a class="nav-link<?php echo ($current_page == 'car-listing.php') ? ' active" aria-current="page' : ''; ?>" href="car-listing.php">Car Listing</a>
           </li>
-          <li class="<?php echo ($current_page == 'page.php' && ($_GET['type'] ?? '') == 'faqs') ? 'active' : ''; ?>">
-            <a href="page.php?type=faqs">FAQs</a>
+          <li class="nav-item">
+            <a class="nav-link<?php echo ($current_page == 'page.php' && ($_GET['type'] ?? '') == 'faqs') ? ' active" aria-current="page' : ''; ?>" href="page.php?type=faqs">FAQs</a>
           </li>
-          <li class="<?php echo ($current_page == 'contact-us.php') ? 'active' : ''; ?>">
-            <a href="contact-us.php">Contact Us</a>
+          <li class="nav-item">
+            <a class="nav-link<?php echo ($current_page == 'contact-us.php') ? ' active" aria-current="page' : ''; ?>" href="contact-us.php">Contact Us</a>
           </li>
         </ul>
       </div>

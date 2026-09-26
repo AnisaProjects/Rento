@@ -99,42 +99,11 @@ if (isset($_POST['update'])) {
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rento - Reset Password</title>
-  <!--Bootstrap -->
-  <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css">
-  <!--Custome Style -->
-  <link rel="stylesheet" href="assets/css/style.css" type="text/css">
-  <!--OWL Carousel slider-->
-  <link rel="stylesheet" href="assets/css/owl.carousel.css" type="text/css">
-  <link rel="stylesheet" href="assets/css/owl.transitions.css" type="text/css">
-  <!--slick-slider -->
-  <link href="assets/css/slick.css" rel="stylesheet">
-  <!--bootstrap-slider -->
-  <link href="assets/css/bootstrap-slider.min.css" rel="stylesheet">
-  <!--FontAwesome Font Style -->
-  <link href="assets/css/font-awesome.min.css" rel="stylesheet">
-
-  <!-- SWITCHER -->
-  <link rel="stylesheet" id="switcher-css" type="text/css" href="assets/switcher/css/switcher.css" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/red.css" title="red" media="all"
-    data-default-color="true" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/orange.css" title="orange" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/blue.css" title="blue" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/pink.css" title="pink" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/green.css" title="green" media="all" />
-  <link rel="alternate stylesheet" type="text/css" href="assets/switcher/css/purple.css" title="purple" media="all" />
-
-  <!-- Fav and touch icons -->
-  <link rel="apple-touch-icon-precomposed" sizes="144x144"
-    href="assets/images/favicon-icon/apple-touch-icon-144-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="72x72"
-    href="assets/images/favicon-icon/apple-touch-icon-72-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" href="assets/images/favicon-icon/apple-touch-icon-57-precomposed.png">
-  <link rel="shortcut icon" href="assets/images/favicon-icon/favicon.png">
-  <!-- Google-Font-->
-  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+  <?php
+  $pageTitle = 'Reset Password';
+  $pageDescription = 'Reset your Rento account password with a secure, time-limited link.';
+  include('includes/head.php');
+  ?>
   <script type="text/javascript">
     function resetpassword_valid() {
       if (document.resetpwd.newpassword.value != document.resetpwd.confirmpassword.value) {
@@ -273,9 +242,9 @@ if (isset($_POST['update'])) {
             </form>
           <?php } else { ?>
             <p>
-              <a href="#loginform" class="btn" data-toggle="modal">Login</a>
+              <a href="#loginform" class="btn" data-bs-toggle="modal">Login</a>
               &nbsp;
-              <a href="#forgotpassword" data-toggle="modal">Request a new reset link</a>
+              <a href="#forgotpassword" data-bs-toggle="modal">Request a new reset link</a>
             </p>
           <?php } ?>
         </div>
@@ -297,17 +266,7 @@ if (isset($_POST['update'])) {
 
   <!--Forgot-password-Form -->
   <?php include('includes/forgotpassword.php'); ?>
-  <!--/Forgot-password-Form -->
-
-  <!-- Scripts -->
-  <script src="assets/js/jquery.min.js"></script>
-  <script src="assets/js/bootstrap.min.js"></script>
-  <script src="assets/js/interface.js"></script>
-  <!--Switcher-->
-  <script src="assets/switcher/js/switcher.js"></script>
-  <!--Slider-JS-->
-  <script src="assets/js/slick.min.js"></script>
-  <script src="assets/js/owl.carousel.min.js"></script>
+  <?php include('includes/scripts.php'); ?>
 
 </body>
 

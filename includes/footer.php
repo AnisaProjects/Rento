@@ -65,23 +65,23 @@ if (isset($_POST['emailsubscibe'])) {
         <div class="f-social">
 
           <a href="#" aria-label="Facebook">
-            <i class="fa fa-facebook" aria-hidden="true"></i>
+            <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
           </a>
 
           <a href="#" aria-label="Twitter">
-            <i class="fa fa-twitter" aria-hidden="true"></i>
+            <i class="fa-brands fa-twitter" aria-hidden="true"></i>
           </a>
 
           <a href="#" aria-label="LinkedIn">
-            <i class="fa fa-linkedin" aria-hidden="true"></i>
+            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
           </a>
 
           <a href="#" aria-label="Google Plus">
-            <i class="fa fa-google-plus" aria-hidden="true"></i>
+            <i class="fa-brands fa-google-plus-g" aria-hidden="true"></i>
           </a>
 
           <a href="#" aria-label="Instagram">
-            <i class="fa fa-instagram" aria-hidden="true"></i>
+            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
           </a>
 
         </div>
@@ -226,23 +226,23 @@ if (isset($_POST['emailsubscibe'])) {
         <div class="f-social">
 
           <a href="#" aria-label="Facebook">
-            <i class="fa fa-facebook" aria-hidden="true"></i>
+            <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
           </a>
 
           <a href="#" aria-label="Twitter">
-            <i class="fa fa-twitter" aria-hidden="true"></i>
+            <i class="fa-brands fa-twitter" aria-hidden="true"></i>
           </a>
 
           <a href="#" aria-label="LinkedIn">
-            <i class="fa fa-linkedin" aria-hidden="true"></i>
+            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
           </a>
 
           <a href="#" aria-label="Google Plus">
-            <i class="fa fa-google-plus" aria-hidden="true"></i>
+            <i class="fa-brands fa-google-plus-g" aria-hidden="true"></i>
           </a>
 
           <a href="#" aria-label="Instagram">
-            <i class="fa fa-instagram" aria-hidden="true"></i>
+            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
           </a>
 
         </div>

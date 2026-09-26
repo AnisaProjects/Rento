@@ -1,0 +1,122 @@
+/* ==========================================================================
+   Rento design tokens
+   The single source for colour, type, spacing, radius and shadow values.
+   Loaded before style.css on every public page (includes/head.php).
+   ========================================================================== */
+
+:root {
+  /* ---------- Brand ---------- */
+  --rento-primary: #ff5a36;          /* taillight orange: buttons, links, accents */
+  --rento-primary-hover: #e8482a;
+  --rento-primary-active: #cc3d22;
+  --rento-primary-soft: #fff0eb;     /* tinted backgrounds, badges */
+  --rento-primary-rgb: 255, 90, 54;
+  --rento-secondary: #ffb238;        /* headlight amber: highlights */
+
+  /* ---------- Neutrals (ink = dark, paper = light) ---------- */
+  --rento-ink-900: #101114;          /* page-dark sections, footer */
+  --rento-ink-800: #17181d;
+  --rento-ink-700: #1d1e25;
+  --rento-ink-600: #2b2d36;
+  --rento-gray-600: #4f5362;         /* body text on light */
+  --rento-gray-500: #6b6f7d;
+  --rento-gray-400: #9497a6;         /* muted text */
+  --rento-gray-300: #c9ccd4;
+  --rento-gray-200: #e2e5e9;         /* borders */
+  --rento-gray-100: #f1f2f4;
+  --rento-gray-50: #f8f9fa;          /* light section background */
+  --rento-paper: #f1efe9;
+  --rento-white: #ffffff;
+  --rento-line-dark: rgba(255, 255, 255, .09);
+
+  /* ---------- Status ---------- */
+  --rento-success: #1f9d55;
+  --rento-success-soft: #e8f6ee;
+  --rento-warning: #d98a00;
+  --rento-warning-soft: #fff5e0;
+  --rento-danger: #d93a2b;
+  --rento-danger-soft: #fdecea;
+  --rento-info: #2f7fd1;
+  --rento-info-soft: #e9f2fc;
+
+  /* ---------- Typography ---------- */
+  --rento-font-heading: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rento-font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --rento-text-xs: .75rem;           /* 12px */
+  --rento-text-sm: .875rem;          /* 14px */
+  --rento-text-base: 1rem;           /* 16px */
+  --rento-text-lg: 1.125rem;         /* 18px */
+  --rento-text-xl: 1.25rem;          /* 20px */
+  --rento-text-2xl: 1.5rem;          /* 24px */
+  --rento-text-3xl: 1.875rem;        /* 30px */
+  --rento-text-4xl: 2.25rem;         /* 36px */
+  --rento-text-5xl: 3rem;            /* 48px */
+  --rento-leading-tight: 1.2;
+  --rento-leading-normal: 1.6;
+  --rento-weight-regular: 400;
+  --rento-weight-medium: 500;
+  --rento-weight-semibold: 600;
+  --rento-weight-bold: 700;
+  --rento-weight-extrabold: 800;
+
+  /* ---------- Spacing (4px scale) ---------- */
+  --rento-space-1: .25rem;
+  --rento-space-2: .5rem;
+  --rento-space-3: .75rem;
+  --rento-space-4: 1rem;
+  --rento-space-5: 1.25rem;
+  --rento-space-6: 1.5rem;
+  --rento-space-8: 2rem;
+  --rento-space-10: 2.5rem;
+  --rento-space-12: 3rem;
+  --rento-space-16: 4rem;
+  --rento-space-20: 5rem;
+
+  /* ---------- Radius ---------- */
+  --rento-radius-sm: 6px;
+  --rento-radius: 10px;
+  --rento-radius-lg: 14px;
+  --rento-radius-xl: 20px;
+  --rento-radius-pill: 999px;
+
+  /* ---------- Shadows ---------- */
+  --rento-shadow-sm: 0 1px 2px rgba(16, 17, 20, .06);
+  --rento-shadow: 0 2px 12px rgba(16, 17, 20, .08);
+  --rento-shadow-lg: 0 12px 32px rgba(16, 17, 20, .14);
+  --rento-shadow-primary: 0 8px 24px rgba(var(--rento-primary-rgb), .28);
+
+  /* ---------- Motion ---------- */
+  --rento-ease: cubic-bezier(.2, .7, .2, 1);
+  --rento-duration: .2s;
+
+  /* ---------- Legacy names used by style.css / about-us.css ---------- */
+  --asphalt: var(--rento-ink-900);
+  --panel: var(--rento-ink-800);
+  --panel-2: var(--rento-ink-700);
+  --line: var(--rento-line-dark);
+  --ash: var(--rento-gray-400);
+  --paper: var(--rento-paper);
+  --signal: var(--rento-primary);
+  --signal-2: var(--rento-secondary);
+  --radius: var(--rento-radius-lg);
+
+  /* ---------- Bootstrap 5 theme hooks ---------- */
+  --bs-primary: var(--rento-primary);
+  --bs-primary-rgb: var(--rento-primary-rgb);
+  --bs-link-color: var(--rento-primary);
+  --bs-link-color-rgb: var(--rento-primary-rgb);
+  --bs-link-hover-color: var(--rento-primary-hover);
+  --bs-body-font-family: var(--rento-font-body);
+  --bs-body-color: var(--rento-gray-600);
+  --bs-border-color: var(--rento-gray-200);
+  --bs-border-radius: var(--rento-radius-sm);
+  --bs-success: var(--rento-success);
+  --bs-warning: var(--rento-warning);
+  --bs-danger: var(--rento-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --rento-duration: 0s;
+  }
+}
