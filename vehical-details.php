@@ -5,44 +5,63 @@ require_once('includes/dynamic_pricing.php');
 error_reporting(0);
 $requestedFromDate = isset($_POST['fromdate']) && $_POST['fromdate'] != '' ? $_POST['fromdate'] : date('Y-m-d', strtotime('+1 day'));
 $requestedToDate = isset($_POST['todate']) && $_POST['todate'] != '' ? $_POST['todate'] : date('Y-m-d', strtotime('+2 day'));
-if (isset($_POST['submit'])) {
-  $fromdate = $_POST['fromdate'];
-  $todate = $_POST['todate'];
-  $message = $_POST['message'];
-  $useremail = $_SESSION['login'];
-  $status = 0;
-  $vhid = $_GET['vhid'];
-  $bookingno = mt_rand(100000000, 999999999);
-  $ret = "SELECT * FROM tblbooking where (:fromdate BETWEEN date(FromDate) and date(ToDate) || :todate BETWEEN date(FromDate) and date(ToDate) || date(FromDate) BETWEEN :fromdate and :todate) and VehicleId=:vhid";
-  $query1 = $dbh->prepare($ret);
-  $query1->bindParam(':vhid', $vhid, PDO::PARAM_STR);
-  $query1->bindParam(':fromdate', $fromdate, PDO::PARAM_STR);
-  $query1->bindParam(':todate', $todate, PDO::PARAM_STR);
-  $query1->execute();
-  $results1 = $query1->fetchAll(PDO::FETCH_OBJ);
+// Returns true for a real calendar date in Y-m-d format.
+function is_booking_date(string $value): bool
+{
+  $date = DateTime::createFromFormat('Y-m-d', $value);
+  return $date !== false && $date->format('Y-m-d') === $value;
+}
 
-  if ($query1->rowCount() == 0) {
-    $sql = "INSERT INTO  tblbooking(BookingNumber,userEmail,VehicleId,FromDate,ToDate,message,Status) VALUES(:bookingno,:useremail,:vhid,:fromdate,:todate,:message,:status)";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':bookingno', $bookingno, PDO::PARAM_STR);
-    $query->bindParam(':useremail', $useremail, PDO::PARAM_STR);
-    $query->bindParam(':vhid', $vhid, PDO::PARAM_STR);
-    $query->bindParam(':fromdate', $fromdate, PDO::PARAM_STR);
-    $query->bindParam(':todate', $todate, PDO::PARAM_STR);
-    $query->bindParam(':message', $message, PDO::PARAM_STR);
-    $query->bindParam(':status', $status, PDO::PARAM_STR);
-    $query->execute();
-    $lastInsertId = $dbh->lastInsertId();
-    if ($lastInsertId) {
-      echo "<script>alert('Booking successfull.');</script>";
-      echo "<script type='text/javascript'> document.location = 'my-booking.php'; </script>";
+if (isset($_POST['submit'])) {
+  $fromdate = (string)($_POST['fromdate'] ?? '');
+  $todate = (string)($_POST['todate'] ?? '');
+  $message = $_POST['message'];
+  $useremail = $_SESSION['login'] ?? '';
+  $status = 0;
+  $vhid = intval($_GET['vhid'] ?? 0);
+  $bookingno = mt_rand(100000000, 999999999);
+
+  // Server-side checks: the booking form alone can be bypassed with a direct POST.
+  if ($useremail === '') {
+    echo "<script>alert('Please login to book this car.');</script>";
+  } elseif (!is_booking_date($fromdate) || !is_booking_date($todate)) {
+    echo "<script>alert('Please choose valid From and To dates.');</script>";
+  } elseif ($fromdate < date('Y-m-d')) {
+    echo "<script>alert('The From date cannot be in the past.');</script>";
+  } elseif ($todate < $fromdate) {
+    echo "<script>alert('The To date must be on or after the From date.');</script>";
+  } else {
+    $ret = "SELECT * FROM tblbooking where (:fromdate BETWEEN date(FromDate) and date(ToDate) || :todate BETWEEN date(FromDate) and date(ToDate) || date(FromDate) BETWEEN :fromdate and :todate) and VehicleId=:vhid";
+    $query1 = $dbh->prepare($ret);
+    $query1->bindParam(':vhid', $vhid, PDO::PARAM_STR);
+    $query1->bindParam(':fromdate', $fromdate, PDO::PARAM_STR);
+    $query1->bindParam(':todate', $todate, PDO::PARAM_STR);
+    $query1->execute();
+    $results1 = $query1->fetchAll(PDO::FETCH_OBJ);
+
+    if ($query1->rowCount() == 0) {
+      $sql = "INSERT INTO  tblbooking(BookingNumber,userEmail,VehicleId,FromDate,ToDate,message,Status) VALUES(:bookingno,:useremail,:vhid,:fromdate,:todate,:message,:status)";
+      $query = $dbh->prepare($sql);
+      $query->bindParam(':bookingno', $bookingno, PDO::PARAM_STR);
+      $query->bindParam(':useremail', $useremail, PDO::PARAM_STR);
+      $query->bindParam(':vhid', $vhid, PDO::PARAM_STR);
+      $query->bindParam(':fromdate', $fromdate, PDO::PARAM_STR);
+      $query->bindParam(':todate', $todate, PDO::PARAM_STR);
+      $query->bindParam(':message', $message, PDO::PARAM_STR);
+      $query->bindParam(':status', $status, PDO::PARAM_STR);
+      $query->execute();
+      $lastInsertId = $dbh->lastInsertId();
+      if ($lastInsertId) {
+        echo "<script>alert('Booking successfull.');</script>";
+        echo "<script type='text/javascript'> document.location = 'my-booking.php'; </script>";
+      } else {
+        echo "<script>alert('Something went wrong. Please try again');</script>";
+        echo "<script type='text/javascript'> document.location = 'car-listing.php'; </script>";
+      }
     } else {
-      echo "<script>alert('Something went wrong. Please try again');</script>";
+      echo "<script>alert('Car already booked for these days');</script>";
       echo "<script type='text/javascript'> document.location = 'car-listing.php'; </script>";
     }
-  } else {
-    echo "<script>alert('Car already booked for these days');</script>";
-    echo "<script type='text/javascript'> document.location = 'car-listing.php'; </script>";
   }
 
 }
