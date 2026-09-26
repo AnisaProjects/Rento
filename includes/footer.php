@@ -103,13 +103,13 @@ if (isset($_POST['emailsubscibe'])) {
           <ul>
 
             <li>
-              <a href="page.php?type=aboutus">
+              <a href="about-us.php">
                 About Us
               </a>
             </li>
 
             <li>
-              <a href="page.php?type=faqs">
+              <a href="faqs.php">
                 FAQs
               </a>
             </li>
@@ -134,13 +134,13 @@ if (isset($_POST['emailsubscibe'])) {
           <ul>
 
             <li>
-              <a href="page.php?type=privacy">
+              <a href="privacy.php">
                 Privacy
               </a>
             </li>
 
             <li>
-              <a href="page.php?type=terms">
+              <a href="terms.php">
                 Terms of Use
               </a>
             </li>

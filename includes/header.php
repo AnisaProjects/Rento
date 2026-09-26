@@ -109,13 +109,13 @@
             <a class="nav-link<?php echo ($current_page == 'index.php') ? ' active" aria-current="page' : ''; ?>" href="index.php">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link<?php echo ($current_page == 'page.php' && ($_GET['type'] ?? '') == 'aboutus') ? ' active" aria-current="page' : ''; ?>" href="page.php?type=aboutus">About Us</a>
+            <a class="nav-link<?php echo ($current_page == 'about-us.php') ? ' active" aria-current="page' : ''; ?>" href="about-us.php">About Us</a>
           </li>
           <li class="nav-item">
             <a class="nav-link<?php echo ($current_page == 'car-listing.php') ? ' active" aria-current="page' : ''; ?>" href="car-listing.php">Car Listing</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link<?php echo ($current_page == 'page.php' && ($_GET['type'] ?? '') == 'faqs') ? ' active" aria-current="page' : ''; ?>" href="page.php?type=faqs">FAQs</a>
+            <a class="nav-link<?php echo ($current_page == 'faqs.php') ? ' active" aria-current="page' : ''; ?>" href="faqs.php">FAQs</a>
           </li>
           <li class="nav-item">
             <a class="nav-link<?php echo ($current_page == 'contact-us.php') ? ' active" aria-current="page' : ''; ?>" href="contact-us.php">Contact Us</a>
