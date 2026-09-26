@@ -10,7 +10,8 @@ else{
 if($_POST['submit']=="Update")
 {
 	$pagetype=$_GET['type'];
-	$pagedetails=$_POST['pgedetails'];
+	// Strip script/event handlers but keep the formatting from the editor.
+	$pagedetails=clean_cms_html($_POST['pgedetails']);
 $sql = "UPDATE tblpages SET detail=:pagedetails WHERE type=:pagetype";
 $query = $dbh->prepare($sql);
 $query -> bindParam(':pagetype',$pagetype, PDO::PARAM_STR);

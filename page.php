@@ -124,7 +124,7 @@ $pageIcon = isset($pageIcons[$pagetype]) ? $pageIcons[$pagetype] : 'fa-info-circ
               Kathmandu traffic taught us what renters actually need.
             </h2>
             <div class="about2-intro__body reveal" style="transition-delay:.3s">
-              <?php echo $aboutDetail; ?>
+              <?php echo clean_cms_html($aboutDetail); ?>
             </div>
           </div>
         </section>
@@ -174,7 +174,7 @@ $pageIcon = isset($pageIcons[$pagetype]) ? $pageIcons[$pagetype] : 'fa-info-circ
               <span class="content-page__badge"><?php echo htmlentities(strtoupper($pagetype)); ?></span>
               <h2 class="content-page__title"><?php echo htmlentities($result->PageName); ?></h2>
               <div class="content-page__body">
-                <?php echo $result->detail; ?>
+                <?php echo clean_cms_html($result->detail); ?>
               </div>
             </div>
           </div>

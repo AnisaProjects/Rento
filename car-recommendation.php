@@ -255,9 +255,9 @@ if(isset($_POST['getRecommendations'])) {
               
               <div class="text-center mb-3">
                 <?php if($car->Vimage1): ?>
-                <img src="admin/img/vehicleimages/<?php echo $car->Vimage1; ?>" 
+                <img src="admin/img/vehicleimages/<?php echo htmlentities($car->Vimage1); ?>" 
                      class="img-fluid rounded" style="height: 200px; object-fit: cover; width: 100%;" 
-                     alt="<?php echo $car->VehiclesTitle; ?>">
+                     alt="<?php echo htmlentities($car->VehiclesTitle); ?>">
                 <?php else: ?>
                 <div class="bg-light d-flex align-items-center justify-content-center" 
                      style="height: 200px; border-radius: 8px;">
@@ -266,21 +266,21 @@ if(isset($_POST['getRecommendations'])) {
                 <?php endif; ?>
               </div>
               
-              <h5 class="mb-2"><?php echo $car->VehiclesTitle; ?></h5>
-              <p class="text-muted mb-2"><?php echo $car->BrandName; ?> • <?php echo $car->CarType; ?></p>
+              <h5 class="mb-2"><?php echo htmlentities($car->VehiclesTitle); ?></h5>
+              <p class="text-muted mb-2"><?php echo htmlentities($car->BrandName); ?> • <?php echo htmlentities($car->CarType); ?></p>
               
               <div class="row text-center mb-3">
                 <div class="col-4">
                   <small class="text-muted">Price/Day</small>
-                  <div class="h5 text-primary">Rs. <?php echo $car->PricePerDay; ?></div>
+                  <div class="h5 text-primary">Rs. <?php echo htmlentities($car->PricePerDay); ?></div>
                 </div>
                 <div class="col-4">
                   <small class="text-muted">Seating</small>
-                  <div class="h6"><?php echo $car->SeatingCapacity; ?> Seats</div>
+                  <div class="h6"><?php echo htmlentities($car->SeatingCapacity); ?> Seats</div>
                 </div>
                 <div class="col-4">
                   <small class="text-muted">Fuel</small>
-                  <div class="h6"><?php echo $car->FuelType; ?></div>
+                  <div class="h6"><?php echo htmlentities($car->FuelType); ?></div>
                 </div>
               </div>
               
@@ -294,7 +294,7 @@ if(isset($_POST['getRecommendations'])) {
                 if($car->CentralLocking) $features[] = 'Central Lock';
                 
                 foreach(array_slice($features, 0, 3) as $feature): ?>
-                <li><?php echo $feature; ?></li>
+                <li><?php echo htmlentities($feature); ?></li>
                 <?php endforeach; ?>
               </ul>
               
@@ -303,18 +303,18 @@ if(isset($_POST['getRecommendations'])) {
                 <small><strong>Why we recommend this:</strong></small>
                 <ul class="mb-0 mt-1">
                   <?php foreach($explanations as $explanation): ?>
-                  <li><small><?php echo $explanation; ?></small></li>
+                  <li><small><?php echo htmlentities($explanation); ?></small></li>
                   <?php endforeach; ?>
                 </ul>
               </div>
               <?php endif; ?>
               
               <div class="text-center mt-3">
-                <a href="vehical-details.php?vhid=<?php echo $car->id; ?>" 
+                <a href="vehical-details.php?vhid=<?php echo htmlentities($car->id); ?>" 
                    class="btn btn-primary btn-sm">
                   <i class="fa fa-eye"></i> View Details
                 </a>
-                <a href="vehical-details.php?vhid=<?php echo $car->id; ?>" 
+                <a href="vehical-details.php?vhid=<?php echo htmlentities($car->id); ?>" 
                    class="btn btn-outline-primary btn-sm ml-2">
                   <i class="fa fa-calendar"></i> Book Now
                 </a>
