@@ -115,7 +115,7 @@ if (isset($_POST['emailsubscibe'])) {
             </li>
 
             <li>
-              <a href="page.php?type=contact">
+              <a href="contact-us.php">
                 Contact Us
               </a>
             </li>
