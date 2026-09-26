@@ -15,7 +15,9 @@ if (!class_exists('DynamicPricingService')) {
         public function __construct(PDO $dbh, array $options = [])
         {
             $this->dbh = $dbh;
-            $this->pythonBinary = $options['python'] ?? getenv('PRICING_PYTHON_BIN') ?? 'python';
+            // getenv() returns false (not null) when unset, so ?: is needed for the fallbacks.
+            $this->pythonBinary = $options['python']
+                ?? (getenv('PRICING_PYTHON_BIN') ?: (defined('PRICING_PYTHON_BIN') ? PRICING_PYTHON_BIN : 'python3'));
             $this->scriptPath = $options['script'] ?? realpath(__DIR__ . '/../ml/predict_price.py');
             $this->defaultNights = (int)($options['default_nights'] ?? 1);
         }
@@ -66,6 +68,7 @@ if (!class_exists('DynamicPricingService')) {
                 '--start-date=' . escapeshellarg($startDate),
                 '--end-date=' . escapeshellarg($endDate),
                 '--db-host=' . escapeshellarg(DB_HOST),
+                '--db-port=' . escapeshellarg((string)(defined('DB_PORT') ? DB_PORT : 3306)),
                 '--db-user=' . escapeshellarg(DB_USER),
                 '--db-pass=' . escapeshellarg(DB_PASS),
                 '--db-name=' . escapeshellarg(DB_NAME),

@@ -1,5 +1,5 @@
 {
-  "trained_at": "2026-09-03T20:05:47.040091",
+  "trained_at": "2026-09-26T20:53:25.616405",
   "n_rows": 26,
   "features": {
     "numeric": [
@@ -19,5 +19,5 @@
       "season_bucket"
     ]
   },
-  "classification_report": "              precision    recall  f1-score   support\n\n           0       1.00      1.00      1.00        24\n           1       1.00      1.00      1.00         2\n\n    accuracy                           1.00        26\n   macro avg       1.00      1.00      1.00        26\nweighted avg       1.00      1.00      1.00        26\n"
+  "classification_report": "              precision    recall  f1-score   support\n\n           0       0.96      1.00      0.98        24\n           1       1.00      0.50      0.67         2\n\n    accuracy                           0.96        26\n   macro avg       0.98      0.75      0.82        26\nweighted avg       0.96      0.96      0.96        26\n"
 }
