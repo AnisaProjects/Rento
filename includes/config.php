@@ -14,6 +14,10 @@ define('DB_NAME', 'rento');
 // Set it to false on any server that real users can reach.
 define('APP_DEV_MODE', true);
 
+// Dynamic (AI) pricing. While false, every page shows the base PricePerDay and the
+// Python model is never called. Phase 4 turns this back on with proper data.
+define('PRICING_ENABLED', false);
+
 // Python used by includes/dynamic_pricing.php. It must have the packages in ml/requirements.txt.
 define('PRICING_PYTHON_BIN', '/opt/homebrew/bin/python3');
 

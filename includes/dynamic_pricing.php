@@ -37,6 +37,10 @@ if (!class_exists('DynamicPricingService')) {
                 return $this->storeAndReturn($cacheKey, $this->fallbackQuote($vehicleId, $basePrice));
             }
 
+            if (defined('PRICING_ENABLED') && !PRICING_ENABLED) {
+                return $this->storeAndReturn($cacheKey, $this->fallbackQuote($vehicleId, $basePrice, 'disabled'));
+            }
+
             if (!$this->scriptPath || !file_exists($this->scriptPath)) {
                 return $this->storeAndReturn($cacheKey, $this->fallbackQuote($vehicleId, $basePrice, 'script_missing'));
             }
