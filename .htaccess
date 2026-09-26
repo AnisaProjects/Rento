@@ -1,0 +1,12 @@
+# Rento web access rules (Apache 2.4 core + mod_alias; mod_rewrite is not enabled in MAMP).
+
+# No directory listings anywhere.
+Options -Indexes
+
+# Hidden files and folders: .git, .gitignore, .DS_Store, .user.ini, ...
+RedirectMatch 404 "/\.(?!well-known/)"
+
+# Data, model, script and database files are never served, wherever they are.
+<FilesMatch "\.(?i:sql|csv|pkl|py|pyc|pt|parquet|joblib|log|md|ini|sh|bak|lock)$">
+    Require all denied
+</FilesMatch>
