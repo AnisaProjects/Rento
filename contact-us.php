@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/includes/security.php';
-error_reporting(0);
 include('includes/config.php');
 if (isset($_POST['send'])) {
   $name = $_POST['fullname'];
@@ -97,7 +96,7 @@ if (isset($_POST['send'])) {
           <h3>Contact Info</h3>
           <div class="contact_detail">
             <?php
-            $pagetype = $_GET['type'];
+            $pagetype = $_GET['type'] ?? '';
             $sql = "SELECT Address,EmailId,ContactNo from tblcontactusinfo";
             $query = $dbh->prepare($sql);
             $query->execute();

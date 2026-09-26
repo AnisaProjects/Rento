@@ -1,8 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/security.php';
-error_reporting(0);
 include('includes/config.php');
-if (strlen($_SESSION['login']) == 0) {
+if (empty($_SESSION['login'])) {
   header('location:index.php');
 } else {
   if (isset($_POST['submit'])) {

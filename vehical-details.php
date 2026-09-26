@@ -2,7 +2,6 @@
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 require_once('includes/dynamic_pricing.php');
-error_reporting(0);
 $requestedFromDate = isset($_POST['fromdate']) && $_POST['fromdate'] != '' ? $_POST['fromdate'] : date('Y-m-d', strtotime('+1 day'));
 $requestedToDate = isset($_POST['todate']) && $_POST['todate'] != '' ? $_POST['todate'] : date('Y-m-d', strtotime('+2 day'));
 // Returns true for a real calendar date in Y-m-d format.
@@ -96,7 +95,7 @@ if (isset($_POST['submit'])) {
   <!--Listing-Image-Slider-->
 
   <?php
-  $vhid = intval($_GET['vhid']);
+  $vhid = intval($_GET['vhid'] ?? 0);
   $sql = "SELECT tblvehicles.*,tblbrands.BrandName,tblbrands.id as bid  from tblvehicles join tblbrands on tblbrands.id=tblvehicles.VehiclesBrand where tblvehicles.id=:vhid";
   $query = $dbh->prepare($sql);
   $query->bindParam(':vhid', $vhid, PDO::PARAM_STR);
@@ -105,7 +104,7 @@ if (isset($_POST['submit'])) {
   $cnt = 1;
   if ($query->rowCount() > 0) {
     foreach ($results as $result) {
-      $_SESSION['brndid'] = $result->bid;
+      $similarBrandId = $result->bid;
       $pricingQuote = dynamic_price_quote($dbh, (int) $result->id, [
         'start_date' => $requestedFromDate,
         'end_date' => $requestedToDate,
@@ -357,7 +356,7 @@ if (isset($_POST['submit'])) {
                 <textarea rows="4" class="form-control" name="message" placeholder="Any special request?"
                   required></textarea>
               </div>
-              <?php if ($_SESSION['login']) { ?>
+              <?php if (!empty($_SESSION['login'])) { ?>
                 <div class="form-group">
                   <input type="submit" class="btn btn-block" name="submit" value="Book Now">
                 </div>
@@ -390,7 +389,7 @@ if (isset($_POST['submit'])) {
         <h3>Similar Cars</h3>
         <div class="car-grid">
           <?php
-          $bid = $_SESSION['brndid'];
+          $bid = $similarBrandId ?? 0;
           $sql = "SELECT tblvehicles.VehiclesTitle,tblbrands.BrandName,tblvehicles.PricePerDay,tblvehicles.FuelType,tblvehicles.ModelYear,tblvehicles.id,tblvehicles.SeatingCapacity,tblvehicles.VehiclesOverview,tblvehicles.Vimage1 from tblvehicles join tblbrands on tblbrands.id=tblvehicles.VehiclesBrand where tblvehicles.VehiclesBrand=:bid";
           $query = $dbh->prepare($sql);
           $query->bindParam(':bid', $bid, PDO::PARAM_STR);

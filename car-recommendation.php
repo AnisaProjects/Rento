@@ -2,7 +2,6 @@
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 include('includes/recommendation_engine.php');
-error_reporting(0);
 
 $recommendations = [];
 $userEmail = $_SESSION['login'] ?? null;

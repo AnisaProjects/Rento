@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
-error_reporting(0);
 ?>
 
 <!DOCTYPE HTML>
@@ -48,8 +47,8 @@ error_reporting(0);
 
                     <?php
                     //Query for Listing count
-                    $brand = $_POST['brand'];
-                    $fueltype = $_POST['fueltype'];
+                    $brand = $_POST['brand'] ?? '';
+                    $fueltype = $_POST['fueltype'] ?? '';
                     $sql = "SELECT id from tblvehicles where tblvehicles.VehiclesBrand=:brand and tblvehicles.FuelType=:fueltype";
                     $query = $dbh->prepare($sql);
                     $query->bindParam(':brand', $brand, PDO::PARAM_STR);

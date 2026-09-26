@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
-error_reporting(0);
 ?>
 
 <!DOCTYPE HTML>
@@ -27,7 +26,7 @@ error_reporting(0);
     <div class="container">
       <div class="page-header_wrap">
         <div class="page-heading">
-          <h1>Search Result of keyword "<?php echo htmlentities($_POST['searchdata']); ?>"</h1>
+          <h1>Search Result of keyword "<?php echo htmlentities($_POST['searchdata'] ?? ''); ?>"</h1>
         </div>
         <ul class="coustom-breadcrumb">
           <li><a href="index.php">Home</a></li>
@@ -48,7 +47,7 @@ error_reporting(0);
 
           <?php
           //Query for Listing count
-          $searchdata = $_POST['searchdata'];
+          $searchdata = $_POST['searchdata'] ?? '';
           $sql = "SELECT tblvehicles.id from tblvehicles 
         join tblbrands on tblbrands.id=tblvehicles.VehiclesBrand 
         where tblvehicles.VehiclesTitle=:search || tblvehicles.FuelType=:search || tblbrands.BrandName=:search || tblvehicles.ModelYear=:search";

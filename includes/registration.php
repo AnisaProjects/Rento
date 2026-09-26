@@ -1,5 +1,4 @@
 <?php
-//error_reporting(0);
 if (isset($_POST['signup'])) {
   $fname = $_POST['fullname'];
   $email = trim($_POST['emailid']);

@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
-error_reporting(0);
 
 ?>
 

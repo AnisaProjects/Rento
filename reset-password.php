@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/includes/security.php';
-error_reporting(0);
 include('includes/config.php');
 
 // Reset links stop working after this many minutes.
