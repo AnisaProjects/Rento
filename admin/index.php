@@ -4,16 +4,22 @@ include('includes/config.php');
 if(isset($_POST['login']))
 {
 $email=$_POST['username'];
-$password=md5($_POST['password']);
-$sql ="SELECT UserName,Password FROM admin WHERE UserName=:email and Password=:password";
+$sql ="SELECT id,UserName,Password FROM admin WHERE UserName=:email";
 $query= $dbh -> prepare($sql);
 $query-> bindParam(':email', $email, PDO::PARAM_STR);
-$query-> bindParam(':password', $password, PDO::PARAM_STR);
 $query-> execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-if($query->rowCount() > 0)
+$admin=$query->fetch(PDO::FETCH_OBJ);
+// Old MD5 hashes are accepted once and replaced with a bcrypt hash.
+$validLogin = $admin && password_check_and_upgrade((string)($_POST['password'] ?? ''), $admin->Password, function ($newHash) use ($dbh, $admin) {
+$upgrade = $dbh->prepare("UPDATE admin SET Password=:password WHERE id=:id");
+$upgrade->bindParam(':password', $newHash, PDO::PARAM_STR);
+$upgrade->bindParam(':id', $admin->id, PDO::PARAM_INT);
+$upgrade->execute();
+});
+if($validLogin)
 {
-$_SESSION['alogin']=$_POST['username'];
+session_login_regenerate();
+$_SESSION['alogin']=$admin->UserName;
 echo "<script type='text/javascript'> document.location = 'dashboard.php'; </script>";
 } else{
   

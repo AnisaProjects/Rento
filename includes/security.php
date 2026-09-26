@@ -2,6 +2,13 @@
 // Session, CSRF, password and HTML-cleaning helpers shared by the site and admin.
 // Every page loads this instead of calling session_start() directly.
 
+// Buffer page output so handlers that run mid-page (login modal, newsletter) can still
+// send headers, e.g. the new session cookie from session_regenerate_id().
+if (!defined('RENTO_OUTPUT_BUFFERED')) {
+    define('RENTO_OUTPUT_BUFFERED', true);
+    ob_start();
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');

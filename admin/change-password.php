@@ -7,19 +7,19 @@ if (strlen($_SESSION['alogin']) == 0) {
 } else {
 	// Code for change password	
 	if (isset($_POST['submit'])) {
-		$password = md5($_POST['password']);
-		$newpassword = md5($_POST['newpassword']);
 		$username = $_SESSION['alogin'];
-		$sql = "SELECT Password FROM admin WHERE UserName=:username and Password=:password";
+		$sql = "SELECT id, Password FROM admin WHERE UserName=:username";
 		$query = $dbh->prepare($sql);
 		$query->bindParam(':username', $username, PDO::PARAM_STR);
-		$query->bindParam(':password', $password, PDO::PARAM_STR);
 		$query->execute();
-		$results = $query->fetchAll(PDO::FETCH_OBJ);
-		if ($query->rowCount() > 0) {
-			$con = "update admin set Password=:newpassword where UserName=:username";
+		$admin = $query->fetch(PDO::FETCH_OBJ);
+		if ((string)($_POST['newpassword'] ?? '') !== (string)($_POST['confirmpassword'] ?? '')) {
+			$error = "New Password and Confirm Password do not match.";
+		} elseif ($admin && password_check_and_upgrade((string)($_POST['password'] ?? ''), $admin->Password, function () {})) {
+			$newpassword = password_hash_for_storage((string)$_POST['newpassword']);
+			$con = "update admin set Password=:newpassword where id=:id";
 			$chngpwd1 = $dbh->prepare($con);
-			$chngpwd1->bindParam(':username', $username, PDO::PARAM_STR);
+			$chngpwd1->bindParam(':id', $admin->id, PDO::PARAM_INT);
 			$chngpwd1->bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
 			$chngpwd1->execute();
 			$msg = "Your Password succesfully changed";

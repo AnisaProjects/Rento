@@ -2,21 +2,35 @@
 //error_reporting(0);
 if (isset($_POST['signup'])) {
   $fname = $_POST['fullname'];
-  $email = $_POST['emailid'];
+  $email = trim($_POST['emailid']);
   $mobile = $_POST['mobileno'];
-  $password = md5($_POST['password']);
-  $sql = "INSERT INTO  tblusers(FullName,EmailId,ContactNo,Password) VALUES(:fname,:email,:mobile,:password)";
-  $query = $dbh->prepare($sql);
-  $query->bindParam(':fname', $fname, PDO::PARAM_STR);
-  $query->bindParam(':email', $email, PDO::PARAM_STR);
-  $query->bindParam(':mobile', $mobile, PDO::PARAM_STR);
-  $query->bindParam(':password', $password, PDO::PARAM_STR);
-  $query->execute();
-  $lastInsertId = $dbh->lastInsertId();
-  if ($lastInsertId) {
-    echo "<script>alert('Registration successfull. Now you can login');</script>";
+  $plainPassword = (string)($_POST['password'] ?? '');
+
+  $existing = $dbh->prepare("SELECT id FROM tblusers WHERE EmailId = :email");
+  $existing->bindParam(':email', $email, PDO::PARAM_STR);
+  $existing->execute();
+
+  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo "<script>alert('Please enter a valid email address.');</script>";
+  } elseif ($plainPassword !== (string)($_POST['confirmpassword'] ?? '')) {
+    echo "<script>alert('Password and Confirm Password do not match.');</script>";
+  } elseif ($existing->fetch()) {
+    echo "<script>alert('This email is already registered. Please login instead.');</script>";
   } else {
-    echo "<script>alert('Something went wrong. Please try again');</script>";
+    $password = password_hash_for_storage($plainPassword);
+    $sql = "INSERT INTO  tblusers(FullName,EmailId,ContactNo,Password) VALUES(:fname,:email,:mobile,:password)";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':fname', $fname, PDO::PARAM_STR);
+    $query->bindParam(':email', $email, PDO::PARAM_STR);
+    $query->bindParam(':mobile', $mobile, PDO::PARAM_STR);
+    $query->bindParam(':password', $password, PDO::PARAM_STR);
+    $query->execute();
+    $lastInsertId = $dbh->lastInsertId();
+    if ($lastInsertId) {
+      echo "<script>alert('Registration successfull. Now you can login');</script>";
+    } else {
+      echo "<script>alert('Something went wrong. Please try again');</script>";
+    }
   }
 }
 
@@ -42,8 +56,11 @@ if (isset($_POST['signup'])) {
   function registration_valid() {
     var password = document.forms["signup"]["password"].value.trim();
     var confirmpassword = document.forms["signup"]["confirmpassword"].value.trim();
-    console.log('password', password);
-    console.log('confirmpassword', confirmpassword);
+    if (password !== confirmpassword) {
+      alert("Password and Confirm Password do not match.");
+      document.forms["signup"]["confirmpassword"].focus();
+      return false;
+    }
     return true;
   }
 </script>

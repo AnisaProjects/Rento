@@ -1,36 +1,43 @@
-```php
 <?php
 
 if (isset($_POST['login'])) {
 
   $email = trim($_POST['email']);
-  $password = md5($_POST['password']);
+  $password = (string)($_POST['password'] ?? '');
 
-  $sql = "SELECT EmailId, Password, FullName
+  $sql = "SELECT id, EmailId, Password, FullName
             FROM tblusers
-            WHERE EmailId = :email
-            AND Password = :password";
+            WHERE EmailId = :email";
 
   $query = $dbh->prepare($sql);
 
   $query->bindParam(':email', $email, PDO::PARAM_STR);
-  $query->bindParam(':password', $password, PDO::PARAM_STR);
 
   $query->execute();
 
   $result = $query->fetch(PDO::FETCH_OBJ);
 
-  if ($result) {
+  // Old MD5 hashes are accepted once and replaced with a bcrypt hash.
+  $validLogin = $result && password_check_and_upgrade($password, $result->Password, function ($newHash) use ($dbh, $result) {
+    $upgrade = $dbh->prepare("UPDATE tblusers SET Password = :password WHERE id = :id");
+    $upgrade->bindParam(':password', $newHash, PDO::PARAM_STR);
+    $upgrade->bindParam(':id', $result->id, PDO::PARAM_INT);
+    $upgrade->execute();
+  });
+
+  if ($validLogin) {
+
+    session_login_regenerate();
 
     // Store login information in session
     $_SESSION['login'] = $result->EmailId;
     $_SESSION['fname'] = $result->FullName;
 
     // Redirect to current page
-    $currentpage = $_SERVER['REQUEST_URI'];
+    $currentpage = json_encode($_SERVER['REQUEST_URI'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 
     echo "<script type='text/javascript'>
-                document.location = '$currentpage';
+                document.location = $currentpage;
               </script>";
 
     exit();
