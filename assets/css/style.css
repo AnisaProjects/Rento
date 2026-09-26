@@ -57,6 +57,30 @@ textarea.form-control {
   height: auto;
 }
 
+/* Flash messages (includes/flash.php): success / error / warning / info notices. */
+.rento-flash {
+  padding: 10px 12px;
+  margin: 0 0 20px;
+  background: var(--rento-white);
+  border-left: 4px solid var(--rento-info);
+  border-radius: 4px;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+  overflow-wrap: anywhere;
+}
+
+.rento-flash--success {
+  border-left-color: var(--rento-success);
+}
+
+.rento-flash--error {
+  border-left-color: var(--rento-danger);
+}
+
+.rento-flash--warning {
+  border-left-color: var(--rento-warning);
+  background: var(--rento-warning-soft);
+}
+
 /* Tabs and other .nav lists: Bootstrap 3 made each link a block. */
 
 .nav>li {

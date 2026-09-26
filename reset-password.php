@@ -115,32 +115,6 @@ if (isset($_POST['update'])) {
     }
   </script>
   <style>
-    .errorWrap {
-      padding: 10px;
-      margin: 0 0 20px 0;
-      background: #fff;
-      border-left: 4px solid #dd3d36;
-      box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-      border-radius: 4px;
-    }
-
-    .succWrap {
-      padding: 10px;
-      margin: 0 0 20px 0;
-      background: #fff;
-      border-left: 4px solid #5cb85c;
-      box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-      border-radius: 4px;
-    }
-
-    .devWrap {
-      padding: 12px;
-      margin: 0 0 20px 0;
-      background: #fff8e1;
-      border: 1px dashed #f0ad4e;
-      border-radius: 4px;
-      word-break: break-all;
-    }
 
     .reset_wrap {
       max-width: 560px;
@@ -210,19 +184,15 @@ if (isset($_POST['update'])) {
           <h6>Reset Password</h6>
         </div>
         <div class="reset_body">
-          <?php if ($error) { ?>
-            <div class="errorWrap"><strong>ERROR</strong>: <?php echo htmlentities($error); ?></div>
-          <?php } else if ($msg) { ?>
-            <div class="succWrap"><strong>SUCCESS</strong>: <?php echo htmlentities($msg); ?></div>
-          <?php } ?>
+          <?php echo !empty($error) ? flash_message('error', $error) : flash_message('success', $msg ?? ''); ?>
 
-          <?php if ($devResetLink) { ?>
-            <div class="devWrap">
-              <strong>Development mode:</strong> there is no mail server, so the reset link is shown here instead of
-              being emailed (set APP_DEV_MODE to false in includes/config.php to hide it).<br>
-              <a href="<?php echo htmlentities($devResetLink); ?>"><?php echo htmlentities($devResetLink); ?></a>
-            </div>
-          <?php } ?>
+          <?php
+          // Development mode only: no mail server, so the link is shown instead of emailed.
+          if ($devResetLink) {
+            echo flash_message('warning', '<strong>Development mode:</strong> there is no mail server, so the reset link is shown here instead of being emailed (set APP_DEV_MODE to false in includes/config.php to hide it).<br><a href="'
+              . htmlentities($devResetLink) . '">' . htmlentities($devResetLink) . '</a>', true);
+          }
+          ?>
 
           <?php if ($showResetForm) { ?>
             <form name="resetpwd" method="post" action="reset-password.php" onSubmit="return resetpassword_valid();">

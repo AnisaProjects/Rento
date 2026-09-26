@@ -47,25 +47,6 @@ if (strlen($_SESSION['login']) == 0) {
       }
     </script>
     <style>
-      .errorWrap {
-        padding: 10px;
-        margin: 0 0 20px 0;
-        background: #fff;
-        border-left: 4px solid #dd3d36;
-        -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-        border-radius: 4px;
-      }
-
-      .succWrap {
-        padding: 10px;
-        margin: 0 0 20px 0;
-        background: #fff;
-        border-left: 4px solid #5cb85c;
-        -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-        border-radius: 4px;
-      }
 
       /* ---- Update password card UI ---- */
       .profile_wrap {
@@ -96,8 +77,7 @@ if (strlen($_SESSION['login']) == 0) {
         padding: 0 30px;
       }
 
-      .profile_wrap .errorWrap,
-      .profile_wrap .succWrap {
+      .profile_wrap .rento-flash {
         margin: 0 0 20px;
       }
 
@@ -242,10 +222,7 @@ if (strlen($_SESSION['login']) == 0) {
 
                   <form name="chngpwd" method="post" onSubmit="return updatepassword_valid();">
 <?php echo csrf_field(); ?>
-                    <?php if ($error) { ?>
-                      <div class="errorWrap"><strong>ERROR</strong>: <?php echo htmlentities($error); ?></div>
-                    <?php } else if ($msg) { ?>
-                        <div class="succWrap"><strong>SUCCESS</strong>: <?php echo htmlentities($msg); ?></div><?php } ?>
+                    <?php echo !empty($error) ? flash_message('error', $error) : flash_message('success', $msg ?? ''); ?>
 
                     <div class="form-group">
                       <label class="control-label">Current Password</label>
