@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/security.php';
 error_reporting(0);
 include('includes/config.php');
+include('includes/upload.php');
 if(strlen($_SESSION['alogin'])==0)
 	{	
 header('location:index.php');
@@ -17,11 +18,6 @@ $priceperday=$_POST['priceperday'];
 $fueltype=$_POST['fueltype'];
 $modelyear=$_POST['modelyear'];
 $seatingcapacity=$_POST['seatingcapacity'];
-$vimage1=$_FILES["img1"]["name"];
-$vimage2=$_FILES["img2"]["name"];
-$vimage3=$_FILES["img3"]["name"];
-$vimage4=$_FILES["img4"]["name"];
-$vimage5=$_FILES["img5"]["name"];
 $airconditioner=$_POST['airconditioner'];
 $powerdoorlocks=$_POST['powerdoorlocks'];
 $antilockbrakingsys=$_POST['antilockbrakingsys'];
@@ -34,12 +30,23 @@ $cdplayer=$_POST['cdplayer'];
 $centrallocking=$_POST['centrallocking'];
 $crashcensor=$_POST['crashcensor'];
 $leatherseats=$_POST['leatherseats'];
-move_uploaded_file($_FILES["img1"]["tmp_name"],"img/vehicleimages/".$_FILES["img1"]["name"]);
-move_uploaded_file($_FILES["img2"]["tmp_name"],"img/vehicleimages/".$_FILES["img2"]["name"]);
-move_uploaded_file($_FILES["img3"]["tmp_name"],"img/vehicleimages/".$_FILES["img3"]["name"]);
-move_uploaded_file($_FILES["img4"]["tmp_name"],"img/vehicleimages/".$_FILES["img4"]["name"]);
-move_uploaded_file($_FILES["img5"]["tmp_name"],"img/vehicleimages/".$_FILES["img5"]["name"]);
+// Check every image before saving any; images 1-4 are required, image 5 is optional.
+try {
+foreach (['img1' => 'Image 1', 'img2' => 'Image 2', 'img3' => 'Image 3', 'img4' => 'Image 4', 'img5' => 'Image 5'] as $field => $label) {
+if ($field === 'img5' && vehicle_image_missing($field)) { continue; }
+validate_vehicle_image($field, $label);
+}
+$vimage1=store_vehicle_image('img1');
+$vimage2=store_vehicle_image('img2');
+$vimage3=store_vehicle_image('img3');
+$vimage4=store_vehicle_image('img4');
+$vimage5=vehicle_image_missing('img5') ? '' : store_vehicle_image('img5');
+} catch (RuntimeException $e) {
+$error=$e->getMessage();
+}
 
+if(empty($error))
+{
 $sql="INSERT INTO tblvehicles(VehiclesTitle,VehiclesBrand,VehiclesOverview,PricePerDay,FuelType,ModelYear,SeatingCapacity,Vimage1,Vimage2,Vimage3,Vimage4,Vimage5,AirConditioner,PowerDoorLocks,AntiLockBrakingSystem,BrakeAssist,PowerSteering,DriverAirbag,PassengerAirbag,PowerWindows,CDPlayer,CentralLocking,CrashSensor,LeatherSeats) VALUES(:vehicletitle,:brand,:vehicleoverview,:priceperday,:fueltype,:modelyear,:seatingcapacity,:vimage1,:vimage2,:vimage3,:vimage4,:vimage5,:airconditioner,:powerdoorlocks,:antilockbrakingsys,:brakeassist,:powersteering,:driverairbag,:passengerairbag,:powerwindow,:cdplayer,:centrallocking,:crashcensor,:leatherseats)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':vehicletitle',$vehicletitle,PDO::PARAM_STR);
@@ -75,6 +82,7 @@ $msg="Vehicle posted successfully";
 else 
 {
 $error="Something went wrong. Please try again";
+}
 }
 
 }

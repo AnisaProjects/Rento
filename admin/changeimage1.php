@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/security.php';
 error_reporting(0);
 include('includes/config.php');
+include('includes/upload.php');
 if(strlen($_SESSION['alogin'])==0)
 	{	
 header('location:index.php');
@@ -10,9 +11,10 @@ else{
 
 if(isset($_POST['update']))
 {
-$vimage1=$_FILES["img1"]["name"];
 $id=intval($_GET['imgid']);
-move_uploaded_file($_FILES["img1"]["tmp_name"],"img/vehicleimages/".$_FILES["img1"]["name"]);
+try {
+validate_vehicle_image('img1', 'Image 1');
+$vimage1=store_vehicle_image('img1');
 $sql="update tblvehicles set Vimage1=:vimage1 where id=:id";
 $query = $dbh->prepare($sql);
 $query->bindParam(':vimage1',$vimage1,PDO::PARAM_STR);
@@ -20,6 +22,9 @@ $query->bindParam(':id',$id,PDO::PARAM_STR);
 $query->execute();
 
 $msg="Image updated successfully";
+} catch (RuntimeException $e) {
+$error=$e->getMessage();
+}
 
 
 
