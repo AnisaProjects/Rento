@@ -9,13 +9,17 @@ if (!defined('RENTO_OUTPUT_BUFFERED')) {
     ob_start();
 }
 
+// Admin pages (admin/*.php) get their own session, so logging in or out of one
+// never affects the other. The admin cookie is also only sent to admin/ URLs.
+$isAdminArea = realpath(dirname($_SERVER['SCRIPT_FILENAME'] ?? '')) === realpath(__DIR__ . '/../admin');
+
 if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
-    session_name('RENTOSESSID');
+    session_name($isAdminArea ? 'RENTOADMINSESSID' : 'RENTOSESSID');
     session_set_cookie_params([
         'lifetime' => 0,
-        'path' => '/',
+        'path' => $isAdminArea ? rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/' : '/',
         'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
         'httponly' => true,
         'samesite' => 'Lax',
