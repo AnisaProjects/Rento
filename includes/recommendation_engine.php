@@ -95,8 +95,13 @@ class CarRecommendationEngine {
      */
     private function classifyCarsByType($cars) {
         foreach ($cars as $car) {
+            // Never overwrite a type set in the admin; only guess one for cars without it.
+            if (trim((string)($car->CarType ?? '')) !== '') {
+                continue;
+            }
             $carType = $this->determineCarType($car);
-            
+            $car->CarType = $carType;
+
             // Update car type in database if not set
             $updateSql = "UPDATE tblvehicles SET CarType = :carType WHERE id = :id";
             $updateQuery = $this->dbh->prepare($updateSql);
