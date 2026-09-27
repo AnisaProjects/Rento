@@ -41,7 +41,7 @@ define('RATE_LIMIT_EMAIL_CHECKS', 20);
 define('PRICING_ENABLED', true);
 
 // Python for the pricing scripts: the dedicated venv (Python 3.12, ml/requirements.txt).
-// Scripts get the DB settings from environment variables set by includes/forecast.php.
+// Scripts get the DB settings from environment variables set by includes/pricing.php.
 define('PRICING_PYTHON_BIN', __DIR__ . '/../ml/.venv/bin/python');
 
 // Nepal time for every date ("today", booking dates, forecasts). MySQL and the Python

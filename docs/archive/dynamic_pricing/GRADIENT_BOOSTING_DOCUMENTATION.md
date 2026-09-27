@@ -1,3 +1,5 @@
+> **Archived (2026-09-27): outdated.** This describes the first pricing prototype (Python started on every page view, database credentials as command-line arguments), replaced in Phase 4 by the rule-based forecast. Kept for history; the current system is described in the main README and ml/README.md. The gradient-boosting model described here is still in `ml/pricing_model.py`, locked until 200 bookings.
+
 # Gradient Boosting Classifier Documentation
 
 ## Dynamic Pricing Demand Prediction Model

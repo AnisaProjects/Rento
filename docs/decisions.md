@@ -329,6 +329,20 @@ template contact address), 10 passed. All of these are expected on MAMP; each ha
 **Undo.** Delete `tools/check-production.php`, `includes/production-check.php` and
 `admin/system-check.php`, and remove the menu line.
 
+### P13. Documentation
+
+**What.**
+- **New:** `README.md` (setup, structure, how smart pricing and Find My Car work, conventions),
+  `docs/admin-guide.md` (plain-language guide for every admin page) and `docs/README.md` (index).
+- **Rewritten:** `ml/README.md`. It described the first prototype (Python per page view, database
+  credentials on the command line).
+- **Archived:** `docs/dynamic_pricing/` moved to `docs/archive/dynamic_pricing/`, with an "outdated" note.
+- Stale references to `includes/forecast.php` now point to `includes/pricing.php`.
+- All docs are blocked from the web (`docs/.htaccess` and `.md` rule).
+- A stray file `ml/ml` (956 bytes, from 31 Aug) was left alone; it isn't used.
+
+**Undo.** `git mv docs/archive/dynamic_pricing docs/dynamic_pricing`.
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`

@@ -1,7 +1,7 @@
 """
 Precompute smart prices: every active car x the next N days -> tbl_price_forecast.
 
-Started by PHP (includes/forecast.php: admin "Recompute prices", automatic after changes)
+Started by PHP (includes/pricing.php: admin "Recompute prices", automatic after changes)
 or by tools/run-forecast.php (nightly launchd job). PHP passes:
   RENTO_DB_*                database settings (see rento_db.py), never CLI arguments
   RENTO_PRICING_SETTINGS    JSON of the effective pricing settings (admin -> Smart Pricing)
