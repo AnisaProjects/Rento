@@ -4476,3 +4476,38 @@ body.r-ai-busy {
     border: 0;
   }
 }
+
+/* ---------- 26. Card prices and insight badges ---------- */
+.r-price__from {
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-xs) !important;
+}
+
+.r-price__usual {
+  display: block;
+  margin-top: 2px;
+  color: var(--rento-gray-500);
+  font-family: var(--rento-font-body);
+  font-size: var(--rento-text-xs);
+  font-weight: var(--rento-weight-medium);
+}
+
+.r-badge--insight {
+  cursor: help;
+}
+
+.r-badge--market {
+  background: #0f5a30;
+  color: #fff;
+}
+
+.r-badge--value {
+  background: #fff;
+  color: var(--rento-ink-900);
+  box-shadow: 0 0 0 1px var(--rento-gray-300);
+}
+
+.r-badge--drop {
+  background: #1d5a96;
+  color: #fff;
+}

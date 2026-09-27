@@ -69,4 +69,5 @@ require_once __DIR__ . '/site-content.php';
 require_once __DIR__ . '/packages.php';
 require_once __DIR__ . '/settings.php';
 require_once __DIR__ . '/pricing.php';
+require_once __DIR__ . '/price-insights.php';
 ?>

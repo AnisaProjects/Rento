@@ -21,13 +21,24 @@ function car_card(object $car, array $opts = []): string
         $specs[] = ['fa-calendar', $car->ModelYear];
     }
 
+    // Card price: "from" the lowest price in the next 30 days (price-insights.php), unless the
+    // caller passes the price for chosen dates ('onDates' => true). Badges come from real data.
+    $info = isset($GLOBALS['dbh']) && function_exists('car_price_info') ? car_price_info($GLOBALS['dbh'], (int)$car->id) : null;
+    $onDates = !empty($opts['onDates']);
+    $cardPrice = $onDates || !$info ? (int)($car->PricePerDay ?? 0) : $info['from'];
+    $usualPrice = !$onDates && $info && $info['from'] !== $info['base'] ? $info['base'] : null;
+    $insightBadges = $info ? array_slice($info['badges'], 0, empty($opts['badge']) ? 2 : 1) : [];
+
     ob_start(); ?>
     <article class="r-car-card">
       <div class="r-car-card__media">
         <?php echo vehicle_image($car->Vimage1 ?? '', $name, ['sizes' => $opts['sizes'] ?? '(min-width: 1200px) 400px, (min-width: 768px) 50vw, 100vw']); ?>
-        <?php if (!empty($opts['badge']) || !empty($car->CarType) || !empty($car->DriverOnly)) { ?>
+        <?php if (!empty($opts['badge']) || !empty($car->CarType) || !empty($car->DriverOnly) || $insightBadges) { ?>
           <div class="r-car-card__badges">
             <?php if (!empty($opts['badge'])) { ?><span class="r-badge r-badge--primary"><?php echo htmlentities($opts['badge']); ?></span><?php } ?>
+            <?php foreach ($insightBadges as $insight) { ?>
+              <span class="r-badge r-badge--insight r-badge--<?php echo $insight['kind']; ?>" tabindex="0" data-bs-toggle="tooltip" data-bs-title="<?php echo htmlentities($insight['tooltip']); ?>"><?php echo htmlentities($insight['label']); ?><span class="visually-hidden">: <?php echo htmlentities($insight['tooltip']); ?></span></span>
+            <?php } ?>
             <?php if (!empty($car->CarType)) { ?><span class="r-badge r-badge--dark"><?php echo htmlentities($car->CarType); ?></span><?php } ?>
             <?php if (!empty($car->DriverOnly)) { ?><span class="r-badge r-badge--dark"><i class="fa fa-id-card" aria-hidden="true"></i> With driver</span><?php } ?>
           </div>
@@ -54,7 +65,9 @@ function car_card(object $car, array $opts = []): string
           </ul>
         <?php } ?>
         <div class="r-car-card__footer">
-          <div class="r-price"><?php echo format_price($car->PricePerDay ?? 0); ?><small>/day</small></div>
+          <div class="r-price"><?php if (!$onDates && $info) { ?><small class="r-price__from">from </small><?php } ?><?php echo format_price($cardPrice); ?><small>/day<?php echo $onDates ? ' on your dates' : ''; ?></small>
+            <?php if ($usualPrice !== null) { ?><span class="r-price__usual">usual <?php echo format_price($usualPrice); ?></span><?php } ?>
+          </div>
           <span class="r-car-card__cta" aria-hidden="true">Details <i class="fa fa-arrow-right"></i></span>
         </div>
       </div>

@@ -166,7 +166,7 @@ $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 
                 $shown->PricePerDay = $match['price'];
                 // The match % is the car's real weighted score for what was asked (see the engine).
                 $badge = $match['percent'] !== null ? $match['percent'] . '% match' : ($i === 0 ? 'Best match' : '');
-                echo '<div class="r-ai-result" style="--i:' . min($i, 8) . '">' . car_card($shown, ['heading' => 'h3', 'badge' => $badge, 'reasons' => array_slice($match['reasons'], 0, 4), 'cautions' => $match['cautions']]) . '</div>';
+                echo '<div class="r-ai-result" style="--i:' . min($i, 8) . '">' . car_card($shown, ['heading' => 'h3', 'badge' => $badge, 'reasons' => array_slice($match['reasons'], 0, 4), 'cautions' => $match['cautions'], 'onDates' => $pickupDate !== '']) . '</div>';
               } ?>
             </div>
           <?php } else {

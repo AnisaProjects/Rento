@@ -127,3 +127,12 @@
     }
   });
 })(jQuery);
+
+// Tooltips (card badges explain why they are shown). Tapping a badge on a phone focuses it,
+// which shows the tooltip too.
+(function () {
+  if (!window.bootstrap || !bootstrap.Tooltip) return;
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+    bootstrap.Tooltip.getOrCreateInstance(el, { trigger: 'hover focus' });
+  });
+})();

@@ -1,0 +1,12 @@
+{
+  "_about": "Self-drive market rates per day (Rs) from docs/market-research.md, for the 'Below market' badge. Only categories with a published self-drive rate are listed; with-driver rates are not comparable to self-drive. Source: Self Drive Nepal rate card (selfdrivenepal.com, article 2025-12-15), inside Kathmandu valley, fuel excluded.",
+  "researched": "2026-09-27",
+  "source": "Self Drive Nepal (selfdrivenepal.com)",
+  "categories": {
+    "hatchback": {"label": "hatchbacks", "price": 5000},
+    "sedan": {"label": "sedans", "price": 5000},
+    "suv": {"label": "SUVs", "price": 7000, "note": "manual SUV rate (the lower of the two SUV rates)"},
+    "suv_ev": {"label": "electric SUVs", "price": 10000},
+    "suv_7seat": {"label": "7-seat SUVs (Scorpio class)", "price": 10000}
+  }
+}
