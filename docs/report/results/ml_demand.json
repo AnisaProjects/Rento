@@ -1,0 +1,148 @@
+{
+  "dataset": {
+    "rows": 18247,
+    "train_rows": 14597,
+    "test_rows": 3650,
+    "train_period": [
+      "2018-08-18",
+      "2020-08-12"
+    ],
+    "test_period": [
+      "2020-08-12",
+      "2021-02-28"
+    ],
+    "features": [
+      "hour",
+      "day_of_week",
+      "is_weekend",
+      "is_festival",
+      "month",
+      "day_of_month",
+      "day_of_year",
+      "week_of_year",
+      "quarter",
+      "is_month_start",
+      "is_month_end",
+      "hour_sin",
+      "hour_cos",
+      "dow_sin",
+      "dow_cos",
+      "month_sin",
+      "month_cos",
+      "season"
+    ],
+    "target": "demand",
+    "target_stats": {
+      "count": 18247.0,
+      "mean": 73.99145064942182,
+      "std": 41.678987983966266,
+      "min": 1.0,
+      "25%": 43.0,
+      "50%": 71.0,
+      "75%": 98.0,
+      "max": 379.0
+    },
+    "festival_hours": 1386
+  },
+  "test": {
+    "Seasonal baseline": {
+      "MAE": 30.954037950711918,
+      "RMSE": 39.59892719516811,
+      "R2": 0.22761105514563906
+    },
+    "Linear Regression": {
+      "MAE": 31.387932469877,
+      "RMSE": 40.223591231951794,
+      "R2": 0.20305033267164718
+    },
+    "Random Forest": {
+      "MAE": 30.57044397726432,
+      "RMSE": 38.481036886995774,
+      "R2": 0.27060507021964686
+    },
+    "Gradient Boosting": {
+      "MAE": 30.456567859807112,
+      "RMSE": 38.089800160764064,
+      "R2": 0.2853611916158011
+    }
+  },
+  "cv": {
+    "Linear Regression": {
+      "MAE": {
+        "mean": 66.23863431664415,
+        "std": 65.89328798932954
+      },
+      "RMSE": {
+        "mean": 74.73497106954467,
+        "std": 65.20124236061534
+      },
+      "R2": {
+        "mean": -7.1062756280525345,
+        "std": 14.010923985877463
+      }
+    },
+    "Random Forest": {
+      "MAE": {
+        "mean": 29.471130428046667,
+        "std": 1.6753690775104304
+      },
+      "RMSE": {
+        "mean": 36.8421919921149,
+        "std": 3.702745725749293
+      },
+      "R2": {
+        "mean": 0.12423446459644268,
+        "std": 0.12295272461589699
+      }
+    },
+    "Gradient Boosting": {
+      "MAE": {
+        "mean": 30.032897590491437,
+        "std": 2.361429383818727
+      },
+      "RMSE": {
+        "mean": 37.54585001111665,
+        "std": 4.038289203310473
+      },
+      "R2": {
+        "mean": 0.06986088650160231,
+        "std": 0.26212352783119947
+      }
+    }
+  },
+  "fit_seconds": {
+    "Linear Regression": 0.01,
+    "Random Forest": 1.48,
+    "Gradient Boosting": 4.49
+  },
+  "best_model": "Gradient Boosting",
+  "feature_importance_gb": {
+    "day_of_year": 0.2628788680379848,
+    "hour": 0.2253864843234557,
+    "hour_cos": 0.0875039717243393,
+    "dow_sin": 0.06534691155596738,
+    "day_of_week": 0.06474550324372173,
+    "hour_sin": 0.058577676570609714,
+    "day_of_month": 0.048248263059242034,
+    "month_sin": 0.04470953662142553,
+    "week_of_year": 0.039179774257874424,
+    "month_cos": 0.029097770015455715,
+    "is_festival": 0.024992918211136483,
+    "is_weekend": 0.017976019842200437,
+    "season_autumn": 0.012755266631612215,
+    "dow_cos": 0.00792358521954365,
+    "season_monsoon": 0.004052011653753086,
+    "is_month_end": 0.0022415808095929426,
+    "quarter": 0.0016606191824816677,
+    "month": 0.001457419490038335,
+    "season_spring": 0.0005841802117655478,
+    "is_month_start": 0.0004441845507520619,
+    "season_winter": 0.00023745478704727306
+  },
+  "seconds": 21.5,
+  "versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1"
+  }
+}

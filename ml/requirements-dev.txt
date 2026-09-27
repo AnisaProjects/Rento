@@ -1,0 +1,6 @@
+# Offline experiments and tests only (not needed by the live site): pip install -r ml/requirements-dev.txt
+# Exact versions used for the FYP report results (2026-09-27, Python 3.12.14).
+-r requirements.txt
+matplotlib==3.11.2
+torch==2.14.0
+pytest==9.1.1
