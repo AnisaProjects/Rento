@@ -45,6 +45,7 @@ const ADMIN_MENU = [
         ['Enquiries', 'package-enquiries.php', ['package-enquiry.php']],
         ['Categories', 'package-categories.php', []],
     ]],
+    ['AI Insights', 'fa-lightbulb', 'insights.php'],
     ['Smart Pricing', 'fa-chart-line', 'pricing.php'],
     ['Festivals', 'fa-calendar-days', 'festivals.php'],
     ['Registered Users', 'fa-users', 'reg-users.php'],

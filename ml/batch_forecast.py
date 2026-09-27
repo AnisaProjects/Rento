@@ -100,6 +100,16 @@ def compute(cur, settings: dict, today: date) -> tuple[list, int]:
     )
     requests = {r["VehicleId"]: int(r["n"]) for r in cur.fetchall()}
 
+    # Manual overrides (admin -> AI Insights): the newest one wins on a day.
+    cur.execute("SELECT VehicleId, FromDate, ToDate, Price, Note FROM tbl_price_overrides WHERE ToDate >= %s AND FromDate <= %s ORDER BY id",
+                [today, last_day])
+    overrides = {}
+    for r in cur.fetchall():
+        d = max(r["FromDate"], today)
+        while d <= min(r["ToDate"], last_day):
+            overrides[(r["VehicleId"], d)] = r
+            d += timedelta(days=1)
+
     window = int(settings["pricing_occupancy_window"])
     rows = []
     for car in cars:
@@ -114,9 +124,16 @@ def compute(cur, settings: dict, today: date) -> tuple[list, int]:
         for i in range(horizon):
             day = today + timedelta(days=i)
             result = price_for_day(day, today, context, festivals, settings)
+            meta = {"reasons": result["reasons"], "capped": result["capped"]}
+            override = overrides.get((car["id"], day))
+            if override:
+                price = int(override["Price"])
+                change = round((price / context.base_price - 1) * 100, 2) if context.base_price else 0
+                result["price"], result["multiplier"] = price, round(price / context.base_price, 4) if context.base_price else 1
+                meta = {"reasons": [{"label": "Manual price" + (f": {override['Note']}" if override["Note"] else ""), "pct": change}],
+                        "capped": False, "override": True, "rules": result["reasons"]}
             rows.append((car["id"], day, context.base_price, result["multiplier"], result["price"],
-                         json.dumps({"reasons": result["reasons"], "capped": result["capped"]}, ensure_ascii=False),
-                         1 if result["available"] else 0))
+                         json.dumps(meta, ensure_ascii=False), 1 if result["available"] else 0))
     return rows, len(cars)
 
 
