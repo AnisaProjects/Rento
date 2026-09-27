@@ -1,0 +1,15 @@
+{
+    "name": "rento/website",
+    "description": "Rento car rental website (PHP). Only runtime library: PHPMailer for SMTP email.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "config": {
+        "platform": { "php": "8.3.14" },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

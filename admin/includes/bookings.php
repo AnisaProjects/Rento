@@ -57,6 +57,9 @@ function admin_booking_set_status(PDO $dbh, int $id, int $status): array
     $update->execute();
     // Availability and occupancy changed.
     forecast_request_recompute($dbh, 'booking ' . $number . ($status === 1 ? ' confirmed' : ' cancelled'));
+    if ($status === 1 && mail_booking_confirmed($dbh, $id)) {
+        return ['success', "Booking $number confirmed. The customer was emailed."];
+    }
     return ['success', $status === 1 ? "Booking $number confirmed." : "Booking $number cancelled."];
 }
 

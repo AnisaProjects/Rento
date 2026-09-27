@@ -61,6 +61,7 @@ const ADMIN_MENU = [
         ['Manage Pages', 'manage-pages.php', []],
     ]],
     ['Contact Info', 'fa-address-card', 'update-contactinfo.php'],
+    ['Email', 'fa-envelope', 'email-settings.php'],
 ];
 
 // HTML-escapes any value (null-safe; database columns are often NULL).

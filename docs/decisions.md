@@ -231,6 +231,42 @@ dark, at 1366 and 390.
 **Undo.** Revert the commit "Dark mode…". To force light for everyone, remove `theme.js` from
 `includes/head.php` and `admin/includes/layout.php`, and delete the two dark blocks in `tokens.css`.
 
+### P10. Email (PHPMailer, optional SMTP)
+
+**What.**
+- **Library.** PHPMailer 6.12 is installed with Composer (`composer.json` / `composer.lock` committed;
+  `vendor/` git-ignored and blocked from the web). Run `composer install --no-dev` on a new server.
+- **Migration 021** adds `admin.Email` and the table `tblmailsettings`. The legacy
+  `admin.updationDate` zero-date default needed a session-only `sql_mode` change for the ALTER; the
+  column itself is untouched.
+- **Admin → Email** (new page `admin/email-settings.php`):
+  - Settings: SMTP server, port, encryption, username, password, From address and name, reply-to.
+  - "Send test email", plus a short log of recent sends.
+  - The password is encrypted with libsodium using `APP_KEY`. The key is generated into
+    `includes/config.local.php` or set with `RENTO_APP_KEY`, and is never in the database. The form never
+    shows the password again.
+- **Admin → Change password** has a new "Account email" form (fields `adminemail`, `emailpassword`).
+  Changing it needs the current password, because reset links go there.
+- **When SMTP is set up:**
+  - Customer and admin password reset links are emailed and no longer shown on screen, even in dev mode.
+  - "We received your booking request" is sent, with the stored price.
+  - "Your booking is confirmed" is sent when an admin confirms.
+  - "We received your request" is sent for package and with-driver enquiries that give an email address.
+- **When it isn't set up:** dev mode shows reset links on screen as before, and nothing is sent.
+- **Failures never interrupt a booking or enquiry.** The admin sees the SMTP error on a test send.
+  `logs/mail.log` records sends and failures with masked addresses and never passwords.
+- **Emails** are plain HTML with a text version, the Rento wordmark, a single button and a detail table.
+
+**Tested** against a local SMTP test server: the test email, customer reset, booking received, booking
+confirmed, package enquiry and admin reset all arrived with the right content and links. With the server
+down, the error was shown and the booking still saved. With email off, the dev-mode link came back.
+All test data, the admin test address and the SMTP settings were then removed, so **email is off until
+you enter your provider's details**.
+
+**Not included (open):** a cancellation email, and an "new booking" notice to the admin inbox.
+**Undo.** Clear the SMTP server in admin → Email (email off). Revert the commit to remove the code;
+migration 021 stays (additive).
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`

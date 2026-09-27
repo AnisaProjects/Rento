@@ -53,11 +53,13 @@ if (isset($_POST['update'])) {
     $insert->bindParam(':hash', $tokenHash, PDO::PARAM_STR);
     $insert->execute();
 
-    if (APP_DEV_MODE) {
-      $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-      $devResetLink = $scheme . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/reset-password?token=' . $newToken;
+    $resetLink = seo_url('reset-password?token=' . $newToken);
+    if (mail_configured($dbh)) {
+      // SMTP is set up (admin -> Email): the link goes only to the account's inbox.
+      mail_password_reset($dbh, $email, $resetLink, RESET_TOKEN_TTL_MINUTES);
+    } elseif (APP_DEV_MODE) {
+      $devResetLink = $resetLink; // no mail server: shown on screen while testing
     }
-    // TODO: when a mail server is available, email the link here instead of showing it.
   }
   // Same message whether or not the email exists, so this form can't be used to discover accounts.
   if (!$error) $msg = "If that email is registered, a password reset link has been sent to it. The link is valid for " . RESET_TOKEN_TTL_MINUTES . " minutes.";

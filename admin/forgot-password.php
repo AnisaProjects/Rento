@@ -16,7 +16,7 @@ if (isset($_POST['request'])) {
   }
   // Every request counts, not only failures.
   rate_limit_record($dbh, 'admin_password_reset', $username);
-  $query = $dbh->prepare("SELECT id FROM admin WHERE UserName = :username");
+  $query = $dbh->prepare("SELECT id, Email FROM admin WHERE UserName = :username");
   $query->bindParam(':username', $username, PDO::PARAM_STR);
   $query->execute();
   $admin = $query->fetch(PDO::FETCH_OBJ);
@@ -27,12 +27,13 @@ if (isset($_POST['request'])) {
     $insert = $dbh->prepare("INSERT INTO tblpasswordresets(UserId, AccountType, TokenHash, ExpiresAt)
       VALUES(:id, 'admin', :hash, NOW() + INTERVAL " . ADMIN_RESET_TTL_MINUTES . " MINUTE)");
     $insert->execute([':id' => $admin->id, ':hash' => hash('sha256', $token)]);
-    if (APP_DEV_MODE) {
-      $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-      $devResetLink = $scheme . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/reset-password.php?token=' . $token;
+    $resetLink = seo_url('admin/reset-password.php?token=' . $token);
+    if (mail_configured($dbh) && filter_var((string)$admin->Email, FILTER_VALIDATE_EMAIL)) {
+      // SMTP is set up and the account has an email (admin -> Change password): email the link only.
+      mail_password_reset($dbh, (string)$admin->Email, $resetLink, ADMIN_RESET_TTL_MINUTES, true);
+    } elseif (APP_DEV_MODE) {
+      $devResetLink = $resetLink; // no mail server (or no email on the account): shown on screen while testing
     }
-    // TODO: the admin table has no email address yet; when it does (and a mail server
-    // is available), email the link instead of showing it.
   }
   // The same answer whether or not the username exists.
   $sent = true;

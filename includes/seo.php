@@ -23,7 +23,7 @@ function seo_base_url(): string
     $host = preg_replace('/[^a-z0-9.:\-\[\]]/i', '', (string)($_SERVER['HTTP_HOST'] ?? 'localhost'));
     $dir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
     // Scripts in subfolders (api/) still belong to the site root one level up.
-    if (preg_match('#/(api|tools)$#', $dir)) $dir = dirname($dir);
+    if (preg_match('#/(api|tools|admin|admin/includes)$#', $dir)) $dir = preg_replace('#/(api|tools|admin|admin/includes)$#', '', $dir);
     return ($https ? 'https' : 'http') . '://' . $host . ($dir === '' || $dir === '.' ? '' : $dir) . '/';
 }
 

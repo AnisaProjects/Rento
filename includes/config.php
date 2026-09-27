@@ -25,6 +25,8 @@ define('DB_PORT', (int)$rentoConf('DB_PORT', 8889));
 define('DB_USER', $rentoConf('DB_USER', APP_DEV_MODE ? 'root' : ''));
 define('DB_PASS', $rentoConf('DB_PASS', APP_DEV_MODE ? 'root' : ''));
 define('DB_NAME', $rentoConf('DB_NAME', 'rento'));
+// Key for secrets stored in the database (the SMTP password, includes/mailer.php): 32 random bytes, base64.
+define('APP_KEY', (string)$rentoConf('APP_KEY', ''));
 unset($rentoLocal, $rentoConf);
 
 // Rate limiting (includes/rate_limit.php): failed logins and reset requests allowed
@@ -82,6 +84,7 @@ require_once __DIR__ . '/site-content.php';
 require_once __DIR__ . '/packages.php';
 require_once __DIR__ . '/festivals.php';
 require_once __DIR__ . '/seo.php';
+require_once __DIR__ . '/mailer.php';
 require_once __DIR__ . '/settings.php';
 require_once __DIR__ . '/pricing.php';
 require_once __DIR__ . '/price-insights.php';

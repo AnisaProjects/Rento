@@ -11,3 +11,6 @@ __pycache__/
 
 # Local secrets (DB user, dev mode) for this machine; see includes/config.php
 /includes/config.local.php
+
+# Composer libraries (composer install --no-dev)
+/vendor/

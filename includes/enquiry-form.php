@@ -64,6 +64,7 @@ function enquiry_handle(PDO $dbh, array $target, string $back): void
         ':notes' => $in['notes'] !== '' ? $in['notes'] : null,
     ]);
     unset($_SESSION['enquiry_form']);
+    mail_enquiry_received($dbh, $in, $title); // when an email was given and SMTP is set up
     flash_set('success', 'Thank you! We received your request for ' . $title . ' and will call you to confirm the price and details.');
     redirect_to($back);
 }

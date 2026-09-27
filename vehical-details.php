@@ -109,8 +109,9 @@ if (isset($_POST['submit'])) {
   $query->bindParam(':quoted', $quotedPrice, PDO::PARAM_INT);
   $query->bindParam(':details', $pricingDetails, PDO::PARAM_STR);
   $query->execute();
-  if ($dbh->lastInsertId()) {
+  if ($newBookingId = (int)$dbh->lastInsertId()) {
     forecast_request_recompute($dbh, 'new booking #' . $bookingno);
+    mail_booking_received($dbh, $newBookingId); // only when SMTP is set up (admin -> Email)
     flash_set('success', 'Booking request sent (#' . $bookingno . ', ' . format_price($quotedPrice) . ' for ' . $quote['rental_days'] . ($quote['rental_days'] === 1 ? ' day' : ' days') . '). We will confirm it shortly.');
     redirect_to('my-booking');
   }
