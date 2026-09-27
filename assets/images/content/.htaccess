@@ -1,0 +1,11 @@
+# Uploaded site images only (admin -> Site content, brand logos, package photos): never execute scripts
+# from this folder, even if a file with a script extension got here.
+Options -ExecCGI -Indexes
+RemoveHandler .php .phtml .phar .php3 .php4 .php5 .php7 .php8 .pht .cgi .pl .py .sh
+RemoveType .php .phtml .phar
+<FilesMatch "\.(?i:php\d*|phtml|phar|pht|cgi|pl|py|sh|shtml|html?|svg|js)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
