@@ -263,18 +263,6 @@ body.r-page {
   box-shadow: var(--rento-shadow);
 }
 
-.r-btn--ghost {
-  --r-btn-bg: transparent;
-  --r-btn-border: transparent;
-  --r-btn-color: var(--rento-ink-900);
-}
-
-.r-btn--ghost:hover {
-  --r-btn-bg: var(--rento-gray-100);
-  --r-btn-border: var(--rento-gray-100);
-  box-shadow: none;
-}
-
 .r-btn--sm {
   min-height: 38px;
   padding: 0 var(--rento-space-4);
