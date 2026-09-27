@@ -99,6 +99,7 @@ admin_page_start($page ? 'Edit ' . $page[0] : 'Manage Pages', 'manage-pages.php'
   });
   quill.setContents(quill.clipboard.convert({ html: textarea.value }), 'silent');
   quill.root.setAttribute('aria-label', 'Page content');
+  document.querySelectorAll('.ql-header .ql-picker-label').forEach(function (el) { el.setAttribute('aria-label', 'Text style'); });
   document.getElementById('page-form').addEventListener('submit', function () {
     // Semantic HTML gives real <ul>/<ol> lists; Quill 2.0.3 writes every space as &nbsp;.
     var html = quill.getLength() > 1 ? quill.getSemanticHTML().replace(/&nbsp;/g, ' ') : '';
