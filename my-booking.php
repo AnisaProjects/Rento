@@ -57,6 +57,7 @@ $bookings = $query->fetchAll(PDO::FETCH_OBJ);
               <div><dt>Return</dt><dd><?php echo htmlentities(date('D, j M Y', strtotime($booking->ToDate))); ?></dd></div>
               <div><dt><?php echo $days; ?> <?php echo $days === 1 ? 'day' : 'days'; ?><?php echo $amount['source'] === 'base' ? ' &times; ' . format_price($booking->PricePerDay) : ''; ?></dt><dd><?php echo format_price($amount['total']); ?></dd></div>
             </dl>
+            <p class="r-booking__links"><a href="invoice?booking=<?php echo urlencode($booking->BookingNumber); ?>"><i class="fa fa-file-invoice" aria-hidden="true"></i><?php echo (int)$booking->Status === 1 ? 'Invoice' : 'Booking summary'; ?></a></p>
             <?php if (trim((string)$booking->message) !== '') { ?>
               <p class="r-booking__message"><strong>Your message:</strong> <?php echo htmlentities($booking->message); ?></p>
             <?php } ?>

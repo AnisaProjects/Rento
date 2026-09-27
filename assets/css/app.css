@@ -4281,3 +4281,198 @@ body.r-ai-busy {
 .r-car-card__reasons .r-car-card__caution i {
   color: var(--rento-warning);
 }
+
+/* ---------- 25. Customer invoice (invoice.php) ---------- */
+.r-booking__links {
+  margin: var(--rento-space-2) 0 0;
+  font-size: var(--rento-text-sm);
+  font-weight: var(--rento-weight-semibold);
+}
+
+.r-booking__links i {
+  margin-right: 6px;
+}
+
+.r-invoice-page {
+  background: var(--rento-gray-100);
+}
+
+.r-invoice {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: var(--rento-space-6) var(--rento-space-4) var(--rento-space-12);
+}
+
+.r-invoice__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--rento-space-2);
+  margin-bottom: var(--rento-space-4);
+}
+
+.r-invoice__sheet {
+  padding: var(--rento-space-8);
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-lg);
+  background: #fff;
+  color: var(--rento-ink-800);
+}
+
+.r-invoice__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--rento-space-6);
+  padding-bottom: var(--rento-space-6);
+  border-bottom: 2px solid var(--rento-ink-900);
+}
+
+.r-invoice__brand {
+  color: var(--rento-ink-900);
+  font-family: var(--rento-font-heading);
+  font-size: 1.75rem;
+  font-weight: var(--rento-weight-extrabold);
+}
+
+.r-invoice__brand span {
+  color: var(--rento-primary-text);
+}
+
+.r-invoice__from {
+  margin: var(--rento-space-2) 0 0;
+  color: var(--rento-gray-600);
+  font-size: var(--rento-text-sm);
+}
+
+.r-invoice__meta h1 {
+  margin: 0 0 var(--rento-space-3);
+  font-size: var(--rento-text-2xl);
+  text-align: right;
+}
+
+.r-invoice__meta dl {
+  margin: 0;
+  font-size: var(--rento-text-sm);
+}
+
+.r-invoice__meta dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rento-space-6);
+}
+
+.r-invoice__meta dt {
+  color: var(--rento-gray-500);
+  font-weight: var(--rento-weight-medium);
+}
+
+.r-invoice__meta dd {
+  margin: 0;
+  font-weight: var(--rento-weight-semibold);
+}
+
+.r-invoice__parties {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--rento-space-6);
+  margin: var(--rento-space-6) 0;
+}
+
+.r-invoice__parties h2 {
+  margin: 0 0 var(--rento-space-2);
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-xs);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.r-invoice__parties p {
+  margin: 0;
+  font-size: var(--rento-text-sm);
+  line-height: 1.6;
+}
+
+.r-invoice__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--rento-text-sm);
+}
+
+.r-invoice__table th {
+  padding: var(--rento-space-2) 0;
+  border-bottom: 1px solid var(--rento-gray-300);
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-xs);
+  letter-spacing: .04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.r-invoice__table td {
+  padding: var(--rento-space-2) var(--rento-space-3) var(--rento-space-2) 0;
+  border-bottom: 1px solid var(--rento-gray-100);
+  vertical-align: top;
+}
+
+.r-invoice__table .r-invoice__num {
+  padding-right: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.r-invoice__sub td {
+  color: var(--rento-gray-600);
+}
+
+.r-invoice__total td {
+  padding-top: var(--rento-space-3);
+  border-top: 2px solid var(--rento-ink-900);
+  border-bottom: 0;
+  color: var(--rento-ink-900);
+  font-family: var(--rento-font-heading);
+  font-size: var(--rento-text-lg);
+  font-weight: var(--rento-weight-extrabold);
+}
+
+.r-invoice__foot {
+  margin-top: var(--rento-space-6);
+  color: var(--rento-gray-600);
+  font-size: var(--rento-text-xs);
+}
+
+@media (max-width: 575px) {
+  .r-invoice__sheet {
+    padding: var(--rento-space-5);
+  }
+
+  .r-invoice__parties {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .r-invoice__meta h1 {
+    text-align: left;
+  }
+}
+
+@media print {
+  .r-invoice-page {
+    background: #fff;
+  }
+
+  .r-invoice {
+    max-width: none;
+    padding: 0;
+  }
+
+  .r-invoice__actions,
+  .r-toasts,
+  .r-back-top {
+    display: none !important;
+  }
+
+  .r-invoice__sheet {
+    padding: 0;
+    border: 0;
+  }
+}
