@@ -149,3 +149,17 @@ so the factors are off.
 
 **Why.** Keep every search usable with market-based prices.
 **Undo.** Revert the same commit; the Find My Car example can also be edited in admin → Site content.
+
+### D10. FAQ "How is the price calculated?"
+
+**What.** The answer said "Every car has one daily price … the number of days multiplied by the daily
+price", which is no longer true. It now explains:
+- each day's price is adjusted within set limits for weekends, festivals and travel days, and the season;
+- the car page's price calendar shows cheaper days;
+- the total shown before the request is saved with the booking and used on the invoice.
+
+It doesn't quote the percentage limits, so it stays correct if they are changed in Smart Pricing.
+Applied by `database/migrations/018_faq_smart_pricing.sql`.
+Your message was cut off after "3. FAQ: reword the "one daily", so this covers only that answer.
+**Why.** The FAQ must describe how prices really work.
+**Undo.** `database/undo/018_faq_smart_pricing_undo.sql`, or edit it in admin → Manage Pages → FAQs.
