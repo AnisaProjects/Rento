@@ -1,0 +1,23 @@
+---
+title: "Activity: price forecast recompute"
+---
+flowchart TD
+    S([Trigger: nightly 02:30, admin Recompute, booking, festival, setting, base price or override change]) --> Q[Queue a row in tbl_forecast_runs]
+    Q --> L{Another run holds the MySQL lock?}
+    L -- yes --> W[Wait up to 300 s, then pick up all queued rows together]
+    L -- no --> R[Load active cars, festivals, bookings, overrides, settings]
+    W --> R
+    R --> G{Confirmed bookings >= 50?}
+    G -- yes --> ON[Occupancy and demand factors on]
+    G -- no --> OFF[Occupancy and demand factors off]
+    ON & OFF --> LOOP[For every car x each of the next 60 days]
+    LOOP --> F1[Add factors: weekend, festival or travel days, season, lead time, occupancy, demand]
+    F1 --> F2[Cap the sum at -15% / +25%, round to Rs 50, keep the reasons]
+    F2 --> F3{Manual override for this day?}
+    F3 -- yes --> F4[Use the override price, keep the rule reasons for reference]
+    F3 -- no --> F5[Use the rule price]
+    F4 & F5 --> F6{More car-days?}
+    F6 -- yes --> LOOP
+    F6 -- no --> T[Replace tbl_price_forecast in one transaction]
+    T --> D[Mark runs done with a summary message]
+    D --> E([End: pages, API and AI Insights read the new forecast])

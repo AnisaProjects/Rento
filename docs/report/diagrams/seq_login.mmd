@@ -1,0 +1,33 @@
+---
+title: "Sequence: customer login"
+---
+sequenceDiagram
+    actor U as Customer
+    participant B as Browser
+    participant S as includes/security.php
+    participant L as includes/login.php
+    participant R as rate_limit.php
+    participant DB as MySQL (tblusers, tblratelimits)
+    U->>B: email + password in the login modal
+    B->>S: POST / (email, password, login, csrf_token)
+    S->>S: csrf_is_valid() (hash_equals with session token)
+    alt token missing or wrong
+        S-->>B: 403 / rejected, no login
+    end
+    S->>L: handle POST login
+    L->>R: rate_limit_exceeded('login', email)
+    R->>DB: count failures for IP and email in 15 min
+    alt too many attempts
+        L-->>B: 303 + "Too many attempts" toast
+    end
+    L->>DB: SELECT id, EmailId, Password WHERE EmailId = :email (prepared)
+    L->>L: password_check_and_upgrade() (bcrypt, or MD5 once then re-hash)
+    alt valid
+        L->>DB: UPDATE tblusers SET Password = new bcrypt hash (only after an MD5 login)
+        L->>R: rate_limit_clear('login', email)
+        L->>L: session_login_regenerate() (new session id)
+        L-->>B: 303 redirect + "Welcome back" toast
+    else invalid
+        L->>R: rate_limit_record('login', email)
+        L-->>B: 303 redirect, login modal re-opened, error announced
+    end

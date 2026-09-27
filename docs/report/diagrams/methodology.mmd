@@ -1,0 +1,19 @@
+---
+title: "Phased iterative development (each phase: plan, build, test, report, owner approval)"
+---
+flowchart LR
+    B["Baseline<br/>open-source Car Rental<br/>Portal template +<br/>Aug ML prototype"] --> P0
+    P0["Phase 0<br/>Stabilise and secure"] --> P1["Phase 1<br/>Foundation:<br/>layout, Bootstrap 5,<br/>clean URLs"]
+    P1 --> P2["Phase 2<br/>Public redesign"] --> P3["Phase 3<br/>Admin redesign,<br/>content, research"]
+    P3 --> P4["Phase 4<br/>AI engine: pricing rules,<br/>forecast, APIs,<br/>recommendations"]
+    P4 --> P5["Phase 5<br/>AI in the interface:<br/>calendar, badges,<br/>AI Insights"]
+    P5 --> P6["Phase 6<br/>Polish: accessibility,<br/>SEO, dark mode, email,<br/>deployment docs"]
+    P6 --> P7["Phase 7<br/>Evaluation, tests,<br/>documentation, report"]
+    P7 -. "feedback" .-> P6
+    subgraph Loop["Inside every phase"]
+        direction LR
+        L1[Plan] --> L2[Backup + branch] --> L3[Build, commit per step] --> L4[Automated + manual tests] --> L5[Report] --> L6{Approved?}
+        L6 -- no --> L3
+    end
+    classDef ph fill:#fff0eb,stroke:#d23f1c
+    class B,P0,P1,P2,P3,P4,P5,P6,P7 ph

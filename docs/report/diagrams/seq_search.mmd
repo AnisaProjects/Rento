@@ -1,0 +1,18 @@
+---
+title: "Sequence: search and filter the car listing"
+---
+sequenceDiagram
+    actor U as Customer
+    participant B as Browser
+    participant P as car-listing.php
+    participant I as price-insights.php
+    participant DB as MySQL
+    U->>B: choose type / brand / fuel / budget, sort by price
+    B->>P: GET car-listing?type=SUV&max=7500&sort=price_asc
+    P->>P: whitelist every parameter (types, brands, budgets, sorts)
+    P->>DB: SELECT active cars JOIN brands WHERE ... (prepared, bound values)
+    P->>I: car_price_info(id) for each car
+    I->>DB: forecast rows of the next 30 days (once per request)
+    I-->>P: 'from' price (lowest available day), badges
+    P->>P: budget filter and price sort on the 'from' price, paging
+    P-->>B: cards with "from Rs X/day", badges, canonical/noindex tags

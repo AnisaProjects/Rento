@@ -1,0 +1,200 @@
+admin	id	int	NO	PRI		auto_increment
+admin	UserName	varchar(100)	NO			
+admin	Email	varchar(150)	YES			
+admin	Password	varchar(100)	NO			
+admin	updationDate	timestamp	NO		0000-00-00 00:00:00	on update CURRENT_TIMESTAMP
+tbl_forecast_runs	id	int	NO	PRI		auto_increment
+tbl_forecast_runs	TriggerReason	varchar(120)	NO			
+tbl_forecast_runs	Status	varchar(12)	NO	MUL	queued	
+tbl_forecast_runs	RequestedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tbl_forecast_runs	StartedAt	datetime	YES			
+tbl_forecast_runs	FinishedAt	datetime	YES			
+tbl_forecast_runs	Cars	int	YES			
+tbl_forecast_runs	RowsWritten	int	YES			
+tbl_forecast_runs	Message	varchar(500)	YES			
+tbl_price_forecast	VehicleId	int	NO	PRI		
+tbl_price_forecast	ForecastDate	date	NO	PRI		
+tbl_price_forecast	BasePrice	int	NO			
+tbl_price_forecast	Multiplier	decimal(6,4)	NO		1.0000	
+tbl_price_forecast	Price	int	NO			
+tbl_price_forecast	Reasons	text	YES			
+tbl_price_forecast	IsAvailable	tinyint(1)	NO		1	
+tbl_price_forecast	RunId	int	YES			
+tbl_price_forecast	ComputedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tbl_price_overrides	id	int	NO	PRI		auto_increment
+tbl_price_overrides	VehicleId	int	NO	MUL		
+tbl_price_overrides	FromDate	date	NO			
+tbl_price_overrides	ToDate	date	NO			
+tbl_price_overrides	Price	int	NO			
+tbl_price_overrides	Note	varchar(200)	YES			
+tbl_price_overrides	CreatedBy	varchar(100)	YES			
+tbl_price_overrides	CreatedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblbooking	id	int	NO	PRI		auto_increment
+tblbooking	BookingNumber	bigint	YES			
+tblbooking	userEmail	varchar(100)	YES			
+tblbooking	VehicleId	int	YES			
+tblbooking	FromDate	varchar(20)	YES			
+tblbooking	ToDate	varchar(20)	YES			
+tblbooking	message	varchar(255)	YES			
+tblbooking	Status	int	YES			
+tblbooking	quoted_price	int	YES			
+tblbooking	pricing_details	text	YES			
+tblbooking	priced_at	datetime	YES			
+tblbooking	PostingDate	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblbooking	LastUpdationDate	timestamp	YES			on update CURRENT_TIMESTAMP
+tblbrands	id	int	NO	PRI		auto_increment
+tblbrands	BrandName	varchar(120)	NO			
+tblbrands	BrandLogo	varchar(160)	YES			
+tblbrands	CreationDate	timestamp	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblbrands	UpdationDate	timestamp	YES			on update CURRENT_TIMESTAMP
+tblcontactusinfo	id	int	NO	PRI		auto_increment
+tblcontactusinfo	Address	tinytext	YES			
+tblcontactusinfo	EmailId	varchar(255)	YES			
+tblcontactusinfo	ContactNo	char(11)	YES			
+tblcontactusquery	id	int	NO	PRI		auto_increment
+tblcontactusquery	name	varchar(100)	YES			
+tblcontactusquery	EmailId	varchar(120)	YES			
+tblcontactusquery	ContactNumber	char(11)	YES			
+tblcontactusquery	Message	longtext	YES			
+tblcontactusquery	PostingDate	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblcontactusquery	status	int	YES			
+tblfestivals	id	int	NO	PRI		auto_increment
+tblfestivals	FestivalName	varchar(150)	NO			
+tblfestivals	StartDate	date	NO	MUL		
+tblfestivals	EndDate	date	NO			
+tblfestivals	TravelFrom	date	YES			
+tblfestivals	TravelTo	date	YES			
+tblfestivals	TravelPct	decimal(5,2)	YES			
+tblfestivals	DemandLevel	varchar(10)	NO		medium	
+tblfestivals	Verification	varchar(20)	NO		unverified	
+tblfestivals	SourceUrl	varchar(500)	YES			
+tblfestivals	Notes	text	YES			
+tblfestivals	CreatedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblfestivals	UpdatedAt	timestamp	YES			on update CURRENT_TIMESTAMP
+tblmailsettings	SettingKey	varchar(40)	NO	PRI		
+tblmailsettings	SettingValue	text	NO			
+tblmailsettings	UpdatedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED on update CURRENT_TIMESTAMP
+tblpackagecategories	id	int	NO	PRI		auto_increment
+tblpackagecategories	CategoryName	varchar(80)	NO			
+tblpackagecategories	Slug	varchar(80)	NO	UNI		
+tblpackagecategories	Icon	varchar(40)	NO		fa-route	
+tblpackagecategories	SortOrder	int	NO		0	
+tblpackagecategories	IsActive	tinyint(1)	NO		1	
+tblpackagecategories	CreatedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblpackageenquiries	id	int	NO	PRI		auto_increment
+tblpackageenquiries	PackageId	int	YES	MUL		
+tblpackageenquiries	VehicleId	int	YES	MUL		
+tblpackageenquiries	PackageTitle	varchar(150)	NO			
+tblpackageenquiries	FullName	varchar(120)	NO			
+tblpackageenquiries	Phone	varchar(20)	NO			
+tblpackageenquiries	Email	varchar(120)	YES			
+tblpackageenquiries	TravelDate	date	NO			
+tblpackageenquiries	PickupLocation	varchar(200)	NO			
+tblpackageenquiries	Passengers	int	NO		1	
+tblpackageenquiries	VehicleType	varchar(30)	YES			
+tblpackageenquiries	Notes	text	YES			
+tblpackageenquiries	Status	varchar(12)	NO	MUL	new	
+tblpackageenquiries	AdminNotes	text	YES			
+tblpackageenquiries	CreatedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblpackageenquiries	UpdatedAt	timestamp	YES			on update CURRENT_TIMESTAMP
+tblpackageimages	id	int	NO	PRI		auto_increment
+tblpackageimages	PackageId	int	NO	MUL		
+tblpackageimages	ImagePath	varchar(160)	NO			
+tblpackageimages	SortOrder	int	NO		0	
+tblpackages	id	int	NO	PRI		auto_increment
+tblpackages	CategoryId	int	YES	MUL		
+tblpackages	Title	varchar(150)	NO			
+tblpackages	Slug	varchar(160)	NO			
+tblpackages	Summary	varchar(300)	YES			
+tblpackages	Description	text	YES			
+tblpackages	SeoDescription	varchar(300)	YES			
+tblpackages	DurationLabel	varchar(80)	YES			
+tblpackages	DurationDays	int	NO		1	
+tblpackages	RouteStops	varchar(300)	YES			
+tblpackages	StartingPrice	int	NO		0	
+tblpackages	FestivalPricing	tinyint(1)	NO		0	
+tblpackages	PricesJson	text	YES			
+tblpackages	ItineraryJson	text	YES			
+tblpackages	Inclusions	text	YES			
+tblpackages	Exclusions	text	YES			
+tblpackages	CoverImage	varchar(160)	YES			
+tblpackages	SortOrder	int	NO		0	
+tblpackages	IsActive	tinyint(1)	NO	MUL	0	
+tblpackages	CreatedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblpackages	UpdatedAt	timestamp	YES			on update CURRENT_TIMESTAMP
+tblpages	id	int	NO	PRI		auto_increment
+tblpages	PageName	varchar(255)	YES			
+tblpages	type	varchar(255)	NO			
+tblpages	detail	longtext	NO			
+tblpages	DraftDetail	longtext	YES			
+tblpages	DraftNote	varchar(500)	YES			
+tblpages	DraftUpdatedAt	datetime	YES			
+tblpasswordresets	id	int	NO	PRI		auto_increment
+tblpasswordresets	UserId	int	NO	MUL		
+tblpasswordresets	AccountType	varchar(10)	NO	MUL	user	
+tblpasswordresets	TokenHash	char(64)	NO	UNI		
+tblpasswordresets	ExpiresAt	datetime	NO			
+tblpasswordresets	UsedAt	datetime	YES			
+tblpasswordresets	CreatedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblratelimits	id	int	NO	PRI		auto_increment
+tblratelimits	Action	varchar(30)	NO	MUL		
+tblratelimits	IpAddress	varchar(45)	NO			
+tblratelimits	Email	varchar(191)	YES			
+tblratelimits	CreatedAt	datetime	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblsettings	SettingKey	varchar(60)	NO	PRI		
+tblsettings	SettingValue	varchar(255)	NO			
+tblsettings	UpdatedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED on update CURRENT_TIMESTAMP
+tblsitecontent	ContentKey	varchar(80)	NO	PRI		
+tblsitecontent	ContentValue	mediumtext	NO			
+tblsitecontent	UpdatedAt	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED on update CURRENT_TIMESTAMP
+tblsubscribers	id	int	NO	PRI		auto_increment
+tblsubscribers	SubscriberEmail	varchar(120)	YES			
+tblsubscribers	PostingDate	timestamp	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tbltestimonial	id	int	NO	PRI		auto_increment
+tbltestimonial	UserEmail	varchar(100)	NO			
+tbltestimonial	Testimonial	mediumtext	NO			
+tbltestimonial	PostingDate	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tbltestimonial	status	int	YES			
+tblusers	id	int	NO	PRI		auto_increment
+tblusers	FullName	varchar(120)	YES			
+tblusers	EmailId	varchar(100)	YES	MUL		
+tblusers	Password	varchar(100)	YES			
+tblusers	ContactNo	char(11)	YES			
+tblusers	dob	varchar(100)	YES			
+tblusers	Address	varchar(255)	YES			
+tblusers	City	varchar(100)	YES			
+tblusers	Country	varchar(100)	YES			
+tblusers	RegDate	timestamp	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblusers	UpdationDate	timestamp	YES			on update CURRENT_TIMESTAMP
+tblvehicles	id	int	NO	PRI		auto_increment
+tblvehicles	VehiclesTitle	varchar(150)	YES			
+tblvehicles	VehiclesBrand	int	YES			
+tblvehicles	VehiclesOverview	longtext	YES			
+tblvehicles	SeoDescription	varchar(300)	YES			
+tblvehicles	PricePerDay	int	YES	MUL		
+tblvehicles	FuelType	varchar(100)	YES			
+tblvehicles	ModelYear	int	YES			
+tblvehicles	SeatingCapacity	int	YES			
+tblvehicles	CarType	varchar(20)	YES	MUL	Sedan	
+tblvehicles	IsActive	tinyint(1)	NO	MUL	1	
+tblvehicles	DriverOnly	tinyint(1)	NO		0	
+tblvehicles	Rugged	tinyint(1)	NO		0	
+tblvehicles	Vimage1	varchar(120)	YES			
+tblvehicles	Vimage2	varchar(120)	YES			
+tblvehicles	Vimage3	varchar(120)	YES			
+tblvehicles	Vimage4	varchar(120)	YES			
+tblvehicles	Vimage5	varchar(120)	YES			
+tblvehicles	AirConditioner	int	YES			
+tblvehicles	PowerDoorLocks	int	YES			
+tblvehicles	AntiLockBrakingSystem	int	YES			
+tblvehicles	BrakeAssist	int	YES			
+tblvehicles	PowerSteering	int	YES			
+tblvehicles	DriverAirbag	int	YES			
+tblvehicles	PassengerAirbag	int	YES			
+tblvehicles	PowerWindows	int	YES			
+tblvehicles	CDPlayer	int	YES			
+tblvehicles	CentralLocking	int	YES			
+tblvehicles	CrashSensor	int	YES			
+tblvehicles	LeatherSeats	int	YES			
+tblvehicles	RegDate	timestamp	NO		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+tblvehicles	UpdationDate	timestamp	YES			on update CURRENT_TIMESTAMP

@@ -1,0 +1,30 @@
+---
+title: "Sequence: booking request and confirmation"
+---
+sequenceDiagram
+    actor U as Customer
+    participant B as Browser
+    participant V as vehical-details.php
+    participant P as pricing.php
+    participant DB as MySQL
+    participant Py as ml/batch_forecast.py
+    participant M as mailer.php
+    participant I as invoice.php
+    actor A as Admin
+    U->>B: Book now (fromdate, todate, message)
+    B->>V: POST car/<name>-<id> (+ csrf_token, checked in security.php)
+    V->>V: logged in? dates valid (inclusive days)?
+    V->>DB: overlapping booking for the car? (prepared)
+    V->>P: public_quote(car, from, to) (browser prices are ignored)
+    P->>DB: forecast day prices
+    P-->>V: total + per-day prices + reasons
+    V->>DB: INSERT tblbooking (quoted_price, pricing_details, priced_at)
+    V->>P: forecast_request_recompute('new booking')
+    P-)Py: start in background (DB settings in the environment)
+    V->>M: mail_booking_received() (only if SMTP is set up)
+    V-->>B: 303 to my-booking + "Booking request sent (booking no., Rs X)"
+    A->>DB: Confirm (POST aeid + CSRF) -> admin_booking_set_status(): clash check, Status = 1
+    A->>M: mail_booking_confirmed()
+    U->>I: GET invoice?booking=no. (login required, owner only)
+    I->>DB: booking + stored quoted_price and per-day details
+    I-->>U: printable invoice at the stored price

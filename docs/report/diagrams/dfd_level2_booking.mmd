@@ -1,0 +1,40 @@
+---
+title: "DFD level 2: process 5.0 Book and invoice"
+---
+flowchart TB
+    C["Customer"]
+    A["Administrator"]
+    P51(["5.1 Check session<br/>and CSRF token"])
+    P52(["5.2 Validate dates<br/>(inclusive days)"])
+    P53(["5.3 Check overlap with<br/>active bookings"])
+    P54(["5.4 Work out server-side<br/>quote (public_quote)"])
+    P55(["5.5 Store booking with<br/>quoted_price + per-day details"])
+    P56(["5.6 Confirm or cancel<br/>(clash check)"])
+    P57(["5.7 Show My bookings<br/>and invoice"])
+    P8(("8.0 Forecast prices"))
+    P9(("9.0 Send email"))
+    D3[("D3 tblbooking")]
+    D4[("D4 tbl_price_forecast")]
+    D1[("D1 tblusers")]
+    C -- "fromdate, todate, message, csrf_token" --> P51 --> P52 --> P53
+    D3 -- "bookings of the car" --> P53
+    P53 -- "free" --> P54
+    D4 -- "day prices + reasons" --> P54
+    P54 -- "total, per_day, reasons" --> P55
+    P55 --> D3
+    P55 -- "recompute request" --> P8
+    P55 -- "request received" --> P9
+    A -- "aeid / eid" --> P56
+    D3 <--> P56
+    P56 -- "confirmed" --> P9
+    P56 -- "recompute request" --> P8
+    C -- "booking number" --> P57
+    D3 --> P57
+    D1 --> P57
+    P57 -- "invoice (stored price)" --> C
+    classDef ext fill:#ffffff,stroke:#101114
+    classDef proc fill:#fff0eb,stroke:#d23f1c
+    classDef store fill:#f1f2f4,stroke:#4f5362
+    class C,A ext
+    class P51,P52,P53,P54,P55,P56,P57,P8,P9 proc
+    class D1,D3,D4 store

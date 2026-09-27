@@ -1,0 +1,1879 @@
+{
+ "tables": {
+  "admin": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "UserName",
+    "type": "varchar(100)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Email",
+    "type": "varchar(150)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Password",
+    "type": "varchar(100)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "updationDate",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "0000-00-00 00:00:00",
+    "extra": "on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tbl_forecast_runs": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "TriggerReason",
+    "type": "varchar(120)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Status",
+    "type": "varchar(12)",
+    "nullable": false,
+    "key": "MUL",
+    "default": "queued",
+    "extra": ""
+   },
+   {
+    "column": "RequestedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "StartedAt",
+    "type": "datetime",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "FinishedAt",
+    "type": "datetime",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Cars",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "RowsWritten",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Message",
+    "type": "varchar(500)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   }
+  ],
+  "tbl_price_forecast": [
+   {
+    "column": "VehicleId",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ForecastDate",
+    "type": "date",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "BasePrice",
+    "type": "int",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Multiplier",
+    "type": "decimal(6,4)",
+    "nullable": false,
+    "key": "",
+    "default": "1.0000",
+    "extra": ""
+   },
+   {
+    "column": "Price",
+    "type": "int",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Reasons",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "IsAvailable",
+    "type": "tinyint(1)",
+    "nullable": false,
+    "key": "",
+    "default": "1",
+    "extra": ""
+   },
+   {
+    "column": "RunId",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ComputedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   }
+  ],
+  "tbl_price_overrides": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "VehicleId",
+    "type": "int",
+    "nullable": false,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "FromDate",
+    "type": "date",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ToDate",
+    "type": "date",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Price",
+    "type": "int",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Note",
+    "type": "varchar(200)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CreatedBy",
+    "type": "varchar(100)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CreatedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   }
+  ],
+  "tblbooking": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "BookingNumber",
+    "type": "bigint",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "userEmail",
+    "type": "varchar(100)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "VehicleId",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "FromDate",
+    "type": "varchar(20)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ToDate",
+    "type": "varchar(20)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "message",
+    "type": "varchar(255)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Status",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "quoted_price",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "pricing_details",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "priced_at",
+    "type": "datetime",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PostingDate",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "LastUpdationDate",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": "on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tblbrands": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "BrandName",
+    "type": "varchar(120)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "BrandLogo",
+    "type": "varchar(160)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CreationDate",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "UpdationDate",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": "on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tblcontactusinfo": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "Address",
+    "type": "tinytext",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "EmailId",
+    "type": "varchar(255)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ContactNo",
+    "type": "char(11)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   }
+  ],
+  "tblcontactusquery": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "name",
+    "type": "varchar(100)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "EmailId",
+    "type": "varchar(120)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ContactNumber",
+    "type": "char(11)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Message",
+    "type": "longtext",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PostingDate",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "status",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   }
+  ],
+  "tblfestivals": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "FestivalName",
+    "type": "varchar(150)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "StartDate",
+    "type": "date",
+    "nullable": false,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "EndDate",
+    "type": "date",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "TravelFrom",
+    "type": "date",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "TravelTo",
+    "type": "date",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "TravelPct",
+    "type": "decimal(5,2)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "DemandLevel",
+    "type": "varchar(10)",
+    "nullable": false,
+    "key": "",
+    "default": "medium",
+    "extra": ""
+   },
+   {
+    "column": "Verification",
+    "type": "varchar(20)",
+    "nullable": false,
+    "key": "",
+    "default": "unverified",
+    "extra": ""
+   },
+   {
+    "column": "SourceUrl",
+    "type": "varchar(500)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Notes",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CreatedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "UpdatedAt",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": "on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tblmailsettings": [
+   {
+    "column": "SettingKey",
+    "type": "varchar(40)",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "SettingValue",
+    "type": "text",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "UpdatedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tblpackagecategories": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "CategoryName",
+    "type": "varchar(80)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Slug",
+    "type": "varchar(80)",
+    "nullable": false,
+    "key": "UNI",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Icon",
+    "type": "varchar(40)",
+    "nullable": false,
+    "key": "",
+    "default": "fa-route",
+    "extra": ""
+   },
+   {
+    "column": "SortOrder",
+    "type": "int",
+    "nullable": false,
+    "key": "",
+    "default": "0",
+    "extra": ""
+   },
+   {
+    "column": "IsActive",
+    "type": "tinyint(1)",
+    "nullable": false,
+    "key": "",
+    "default": "1",
+    "extra": ""
+   },
+   {
+    "column": "CreatedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   }
+  ],
+  "tblpackageenquiries": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "PackageId",
+    "type": "int",
+    "nullable": true,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "VehicleId",
+    "type": "int",
+    "nullable": true,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PackageTitle",
+    "type": "varchar(150)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "FullName",
+    "type": "varchar(120)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Phone",
+    "type": "varchar(20)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Email",
+    "type": "varchar(120)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "TravelDate",
+    "type": "date",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PickupLocation",
+    "type": "varchar(200)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Passengers",
+    "type": "int",
+    "nullable": false,
+    "key": "",
+    "default": "1",
+    "extra": ""
+   },
+   {
+    "column": "VehicleType",
+    "type": "varchar(30)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Notes",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Status",
+    "type": "varchar(12)",
+    "nullable": false,
+    "key": "MUL",
+    "default": "new",
+    "extra": ""
+   },
+   {
+    "column": "AdminNotes",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CreatedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "UpdatedAt",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": "on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tblpackageimages": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "PackageId",
+    "type": "int",
+    "nullable": false,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ImagePath",
+    "type": "varchar(160)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "SortOrder",
+    "type": "int",
+    "nullable": false,
+    "key": "",
+    "default": "0",
+    "extra": ""
+   }
+  ],
+  "tblpackages": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "CategoryId",
+    "type": "int",
+    "nullable": true,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Title",
+    "type": "varchar(150)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Slug",
+    "type": "varchar(160)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Summary",
+    "type": "varchar(300)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Description",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "SeoDescription",
+    "type": "varchar(300)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "DurationLabel",
+    "type": "varchar(80)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "DurationDays",
+    "type": "int",
+    "nullable": false,
+    "key": "",
+    "default": "1",
+    "extra": ""
+   },
+   {
+    "column": "RouteStops",
+    "type": "varchar(300)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "StartingPrice",
+    "type": "int",
+    "nullable": false,
+    "key": "",
+    "default": "0",
+    "extra": ""
+   },
+   {
+    "column": "FestivalPricing",
+    "type": "tinyint(1)",
+    "nullable": false,
+    "key": "",
+    "default": "0",
+    "extra": ""
+   },
+   {
+    "column": "PricesJson",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ItineraryJson",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Inclusions",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Exclusions",
+    "type": "text",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CoverImage",
+    "type": "varchar(160)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "SortOrder",
+    "type": "int",
+    "nullable": false,
+    "key": "",
+    "default": "0",
+    "extra": ""
+   },
+   {
+    "column": "IsActive",
+    "type": "tinyint(1)",
+    "nullable": false,
+    "key": "MUL",
+    "default": "0",
+    "extra": ""
+   },
+   {
+    "column": "CreatedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "UpdatedAt",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": "on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tblpages": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "PageName",
+    "type": "varchar(255)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "type",
+    "type": "varchar(255)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "detail",
+    "type": "longtext",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "DraftDetail",
+    "type": "longtext",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "DraftNote",
+    "type": "varchar(500)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "DraftUpdatedAt",
+    "type": "datetime",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   }
+  ],
+  "tblpasswordresets": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "UserId",
+    "type": "int",
+    "nullable": false,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "AccountType",
+    "type": "varchar(10)",
+    "nullable": false,
+    "key": "MUL",
+    "default": "user",
+    "extra": ""
+   },
+   {
+    "column": "TokenHash",
+    "type": "char(64)",
+    "nullable": false,
+    "key": "UNI",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ExpiresAt",
+    "type": "datetime",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "UsedAt",
+    "type": "datetime",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CreatedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   }
+  ],
+  "tblratelimits": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "Action",
+    "type": "varchar(30)",
+    "nullable": false,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "IpAddress",
+    "type": "varchar(45)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Email",
+    "type": "varchar(191)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CreatedAt",
+    "type": "datetime",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   }
+  ],
+  "tblsettings": [
+   {
+    "column": "SettingKey",
+    "type": "varchar(60)",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "SettingValue",
+    "type": "varchar(255)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "UpdatedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tblsitecontent": [
+   {
+    "column": "ContentKey",
+    "type": "varchar(80)",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ContentValue",
+    "type": "mediumtext",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "UpdatedAt",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tblsubscribers": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "SubscriberEmail",
+    "type": "varchar(120)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PostingDate",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   }
+  ],
+  "tbltestimonial": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "UserEmail",
+    "type": "varchar(100)",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Testimonial",
+    "type": "mediumtext",
+    "nullable": false,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PostingDate",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "status",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   }
+  ],
+  "tblusers": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "FullName",
+    "type": "varchar(120)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "EmailId",
+    "type": "varchar(100)",
+    "nullable": true,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Password",
+    "type": "varchar(100)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ContactNo",
+    "type": "char(11)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "dob",
+    "type": "varchar(100)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Address",
+    "type": "varchar(255)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "City",
+    "type": "varchar(100)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Country",
+    "type": "varchar(100)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "RegDate",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "UpdationDate",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": "on update CURRENT_TIMESTAMP"
+   }
+  ],
+  "tblvehicles": [
+   {
+    "column": "id",
+    "type": "int",
+    "nullable": false,
+    "key": "PRI",
+    "default": "",
+    "extra": "auto_increment"
+   },
+   {
+    "column": "VehiclesTitle",
+    "type": "varchar(150)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "VehiclesBrand",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "VehiclesOverview",
+    "type": "longtext",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "SeoDescription",
+    "type": "varchar(300)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PricePerDay",
+    "type": "int",
+    "nullable": true,
+    "key": "MUL",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "FuelType",
+    "type": "varchar(100)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "ModelYear",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "SeatingCapacity",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CarType",
+    "type": "varchar(20)",
+    "nullable": true,
+    "key": "MUL",
+    "default": "Sedan",
+    "extra": ""
+   },
+   {
+    "column": "IsActive",
+    "type": "tinyint(1)",
+    "nullable": false,
+    "key": "MUL",
+    "default": "1",
+    "extra": ""
+   },
+   {
+    "column": "DriverOnly",
+    "type": "tinyint(1)",
+    "nullable": false,
+    "key": "",
+    "default": "0",
+    "extra": ""
+   },
+   {
+    "column": "Rugged",
+    "type": "tinyint(1)",
+    "nullable": false,
+    "key": "",
+    "default": "0",
+    "extra": ""
+   },
+   {
+    "column": "Vimage1",
+    "type": "varchar(120)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Vimage2",
+    "type": "varchar(120)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Vimage3",
+    "type": "varchar(120)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Vimage4",
+    "type": "varchar(120)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "Vimage5",
+    "type": "varchar(120)",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "AirConditioner",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PowerDoorLocks",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "AntiLockBrakingSystem",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "BrakeAssist",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PowerSteering",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "DriverAirbag",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PassengerAirbag",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "PowerWindows",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CDPlayer",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CentralLocking",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "CrashSensor",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "LeatherSeats",
+    "type": "int",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": ""
+   },
+   {
+    "column": "RegDate",
+    "type": "timestamp",
+    "nullable": false,
+    "key": "",
+    "default": "CURRENT_TIMESTAMP",
+    "extra": "DEFAULT_GENERATED"
+   },
+   {
+    "column": "UpdationDate",
+    "type": "timestamp",
+    "nullable": true,
+    "key": "",
+    "default": "",
+    "extra": "on update CURRENT_TIMESTAMP"
+   }
+  ]
+ },
+ "indexes": [
+  {
+   "table": "tbl_forecast_runs",
+   "index": "Status",
+   "columns": "Status",
+   "non_unique": "1"
+  },
+  {
+   "table": "tbl_price_forecast",
+   "index": "ForecastDate",
+   "columns": "ForecastDate",
+   "non_unique": "1"
+  },
+  {
+   "table": "tbl_price_overrides",
+   "index": "VehicleDates",
+   "columns": "VehicleId,FromDate,ToDate",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblfestivals",
+   "index": "Dates",
+   "columns": "StartDate,EndDate",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblpackagecategories",
+   "index": "Slug",
+   "columns": "Slug",
+   "non_unique": "0"
+  },
+  {
+   "table": "tblpackageenquiries",
+   "index": "PackageId",
+   "columns": "PackageId",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblpackageenquiries",
+   "index": "Status",
+   "columns": "Status",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblpackageenquiries",
+   "index": "VehicleId",
+   "columns": "VehicleId",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblpackageimages",
+   "index": "PackageId",
+   "columns": "PackageId",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblpackages",
+   "index": "Active",
+   "columns": "IsActive,SortOrder",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblpackages",
+   "index": "CategoryId",
+   "columns": "CategoryId",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblpasswordresets",
+   "index": "AccountUser",
+   "columns": "AccountType,UserId",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblpasswordresets",
+   "index": "TokenHash",
+   "columns": "TokenHash",
+   "non_unique": "0"
+  },
+  {
+   "table": "tblpasswordresets",
+   "index": "UserId",
+   "columns": "UserId",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblratelimits",
+   "index": "ActionEmail",
+   "columns": "Action,Email,CreatedAt",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblratelimits",
+   "index": "ActionIp",
+   "columns": "Action,IpAddress,CreatedAt",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblusers",
+   "index": "EmailId",
+   "columns": "EmailId",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblvehicles",
+   "index": "idx_cartype",
+   "columns": "CarType",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblvehicles",
+   "index": "idx_price",
+   "columns": "PricePerDay",
+   "non_unique": "1"
+  },
+  {
+   "table": "tblvehicles",
+   "index": "IsActive",
+   "columns": "IsActive",
+   "non_unique": "1"
+  }
+ ],
+ "relationships": [
+  {
+   "child": "tblvehicles",
+   "child_column": "VehiclesBrand",
+   "parent": "tblbrands",
+   "parent_column": "id",
+   "cardinality": "}o--||",
+   "label": "brand of"
+  },
+  {
+   "child": "tblbooking",
+   "child_column": "VehicleId",
+   "parent": "tblvehicles",
+   "parent_column": "id",
+   "cardinality": "}o--||",
+   "label": "books"
+  },
+  {
+   "child": "tblbooking",
+   "child_column": "userEmail",
+   "parent": "tblusers",
+   "parent_column": "EmailId",
+   "cardinality": "}o--||",
+   "label": "made by"
+  },
+  {
+   "child": "tbl_price_forecast",
+   "child_column": "VehicleId",
+   "parent": "tblvehicles",
+   "parent_column": "id",
+   "cardinality": "}o--||",
+   "label": "prices"
+  },
+  {
+   "child": "tbl_price_forecast",
+   "child_column": "RunId",
+   "parent": "tbl_forecast_runs",
+   "parent_column": "id",
+   "cardinality": "}o--||",
+   "label": "written by"
+  },
+  {
+   "child": "tbl_price_overrides",
+   "child_column": "VehicleId",
+   "parent": "tblvehicles",
+   "parent_column": "id",
+   "cardinality": "}o--||",
+   "label": "overrides"
+  },
+  {
+   "child": "tbltestimonial",
+   "child_column": "UserEmail",
+   "parent": "tblusers",
+   "parent_column": "EmailId",
+   "cardinality": "}o--||",
+   "label": "written by"
+  },
+  {
+   "child": "tblpasswordresets",
+   "child_column": "UserId",
+   "parent": "tblusers",
+   "parent_column": "id",
+   "cardinality": "}o--o|",
+   "label": "resets (AccountType=user)"
+  },
+  {
+   "child": "tblpasswordresets",
+   "child_column": "UserId",
+   "parent": "admin",
+   "parent_column": "id",
+   "cardinality": "}o--o|",
+   "label": "resets (AccountType=admin)"
+  },
+  {
+   "child": "tblpackages",
+   "child_column": "CategoryId",
+   "parent": "tblpackagecategories",
+   "parent_column": "id",
+   "cardinality": "}o--o|",
+   "label": "in category"
+  },
+  {
+   "child": "tblpackageimages",
+   "child_column": "PackageId",
+   "parent": "tblpackages",
+   "parent_column": "id",
+   "cardinality": "}o--||",
+   "label": "photo of"
+  },
+  {
+   "child": "tblpackageenquiries",
+   "child_column": "PackageId",
+   "parent": "tblpackages",
+   "parent_column": "id",
+   "cardinality": "}o--o|",
+   "label": "about package"
+  },
+  {
+   "child": "tblpackageenquiries",
+   "child_column": "VehicleId",
+   "parent": "tblvehicles",
+   "parent_column": "id",
+   "cardinality": "}o--o|",
+   "label": "about driver-only car"
+  }
+ ],
+ "note": "No foreign-key constraints exist in the database; relationships are logical (enforced in PHP)."
+}
