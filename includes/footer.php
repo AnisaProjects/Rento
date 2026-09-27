@@ -7,16 +7,16 @@ if (isset($_POST['emailsubscibe'])) {
   if (!filter_var($subscriberemail, FILTER_VALIDATE_EMAIL)) {
     flash_set('error', 'Please enter a valid email address.');
   } else {
-    $query = $dbh->prepare("SELECT id FROM tblsubscribers WHERE SubscriberEmail=:subscriberemail");
-    $query->bindParam(':subscriberemail', $subscriberemail, PDO::PARAM_STR);
-    $query->execute();
+    $subscriberQuery = $dbh->prepare("SELECT id FROM tblsubscribers WHERE SubscriberEmail=:subscriberemail");
+    $subscriberQuery->bindParam(':subscriberemail', $subscriberemail, PDO::PARAM_STR);
+    $subscriberQuery->execute();
 
-    if ($query->fetch()) {
+    if ($subscriberQuery->fetch()) {
       flash_set('info', 'You are already subscribed. Thank you!');
     } else {
-      $query = $dbh->prepare("INSERT INTO tblsubscribers(SubscriberEmail) VALUES(:subscriberemail)");
-      $query->bindParam(':subscriberemail', $subscriberemail, PDO::PARAM_STR);
-      $query->execute();
+      $subscriberInsert = $dbh->prepare("INSERT INTO tblsubscribers(SubscriberEmail) VALUES(:subscriberemail)");
+      $subscriberInsert->bindParam(':subscriberemail', $subscriberemail, PDO::PARAM_STR);
+      $subscriberInsert->execute();
       flash_set('success', 'Subscribed! We will send you our best deals.');
     }
   }
@@ -43,12 +43,12 @@ $socials = array_filter(SOCIAL_LINKS);
           trip.</p>
         <?php if ($socials) { ?>
           <ul class="r-social">
-            <?php foreach ($socials as $network => $url) {
-              if (!isset($socialIcons[$network])) {
+            <?php foreach ($socials as $socialNetwork => $socialUrl) {
+              if (!isset($socialIcons[$socialNetwork])) {
                 continue;
               } ?>
-              <li><a href="<?php echo htmlentities($url); ?>" target="_blank" rel="noopener" aria-label="<?php echo $socialIcons[$network][0]; ?>">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><?php echo $socialIcons[$network][1]; ?></svg></a></li>
+              <li><a href="<?php echo htmlentities($socialUrl); ?>" target="_blank" rel="noopener" aria-label="<?php echo $socialIcons[$socialNetwork][0]; ?>">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><?php echo $socialIcons[$socialNetwork][1]; ?></svg></a></li>
             <?php } ?>
           </ul>
         <?php } ?>

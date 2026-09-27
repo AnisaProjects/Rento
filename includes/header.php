@@ -16,10 +16,10 @@ $navItems = [
 
 $accountName = '';
 if (!empty($_SESSION['login'])) {
-  $query = $dbh->prepare("SELECT FullName FROM tblusers WHERE EmailId=:email");
-  $query->bindParam(':email', $_SESSION['login'], PDO::PARAM_STR);
-  $query->execute();
-  $accountName = (string)($query->fetchColumn() ?: $_SESSION['login']);
+  $accountQuery = $dbh->prepare("SELECT FullName FROM tblusers WHERE EmailId=:email");
+  $accountQuery->bindParam(':email', $_SESSION['login'], PDO::PARAM_STR);
+  $accountQuery->execute();
+  $accountName = (string)($accountQuery->fetchColumn() ?: $_SESSION['login']);
 }
 $accountLinks = [
   ['profile', 'fa-user', 'Profile settings'],
@@ -34,15 +34,13 @@ $accountLinks = [
 <header class="r-header" id="top">
   <div class="container">
     <div class="r-header__bar">
-      <a class="r-header__logo" href="./" aria-label="Rento home">
-        <img src="assets/images/rentoindia_logo.jpeg" alt="Rento" width="200" height="200">
-      </a>
+      <a class="r-header__logo r-wordmark" href="./" aria-label="Rento home">Rent<span>o</span></a>
 
       <nav aria-label="Main">
         <ul class="r-nav">
-          <?php foreach ($navItems as [$url, $label, $pages]) {
-            $active = in_array($current_page, $pages, true); ?>
-            <li><a href="<?php echo $url; ?>" class="<?php echo $active ? 'is-active' : ''; ?>" <?php echo $active ? 'aria-current="page"' : ''; ?>><?php echo $label; ?></a></li>
+          <?php foreach ($navItems as [$navUrl, $navLabel, $navPages]) {
+            $navActive = in_array($current_page, $navPages, true); ?>
+            <li><a href="<?php echo $navUrl; ?>" class="<?php echo $navActive ? 'is-active' : ''; ?>" <?php echo $navActive ? 'aria-current="page"' : ''; ?>><?php echo $navLabel; ?></a></li>
           <?php } ?>
         </ul>
       </nav>
@@ -69,8 +67,8 @@ $accountLinks = [
             </button>
             <ul class="dropdown-menu dropdown-menu-end r-dropdown">
               <li class="dropdown-header">Signed in as<br><strong><?php echo htmlentities($accountName); ?></strong></li>
-              <?php foreach ($accountLinks as [$url, $icon, $label]) { ?>
-                <li><a class="dropdown-item" href="<?php echo $url; ?>"><i class="fa <?php echo $icon; ?>" aria-hidden="true"></i><?php echo $label; ?></a></li>
+              <?php foreach ($accountLinks as [$linkUrl, $linkIcon, $linkLabel]) { ?>
+                <li><a class="dropdown-item" href="<?php echo $linkUrl; ?>"><i class="fa <?php echo $linkIcon; ?>" aria-hidden="true"></i><?php echo $linkLabel; ?></a></li>
               <?php } ?>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="logout"><i class="fa fa-arrow-right-from-bracket" aria-hidden="true"></i>Sign out</a></li>
@@ -110,14 +108,14 @@ $accountLinks = [
   </div>
   <div class="offcanvas-body">
     <ul class="r-offcanvas__nav">
-      <?php foreach ($navItems as [$url, $label, $pages]) { ?>
-        <li><a href="<?php echo $url; ?>" class="<?php echo in_array($current_page, $pages, true) ? 'is-active' : ''; ?>"><?php echo $label; ?></a></li>
+      <?php foreach ($navItems as [$navUrl, $navLabel, $navPages]) { ?>
+        <li><a href="<?php echo $navUrl; ?>" class="<?php echo in_array($current_page, $navPages, true) ? 'is-active' : ''; ?>"><?php echo $navLabel; ?></a></li>
       <?php } ?>
     </ul>
     <?php if ($accountName !== '') { ?>
       <ul class="r-offcanvas__nav">
-        <?php foreach ($accountLinks as [$url, $icon, $label]) { ?>
-          <li><a href="<?php echo $url; ?>"><?php echo $label; ?></a></li>
+        <?php foreach ($accountLinks as [$linkUrl, $linkIcon, $linkLabel]) { ?>
+          <li><a href="<?php echo $linkUrl; ?>"><?php echo $linkLabel; ?></a></li>
         <?php } ?>
         <li><a href="logout">Sign out</a></li>
       </ul>
