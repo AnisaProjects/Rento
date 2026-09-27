@@ -20,9 +20,17 @@ $typeInfo = [
   'SUV' => ['fa-truck-monster', 'Ground clearance and space for hills and rough roads.'],
 ];
 
-$brands = $dbh->query("SELECT tblbrands.id, tblbrands.BrandName, COUNT(tblvehicles.id) AS cars FROM tblbrands
-  LEFT JOIN tblvehicles ON tblvehicles.VehiclesBrand = tblbrands.id GROUP BY tblbrands.id, tblbrands.BrandName
-  HAVING cars > 0 ORDER BY tblbrands.BrandName")->fetchAll(PDO::FETCH_OBJ);
+// Brands with cars: count, lowest daily price and the photo of their cheapest car.
+$brands = $dbh->query("SELECT tblbrands.id, tblbrands.BrandName, COUNT(tblvehicles.id) AS cars, MIN(tblvehicles.PricePerDay) AS fromPrice,
+    (SELECT v2.Vimage1 FROM tblvehicles v2 WHERE v2.VehiclesBrand = tblbrands.id ORDER BY v2.PricePerDay, v2.id LIMIT 1) AS photo
+  FROM tblbrands JOIN tblvehicles ON tblvehicles.VehiclesBrand = tblbrands.id
+  GROUP BY tblbrands.id, tblbrands.BrandName ORDER BY cars DESC, tblbrands.BrandName")->fetchAll(PDO::FETCH_OBJ);
+
+$heroSlides = [
+  ['banner-image-1', 'Car rental across Nepal', 'The right car for every road in Nepal', 'Hatchbacks for the city, SUVs for the hills. Choose a car, pick your dates and book online.', 'Browse all cars', 'car-listing'],
+  ['banner-image-2', 'Comfort for long drives', 'Sedans for highways and family trips', 'Quiet, comfortable cars for the Kathmandu–Pokhara highway and every trip in between.', 'See sedans', 'car-listing?type=Sedan'],
+  ['banner-image-3', 'Not sure what to pick?', 'Tell us your trip, we match the car', 'Share your budget and the kind of car you like, and get suggestions that fit.', 'Find my car', 'car-recommendation'],
+];
 
 $tid = 1;
 $query = $dbh->prepare("SELECT tbltestimonial.Testimonial, tblusers.FullName FROM tbltestimonial
@@ -41,7 +49,7 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
   $pageDescription = 'Rento: rent a verified car anywhere in Nepal. Browse hatchbacks, sedans and SUVs, compare daily prices in rupees and book online.';
   include('includes/head.php');
   ?>
-  <link rel="preload" as="image" href="assets/images/banner-image-1.webp" imagesrcset="assets/images/banner-image-1-960.webp 960w, assets/images/banner-image-1.webp 1920w" imagesizes="100vw">
+  <link rel="preload" as="image" href="assets/images/banner-image-1.webp" imagesrcset="assets/images/banner-image-1-960.webp 960w, assets/images/banner-image-1.webp 1920w" imagesizes="100vw" fetchpriority="high">
 </head>
 
 <body class="r-page">
@@ -50,20 +58,36 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
 
   <main id="main">
 
-    <!-- Hero with search -->
-    <section class="r-hero">
-      <picture class="r-hero__bg">
-        <source type="image/webp" srcset="assets/images/banner-image-1-960.webp 960w, assets/images/banner-image-1.webp 1920w" sizes="100vw">
-        <img src="assets/images/banner-image-1.jpg" alt="" width="1918" height="821">
-      </picture>
-      <div class="container r-hero__inner">
-        <div class="r-hero__copy">
-          <span class="r-eyebrow">Car rental across Nepal</span>
-          <h1>The right car for every road in Nepal</h1>
-          <p>Hatchbacks for the city, SUVs for the hills. Choose a car, pick your dates and book online, with clear
-            daily prices in rupees.</p>
+    <!-- Hero: rotating slides, with the search card fixed below them -->
+    <section class="r-hero" aria-label="Featured">
+      <div id="r-hero-carousel" class="carousel slide carousel-fade r-hero__carousel">
+        <div class="carousel-inner">
+          <?php foreach ($heroSlides as $i => [$image, $eyebrow, $title, $text, $cta, $url]) { ?>
+            <div class="carousel-item <?php echo $i === 0 ? 'active' : ''; ?>" role="group" aria-roledescription="slide" aria-label="<?php echo ($i + 1) . ' of ' . count($heroSlides); ?>">
+              <picture class="r-hero__bg">
+                <source type="image/webp" srcset="assets/images/<?php echo $image; ?>-960.webp 960w, assets/images/<?php echo $image; ?>.webp 1920w" sizes="100vw">
+                <img src="assets/images/<?php echo $image; ?>.jpg" alt="" width="1918" height="821" <?php echo $i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>
+              </picture>
+              <div class="container r-hero__copy">
+                <span class="r-eyebrow"><?php echo $eyebrow; ?></span>
+                <<?php echo $i === 0 ? 'h1' : 'p'; ?> class="r-hero__title"><?php echo $title; ?></<?php echo $i === 0 ? 'h1' : 'p'; ?>>
+                <p><?php echo $text; ?></p>
+                <a class="r-btn r-btn--light" href="<?php echo $url; ?>"><?php echo $cta; ?> <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          <?php } ?>
         </div>
+        <div class="container r-hero__controls">
+          <div class="r-hero__dots">
+            <?php foreach ($heroSlides as $i => $slide) { ?>
+              <button type="button" data-bs-target="#r-hero-carousel" data-bs-slide-to="<?php echo $i; ?>" class="<?php echo $i === 0 ? 'active' : ''; ?>" <?php echo $i === 0 ? 'aria-current="true"' : ''; ?> aria-label="Slide <?php echo $i + 1; ?>"></button>
+            <?php } ?>
+          </div>
+          <button type="button" class="r-hero__pause" data-r-carousel-toggle aria-label="Pause slideshow"><i class="fa fa-pause" aria-hidden="true"></i></button>
+        </div>
+      </div>
 
+      <div class="container r-hero__search-wrap">
         <form class="r-hero__search" action="car-listing" method="get" aria-label="Find a car">
           <div class="r-field">
             <label class="r-label" for="hero-type">Car type</label>
@@ -96,7 +120,6 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
             <i class="fa fa-magnifying-glass" aria-hidden="true"></i>Search cars
           </button>
         </form>
-
         <ul class="r-hero__trust">
           <li><i class="fa fa-circle-check" aria-hidden="true"></i>Cars checked before every trip</li>
           <li><i class="fa fa-tag" aria-hidden="true"></i>Daily prices in rupees</li>
@@ -235,17 +258,23 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
             <span class="r-eyebrow">Testimonials</span>
             <h2 class="r-section-title">What renters say</h2>
           </div>
-          <div class="r-grid r-grid--3">
-            <?php foreach ($testimonials as $testimonial) { ?>
-              <figure class="r-quote r-reveal">
-                <i class="fa fa-quote-left r-quote__mark" aria-hidden="true"></i>
-                <blockquote><?php echo htmlentities($testimonial->Testimonial); ?></blockquote>
-                <figcaption>
-                  <span class="r-avatar" aria-hidden="true"><?php echo htmlentities(initials($testimonial->FullName)); ?></span>
-                  <span><?php echo htmlentities($testimonial->FullName); ?></span>
-                </figcaption>
-              </figure>
-            <?php } ?>
+          <div class="r-slider" data-r-slider>
+            <div class="r-slider__track" tabindex="0" aria-label="Testimonials">
+              <?php foreach ($testimonials as $testimonial) { ?>
+                <figure class="r-quote r-slider__item">
+                  <i class="fa fa-quote-left r-quote__mark" aria-hidden="true"></i>
+                  <blockquote><?php echo htmlentities($testimonial->Testimonial); ?></blockquote>
+                  <figcaption>
+                    <span class="r-avatar" aria-hidden="true"><?php echo htmlentities(initials($testimonial->FullName)); ?></span>
+                    <span><?php echo htmlentities($testimonial->FullName); ?></span>
+                  </figcaption>
+                </figure>
+              <?php } ?>
+            </div>
+            <div class="r-slider__nav">
+              <button type="button" class="r-icon-btn" data-r-slider-prev aria-label="Previous testimonials"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+              <button type="button" class="r-icon-btn" data-r-slider-next aria-label="Next testimonials"><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+            </div>
           </div>
         </div>
       </section>
@@ -253,15 +282,33 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
 
     <!-- Brands -->
     <?php if ($brands) { ?>
-      <section class="r-section r-section--tight">
+      <section class="r-section">
         <div class="container">
-          <div class="r-brands">
-            <h2 class="r-brands__title">Browse by brand</h2>
-            <ul class="r-chips">
+          <div class="r-section-row">
+            <div class="r-section-head r-section-head--start">
+              <span class="r-eyebrow">Brands</span>
+              <h2 class="r-section-title">Browse by brand</h2>
+            </div>
+          </div>
+          <div class="r-slider" data-r-slider>
+            <ul class="r-slider__track r-brand-track" aria-label="Brands">
               <?php foreach ($brands as $brand) { ?>
-                <li><a class="r-chip" href="car-listing?brand=<?php echo (int)$brand->id; ?>"><?php echo htmlentities($brand->BrandName); ?> <span class="r-chip__count"><?php echo (int)$brand->cars; ?></span></a></li>
+                <li class="r-slider__item">
+                  <a class="r-brand-card" href="car-listing?brand=<?php echo (int)$brand->id; ?>">
+                    <span class="r-brand-card__media"><?php echo vehicle_image($brand->photo, '', ['sizes' => '280px']); ?></span>
+                    <span class="r-brand-card__body">
+                      <span class="r-brand-card__name"><?php echo htmlentities($brand->BrandName); ?></span>
+                      <span class="r-brand-card__meta"><?php echo (int)$brand->cars; ?> <?php echo $brand->cars == 1 ? 'car' : 'cars'; ?> &middot; from <?php echo format_price_per_day($brand->fromPrice); ?></span>
+                    </span>
+                    <span class="r-brand-card__go" aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
+                  </a>
+                </li>
               <?php } ?>
             </ul>
+            <div class="r-slider__nav">
+              <button type="button" class="r-icon-btn" data-r-slider-prev aria-label="Previous brands"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+              <button type="button" class="r-icon-btn" data-r-slider-next aria-label="Next brands"><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+            </div>
           </div>
         </div>
       </section>

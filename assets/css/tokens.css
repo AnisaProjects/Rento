@@ -13,7 +13,9 @@
   --rento-primary-rgb: 255, 90, 54;
   --rento-secondary: #ffb238;        /* headlight amber: highlights */
   /* Accessible pairs (WCAG AA 4.5:1 for normal text): */
-  --rento-on-primary: #101114;       /* text on #ff5a36 buttons: 6.1:1 */
+  --rento-on-primary: #101114;       /* dark text on #ff5a36: 6.1:1 */
+  --rento-button: #d23f1c;           /* button background with white text: 4.7:1 */
+  --rento-button-hover: #b83716;     /* 5.6:1 */
   --rento-primary-text: #c43c1a;     /* orange text on white / light grey: 5.2:1 */
   --rento-primary-text-hover: #a33218;
 

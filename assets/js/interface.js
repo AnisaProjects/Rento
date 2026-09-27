@@ -27,6 +27,47 @@
       $('#header-search').trigger('focus');
     });
 
+    // Home hero slideshow: autoplay unless the visitor prefers reduced motion; pause button.
+    var heroEl = document.getElementById('r-hero-carousel');
+    if (heroEl) {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var hero = new bootstrap.Carousel(heroEl, { interval: 6500, ride: reduce ? false : 'carousel', pause: 'hover', touch: true });
+      var toggle = heroEl.querySelector('[data-r-carousel-toggle]');
+      var paused = reduce;
+      function setPaused(value) {
+        paused = value;
+        if (paused) { hero.pause(); } else { hero.cycle(); }
+        toggle.setAttribute('aria-label', paused ? 'Play slideshow' : 'Pause slideshow');
+        toggle.innerHTML = '<i class="fa ' + (paused ? 'fa-play' : 'fa-pause') + '" aria-hidden="true"></i>';
+      }
+      setPaused(reduce);
+      toggle.addEventListener('click', function () { setPaused(!paused); });
+      heroEl.addEventListener('slid.bs.carousel', function () { if (paused) hero.pause(); });
+    }
+
+    // Horizontal sliders: arrow buttons scroll one card; arrows hide when everything fits.
+    document.querySelectorAll('[data-r-slider]').forEach(function (slider) {
+      var track = slider.querySelector('.r-slider__track');
+      var nav = slider.querySelector('.r-slider__nav');
+      var prev = slider.querySelector('[data-r-slider-prev]');
+      var next = slider.querySelector('[data-r-slider-next]');
+      function step() {
+        var item = track.querySelector('.r-slider__item');
+        return item ? item.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0) : track.clientWidth;
+      }
+      function update() {
+        var max = track.scrollWidth - track.clientWidth;
+        nav.hidden = max <= 2;
+        prev.disabled = track.scrollLeft <= 2;
+        next.disabled = track.scrollLeft >= max - 2;
+      }
+      prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+      next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+      track.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    });
+
     // Flash messages rendered as toasts.
     document.querySelectorAll('.r-toasts .toast').forEach(function (el) {
       bootstrap.Toast.getOrCreateInstance(el).show();
