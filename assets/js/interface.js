@@ -5,6 +5,10 @@
 (function ($) {
   'use strict';
 
+  // Smooth scrolling only when the visitor hasn't asked for reduced motion.
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function scrollMode() { return reduceMotion.matches ? 'auto' : 'smooth'; }
+
   $(function () {
     // Header gets a shadow once the page scrolls; the back-to-top button appears.
     var header = document.querySelector('.r-header');
@@ -18,7 +22,7 @@
     onScroll();
     if (backTop) {
       backTop.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: scrollMode() });
       });
     }
 
@@ -61,8 +65,8 @@
         prev.disabled = track.scrollLeft <= 2;
         next.disabled = track.scrollLeft >= max - 2;
       }
-      prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
-      next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+      prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: scrollMode() }); });
+      next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: scrollMode() }); });
       track.addEventListener('scroll', update, { passive: true });
       window.addEventListener('resize', update);
       update();
@@ -72,6 +76,15 @@
     document.querySelectorAll('.r-toasts .toast').forEach(function (el) {
       bootstrap.Toast.getOrCreateInstance(el).show();
     });
+
+    // Read each flash message out once through the live regions (includes/flash.php).
+    window.setTimeout(function () {
+      document.querySelectorAll('[data-r-announce]').forEach(function (toast) {
+        var region = document.getElementById(toast.dataset.rAnnounce === 'alert' ? 'r-live-alert' : 'r-live-status');
+        var body = toast.querySelector('.r-toast__body');
+        if (region && body) region.textContent = (region.textContent ? region.textContent + ' ' : '') + body.textContent;
+      });
+    }, 250);
 
     // Opening a modal (e.g. Login from the mobile menu) closes the off-canvas menu.
     document.addEventListener('show.bs.modal', function () {
@@ -111,17 +124,27 @@
       reveal.forEach(function (el) { el.classList.add('is-visible'); });
     }
 
+    // Skip link: move keyboard focus (not just the scroll position) to the main content.
+    $(document).on('click', '.r-skip-link', function (event) {
+      var main = document.getElementById('main');
+      if (!main) return;
+      event.preventDefault();
+      if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
+      main.focus({ preventScroll: true });
+      main.scrollIntoView();
+    });
+
     // Pages at a deeper clean URL (car/...) have a <base>, which would turn plain "#..."
     // links into links to the home page. Keep them on the page instead.
     if (document.querySelector('base')) {
-      $(document).on('click', 'a[href^="#"]:not([data-bs-toggle])', function (event) {
+      $(document).on('click', 'a[href^="#"]:not([data-bs-toggle]):not(.r-skip-link)', function (event) {
         var hash = this.getAttribute('href');
         var target = hash.length > 1 ? document.getElementById(hash.slice(1)) : null;
         event.preventDefault();
         if (target) {
-          target.scrollIntoView({ behavior: 'smooth' });
+          target.scrollIntoView({ behavior: scrollMode() });
         } else {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          window.scrollTo({ top: 0, behavior: scrollMode() });
         }
       });
     }

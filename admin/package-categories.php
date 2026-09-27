@@ -76,7 +76,7 @@ admin_page_start('Package Categories', 'package-categories.php', [['Packages', '
                   <div class="a-actions">
                     <?php echo admin_icon_link('package-categories.php?edit=' . (int)$c->id, 'fa-pen', 'Edit category', 'primary'); ?>
                     <?php if ((int)$c->packages) { ?>
-                      <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Has packages, so it can't be deleted"><button type="button" class="a-icon-btn" disabled aria-label="Delete (not possible: has packages)"><i class="fa fa-trash" aria-hidden="true"></i></button></span>
+                      <button type="button" class="a-icon-btn" aria-disabled="true" data-bs-toggle="tooltip" data-bs-title="Has packages, so it can't be deleted" aria-label="Delete (not possible: has packages)"><i class="fa fa-trash" aria-hidden="true"></i></button>
                     <?php } else {
                       echo admin_action_button(['delcategory' => $c->id], 'fa-trash', 'Delete category', 'danger', 'Delete the category ' . $c->CategoryName . '?');
                     } ?>

@@ -61,6 +61,15 @@
     bs.Toast.getOrCreateInstance(el).show();
   });
 
+  // Read each flash message out once through the live regions (includes/flash.php).
+  window.setTimeout(function () {
+    document.querySelectorAll('[data-r-announce]').forEach(function (toast) {
+      var region = document.getElementById(toast.dataset.rAnnounce === 'alert' ? 'r-live-alert' : 'r-live-status');
+      var body = toast.querySelector('.r-toast__body');
+      if (region && body) region.textContent = (region.textContent ? region.textContent + ' ' : '') + body.textContent;
+    });
+  }, 250);
+
   /* ---------- Confirmation modal ---------- */
   var modalEl = document.getElementById('a-confirm');
   var modal = modalEl ? bs.Modal.getOrCreateInstance(modalEl) : null;

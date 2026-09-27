@@ -98,6 +98,8 @@ a:hover {
 .form-control:focus,
 .form-select:focus,
 .form-check-input:focus {
+  outline: 2px solid var(--rento-focus-ring);
+  outline-offset: 1px;
   border-color: var(--rento-primary);
   box-shadow: 0 0 0 .2rem rgba(var(--rento-primary-rgb), .2);
 }
@@ -135,8 +137,13 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 3px solid rgba(var(--rento-primary-rgb), .45);
+  outline: 3px solid var(--rento-focus-ring);
   outline-offset: 2px;
+}
+
+/* The dark sidebar uses the lighter ring. */
+.a-sidebar {
+  --rento-focus-ring: var(--rento-focus-ring-on-dark);
 }
 
 .a-skip {
@@ -883,6 +890,15 @@ a.a-activity__title:hover {
   color: var(--rento-primary-text);
 }
 
+/* Not available (e.g. delete when records depend on it): still focusable so the tooltip explains why. */
+.a-icon-btn:disabled,
+.a-icon-btn[aria-disabled="true"],
+.a-icon-btn[aria-disabled="true"]:hover {
+  background: transparent;
+  color: var(--rento-gray-400);
+  cursor: not-allowed;
+}
+
 .a-filters {
   display: flex;
   flex-wrap: wrap;
@@ -1314,7 +1330,7 @@ div.dt-container .dt-length select {
 }
 
 .a-drop__input:focus-visible + .a-drop__preview {
-  outline: 3px solid rgba(var(--rento-primary-rgb), .45);
+  outline: 3px solid var(--rento-focus-ring);
   outline-offset: 2px;
 }
 

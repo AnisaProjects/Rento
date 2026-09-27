@@ -94,7 +94,7 @@ admin_page_start('Registered Users', 'reg-users.php', [], [
               <div class="a-actions">
                 <?php echo admin_icon_link('mailto:' . $u->EmailId, 'fa-envelope', 'Email ' . $u->FullName); ?>
                 <?php if ((int)$u->bookings > 0) { ?>
-                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Has bookings, so the account is kept"><button type="button" class="a-icon-btn" disabled aria-label="Delete (not possible: has bookings)"><i class="fa fa-trash" aria-hidden="true"></i></button></span>
+                  <button type="button" class="a-icon-btn" aria-disabled="true" data-bs-toggle="tooltip" data-bs-title="Has bookings, so the account is kept" aria-label="Delete (not possible: has bookings)"><i class="fa fa-trash" aria-hidden="true"></i></button>
                 <?php } else {
                   $message = 'Delete the account of ' . $u->FullName . ' (' . $u->EmailId . ')? This can\'t be undone.';
                   echo admin_action_button(['del' => $u->id], 'fa-trash', 'Delete user', 'danger', $message, (int)$u->testimonials > 0 ? str_replace('<legend class="form-label">Their testimonials', '<legend class="form-label">Their ' . (int)$u->testimonials . ' testimonial(s)', $deleteChoice) : '');

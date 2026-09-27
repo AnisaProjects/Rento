@@ -39,8 +39,11 @@ function flash_render_toasts(): string
     $html = '';
     foreach ($_SESSION['flash'] ?? [] as [$type, $message]) {
         $type = isset($icons[$type]) ? $type : 'info';
-        $html .= '<div class="r-toast r-toast--' . $type . ' toast" role="' . ($type === 'error' ? 'alert' : 'status')
-            . '" aria-live="' . ($type === 'error' ? 'assertive' : 'polite') . '" aria-atomic="true" data-bs-delay="6000">'
+        // Errors stay until closed (WCAG 2.2.1). Screen readers hear the message through the live
+        // regions below, which the page script fills after load (a region that is already filled on
+        // load is often not announced).
+        $html .= '<div class="r-toast r-toast--' . $type . ' toast" data-r-announce="' . ($type === 'error' ? 'alert' : 'status') . '"'
+            . ($type === 'error' ? ' data-bs-autohide="false"' : ' data-bs-delay="8000"') . '>'
             . '<i class="fa ' . $icons[$type] . ' r-toast__icon" aria-hidden="true"></i>'
             . '<div class="r-toast__body">' . htmlentities($message) . '</div>'
             . '<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div>';
@@ -48,7 +51,9 @@ function flash_render_toasts(): string
     unset($_SESSION['flash']);
     $modal = $_SESSION['flash_modal'] ?? '';
     unset($_SESSION['flash_modal']);
-    $out = $html === '' ? '' : '<div class="r-toasts">' . $html . '</div>';
+    $out = '<div class="visually-hidden" id="r-live-status" role="status" aria-live="polite" aria-atomic="true"></div>'
+        . '<div class="visually-hidden" id="r-live-alert" role="alert" aria-atomic="true"></div>';
+    $out .= $html === '' ? '' : '<div class="r-toasts">' . $html . '</div>';
     if (preg_match('/^[a-z-]+$/', $modal)) {
         $out .= '<div id="r-open-modal" data-modal="' . $modal . '" hidden></div>';
     }

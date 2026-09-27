@@ -80,6 +80,55 @@ The customer and booking were then deleted. Revenue is back at Rs 57,000, and pr
 (before: Kicks 96%, Fortuner 96%, Brezza 95%, Q8 95%).
 **Undo.** Switch the flag off per car in admin. The column itself stays (additive rule).
 
+### P6. Accessibility beyond axe
+
+**How it was tested.**
+- **Keyboard:** a script presses real Tab keys through every public, customer and admin page at 1366px
+  and 390px. It flags focus stops with no name, no visible focus style, invisible focused elements and
+  focus traps.
+- **Widgets:** 29 keyboard scenarios cover the skip link, mobile menu, login modal, hero slideshow, FAQ
+  accordion, price calendar, Find My Car, booking date fields and a failed login.
+- **axe:** run on every page at both widths.
+
+**What changed.**
+- **Focus ring contrast.** Rings were orange at 45% opacity (about 1.7:1 on white, under the 3:1 that
+  WCAG 1.4.11 asks for). They now use `--rento-focus-ring` (#c43c1a, 5.2:1). Dark sections (hero,
+  page headers, footer, Find My Car, admin sidebar) use `--rento-focus-ring-on-dark` (#ff8a6b, 8.2:1).
+  Form fields get a solid ring too, not only a faint glow.
+- **Skip link** now moves keyboard focus to the main content. Before, it only scrolled.
+- **Price calendar:**
+  - It is one Tab stop. Arrows move by a day or a week, Home/End go to the start/end of the week, and
+    Page Up/Down change month.
+  - Each day's spoken label now says "cheaper than usual" or "higher than usual". Before, only the colour
+    showed it.
+- **Scroll-reveal content** becomes visible as soon as it receives keyboard focus. Before, the home
+  page's type cards could be focused while still invisible.
+- **Form errors.**
+  - Flash messages are read out through live regions (`role=status`, or `role=alert` for errors) that
+    are filled after the page loads.
+  - Error toasts stay until they are closed. Before, they disappeared after 6 s.
+  - Success toasts stay 8 s.
+- **Admin.**
+  - "Delete not possible" icons are now one focusable, named button (`aria-disabled`) with its tooltip,
+    not an unnamed focusable span around a disabled button.
+  - Image upload inputs have explicit names ("Image 1 (cover): choose a photo").
+- **Heading order and alt text.** Empty states on My Bookings, My Testimonials and Packages use h2 after the
+  page's h1. The About page's car photos no longer repeat the name shown next to them.
+- **Reduced motion.** A global rule in `tokens.css` (public and admin) turns off animations, transitions and
+  smooth scrolling. Script-driven smooth scrolling follows the setting too. The slideshow already didn't
+  autoplay and has a pause button.
+  - Checked with reduced motion emulated: no running animations, no hidden reveal elements, and the
+    slideshow stays on slide 1.
+  - With normal settings the effects still run.
+
+**Result.**
+- Keyboard pass: no problems on any page.
+- Widget scenarios: 29/29.
+- axe: no violations on any page at 1366 or 390.
+
+**Not automated:** a real screen reader (VoiceOver / NVDA). Worth one manual pass before launch.
+**Undo.** Revert the commit "Accessibility: focus rings, skip link, calendar keys, announcements…".
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`

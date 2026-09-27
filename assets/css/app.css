@@ -58,9 +58,19 @@ body.r-page {
   max-width: 100%;
 }
 
-:focus-visible {
-  outline: 3px solid rgba(var(--rento-primary-rgb), .45);
+:focus-visible,
+.r-map:focus-within {
+  outline: 3px solid var(--rento-focus-ring);
   outline-offset: 2px;
+}
+
+/* Dark sections use the lighter ring. */
+.r-footer,
+.r-page-hero,
+.r-hero,
+.r-cta,
+.r-ai-hero {
+  --rento-focus-ring: var(--rento-focus-ring-on-dark);
 }
 
 .r-skip-link {
@@ -77,6 +87,11 @@ body.r-page {
 
 .r-skip-link:focus {
   top: var(--rento-space-3);
+}
+
+/* The skip link focuses <main>; no ring around the whole page. */
+main:focus {
+  outline: none;
 }
 
 /* ---------- 2. Layout helpers & sections ---------- */
@@ -175,7 +190,9 @@ body.r-page {
   transition: opacity .6s var(--rento-ease), transform .6s var(--rento-ease);
 }
 
-.r-js .r-reveal.is-visible {
+.r-js .r-reveal.is-visible,
+.r-js .r-reveal:focus-within,
+.r-js .r-reveal:focus-visible {
   opacity: 1;
   transform: none;
 }
@@ -340,7 +357,8 @@ body.r-page {
 .r-input:focus,
 .r-select:focus,
 .r-textarea:focus {
-  outline: none;
+  outline: 2px solid var(--rento-focus-ring);
+  outline-offset: 1px;
   border-color: var(--rento-primary);
   box-shadow: 0 0 0 4px rgba(var(--rento-primary-rgb), .15);
 }
@@ -2592,6 +2610,17 @@ a.r-chip:hover {
   opacity: 1;
 }
 
+/* A solid ring as well, so focus stays visible without the animated gradient (reduced motion). */
+.r-ai-prompt:has(textarea:focus, input:focus) {
+  outline: 2px solid var(--rento-focus-ring);
+  outline-offset: 4px;
+}
+
+.r-ai-prompt textarea:focus-visible,
+.r-ai-prompt input:focus-visible {
+  outline: none;
+}
+
 .r-ai-prompt__icon {
   position: absolute;
   top: 50%;
@@ -2810,7 +2839,7 @@ a.r-chip:hover {
 }
 
 .r-segmented .btn-check:focus-visible + label {
-  outline: 3px solid rgba(var(--rento-primary-rgb), .45);
+  outline: 3px solid var(--rento-focus-ring);
   outline-offset: 2px;
 }
 
@@ -3591,7 +3620,7 @@ body.r-ai-busy {
   --bs-accordion-border-color: var(--rento-gray-200);
   --bs-accordion-border-radius: var(--rento-radius-lg);
   --bs-accordion-inner-border-radius: var(--rento-radius-lg);
-  --bs-accordion-btn-focus-box-shadow: 0 0 0 4px rgba(var(--rento-primary-rgb), .15);
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 3px var(--rento-focus-ring);
   --bs-accordion-active-bg: var(--rento-primary-soft);
   --bs-accordion-active-color: var(--rento-ink-900);
   --bs-accordion-btn-padding-y: 1.1rem;

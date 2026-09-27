@@ -125,7 +125,7 @@ if ($isAboutUs) {
               <?php foreach ($fleetPhotos as $photo) { ?>
                 <li class="r-reveal">
                   <a href="<?php echo htmlentities(vehicle_url($photo->id, $photo->BrandName, $photo->VehiclesTitle)); ?>">
-                    <?php echo vehicle_image($photo->Vimage1, vehicle_display_name($photo->BrandName, $photo->VehiclesTitle), ['sizes' => '(min-width: 992px) 380px, 50vw']); ?>
+                    <?php echo vehicle_image($photo->Vimage1, '', ['sizes' => '(min-width: 992px) 380px, 50vw']); // the label below names the car ?>
                     <span class="r-gallery-grid__label"><?php echo htmlentities(vehicle_display_name($photo->BrandName, $photo->VehiclesTitle)); ?></span>
                   </a>
                 </li>

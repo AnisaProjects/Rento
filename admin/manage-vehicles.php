@@ -102,7 +102,7 @@ admin_page_start('Manage Vehicles', 'manage-vehicles.php', [['Vehicles', 'manage
                 <?php echo admin_icon_link('edit-vehicle.php?id=' . (int)$v->id, 'fa-pen', 'Edit vehicle', 'primary'); ?>
                 <?php echo admin_icon_link('edit-vehicle.php?id=' . (int)$v->id . '#images', 'fa-images', 'Manage images'); ?>
                 <?php if ((int)$v->bookings > 0) { ?>
-                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Has bookings, so it can't be deleted"><button type="button" class="a-icon-btn" disabled aria-label="Delete (not possible: has bookings)"><i class="fa fa-trash" aria-hidden="true"></i></button></span>
+                  <button type="button" class="a-icon-btn" aria-disabled="true" data-bs-toggle="tooltip" data-bs-title="Has bookings, so it can't be deleted" aria-label="Delete (not possible: has bookings)"><i class="fa fa-trash" aria-hidden="true"></i></button>
                 <?php } else {
                   echo admin_action_button(['del' => $v->id], 'fa-trash', 'Delete vehicle', 'danger', 'Delete ' . $name . '? This can\'t be undone.');
                 } ?>

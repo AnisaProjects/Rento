@@ -65,7 +65,7 @@ $bookings = $query->fetchAll(PDO::FETCH_OBJ);
         </article>
       <?php }
     } else {
-      echo empty_state('fa-calendar-check', 'No bookings yet', 'When you request a car, it shows up here with its status.', 'Browse cars', 'car-listing');
+      echo empty_state('fa-calendar-check', 'No bookings yet', 'When you request a car, it shows up here with its status.', 'Browse cars', 'car-listing', 'h2');
     } ?>
     <?php echo account_end(); ?>
   </main>

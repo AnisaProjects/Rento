@@ -343,7 +343,7 @@ function admin_image_field(string $name, string $label, string $src, string $hin
         <span class="a-badge<?php echo $has ? ' a-badge--success' : ''; ?>" data-a-drop-status><?php echo $has ? 'Current' : 'Empty'; ?></span>
       </div>
       <label class="d-block mb-0" for="<?php echo h($name); ?>">
-        <input class="a-drop__input" type="file" id="<?php echo h($name); ?>" name="<?php echo h($name); ?>" accept="image/jpeg,image/png,image/webp" data-a-drop-input>
+        <input class="a-drop__input" type="file" id="<?php echo h($name); ?>" name="<?php echo h($name); ?>" accept="image/jpeg,image/png,image/webp" aria-label="<?php echo h($label . ($has ? ': replace the photo' : ': choose a photo')); ?>" data-a-drop-input>
         <span class="a-drop__preview">
           <?php if ($has) { ?><img src="<?php echo h($src); ?>" alt="Current <?php echo h(strtolower($label)); ?>"><?php } else { ?>
             <span><i class="fa fa-cloud-arrow-up" aria-hidden="true"></i><span class="a-drop__hint">Drop a photo here or click to choose</span></span>

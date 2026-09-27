@@ -71,7 +71,7 @@ admin_page_start('Manage Brands', 'manage-brands.php', [['Brands', 'manage-brand
                 <?php echo admin_icon_link('../car-listing?brand=' . (int)$brand->id, 'fa-eye', 'View cars on website'); ?>
                 <?php echo admin_icon_link('edit-brand.php?id=' . (int)$brand->id, 'fa-pen', 'Edit brand', 'primary'); ?>
                 <?php if ((int)$brand->vehicles > 0) { ?>
-                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Used by vehicles, so it can't be deleted"><button type="button" class="a-icon-btn" disabled aria-label="Delete (not possible: used by vehicles)"><i class="fa fa-trash" aria-hidden="true"></i></button></span>
+                  <button type="button" class="a-icon-btn" aria-disabled="true" data-bs-toggle="tooltip" data-bs-title="Used by vehicles, so it can't be deleted" aria-label="Delete (not possible: used by vehicles)"><i class="fa fa-trash" aria-hidden="true"></i></button>
                 <?php } else {
                   echo admin_action_button(['del' => $brand->id], 'fa-trash', 'Delete brand', 'danger', 'Delete the brand ' . $brand->BrandName . '?');
                 } ?>

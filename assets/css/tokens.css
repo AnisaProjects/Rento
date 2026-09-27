@@ -18,6 +18,9 @@
   --rento-button-hover: #b83716;     /* 5.6:1 */
   --rento-primary-text: #c43c1a;     /* orange text on white / light grey: 5.2:1 */
   --rento-primary-text-hover: #a33218;
+  /* Keyboard focus ring: at least 3:1 against the surface (WCAG 1.4.11). */
+  --rento-focus-ring: #c43c1a;       /* on white / light grey: 5.2:1 */
+  --rento-focus-ring-on-dark: #ff8a6b; /* on ink-900 sections: 8.2:1 */
 
   /* ---------- Neutrals (ink = dark, paper = light) ---------- */
   --rento-ink-900: #101114;          /* page-dark sections, footer */
@@ -113,8 +116,21 @@
   --bs-danger: var(--rento-danger);
 }
 
+/* Reduced motion (public site and admin): no animations, transitions or smooth scrolling.
+   Components can add their own static fallbacks; this is the safety net for everything else. */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --rento-duration: 0s;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -4,6 +4,8 @@
  *   - each day coloured cheaper / normal / higher than the car's usual price, booked days crossed out
  *   - hover, focus or tap a day: its price and the reasons
  *   - with the booking form: first tap = pickup, second = return (fills #fromdate / #todate)
+ *   - keyboard: the grid is one Tab stop; arrows move by a day / week, Home / End to the start /
+ *     end of the week, Page Up / Page Down by a month; Enter or Space picks the day
  *   - a "Save Rs X by picking up <day>" hint, only when a same-length trip starting up to 3 days
  *     earlier or later is really cheaper, fully available and priced from the forecast
  */
@@ -28,6 +30,7 @@
   var months = [];      // loaded months, 'YYYY-MM'
   var shown = 0;        // index into months
   var picking = 'from'; // next tap sets the pickup or the return date
+  var focusDate = null; // the day that holds the grid's single Tab stop
 
   var fmt = function (n) { return 'Rs ' + Math.round(n).toLocaleString('en-US'); };
   var pct = function (p) { return (p > 0 ? '+' : '') + (Math.round(p * 10) / 10) + '%'; };
@@ -43,9 +46,11 @@
     return 'normal';
   }
 
+  var LEVEL_WORDS = { cheap: ', cheaper than usual', high: ', higher than usual', normal: '', booked: '' };
+
   function describe(day) {
     if (!day) return '';
-    var text = longDate(day.date) + ': ' + (day.available ? fmt(day.price) + (day.change_pct ? ' (' + pct(day.change_pct) + ')' : '') : 'already booked');
+    var text = longDate(day.date) + ': ' + (day.available ? fmt(day.price) + (day.change_pct ? ' (' + pct(day.change_pct) + ')' : '') + LEVEL_WORDS[level(day)] : 'already booked');
     if (day.available && day.reasons.length) text += ' · ' + day.reasons.join(', ');
     if (day.estimate) text += ' · usual price (beyond the price forecast)';
     return text;
@@ -91,10 +96,49 @@
         cell.title = describe(day);
         if (!day.available) cell.setAttribute('aria-disabled', 'true');
       }
+      cell.tabIndex = -1;
       grid.appendChild(cell);
     }
     markRange();
+    setTabStop();
   }
+
+  // One Tab stop for the whole grid: the focused / picked day, else the first day that can be chosen.
+  function setTabStop() {
+    var cells = grid.querySelectorAll('.r-pcal__day:not(:disabled)');
+    if (!cells.length) return;
+    var want = [focusDate, from && from.value].filter(Boolean);
+    var target = null;
+    cells.forEach(function (c) { c.tabIndex = -1; if (!target && want.indexOf(c.dataset.date) >= 0) target = c; });
+    (target || cells[0]).tabIndex = 0;
+  }
+
+  function focusDay(date) {
+    var month = date.slice(0, 7);
+    var index = months.indexOf(month);
+    if (index < 0 || !days[date]) return; // outside the loaded range or in the past
+    focusDate = date;
+    if (index !== shown) { shown = index; render(); } else { setTabStop(); }
+    var cell = grid.querySelector('[data-date="' + date + '"]');
+    if (cell && !cell.disabled) { cell.focus(); show(date); }
+  }
+
+  grid.addEventListener('keydown', function (e) {
+    var cell = e.target.closest('.r-pcal__day');
+    if (!cell) return;
+    var d = parse(cell.dataset.date);
+    var weekday = (d.getDay() + 6) % 7; // Monday = 0
+    var steps = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 7, ArrowUp: -7, Home: -weekday, End: 6 - weekday };
+    if (e.key in steps) {
+      d.setDate(d.getDate() + steps[e.key]);
+    } else if (e.key === 'PageDown' || e.key === 'PageUp') {
+      d.setMonth(d.getMonth() + (e.key === 'PageDown' ? 1 : -1));
+    } else {
+      return;
+    }
+    e.preventDefault();
+    focusDay(iso(d));
+  });
 
   function markRange() {
     var a = from && from.value, b = to && to.value;
@@ -112,11 +156,12 @@
   }
 
   grid.addEventListener('mouseover', function (e) { var c = e.target.closest('.r-pcal__day'); if (c && !c.disabled) show(c.dataset.date); });
-  grid.addEventListener('focusin', function (e) { var c = e.target.closest('.r-pcal__day'); if (c) show(c.dataset.date); });
+  grid.addEventListener('focusin', function (e) { var c = e.target.closest('.r-pcal__day'); if (c) { focusDate = c.dataset.date; show(c.dataset.date); } });
   grid.addEventListener('click', function (e) {
     var cell = e.target.closest('.r-pcal__day');
     if (!cell || cell.disabled) return;
     var date = cell.dataset.date;
+    focusDate = date;
     show(date);
     if (!from || !to || cell.getAttribute('aria-disabled') === 'true') return;
     if (picking === 'from' || date < from.value) {
@@ -130,6 +175,7 @@
     from.dispatchEvent(new Event('change'));
     to.dispatchEvent(new Event('change'));
     markRange();
+    setTabStop();
   });
   prevBtn.addEventListener('click', function () { if (shown > 0) { shown--; render(); } });
   nextBtn.addEventListener('click', function () { if (shown < months.length - 1) { shown++; render(); } });

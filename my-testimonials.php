@@ -42,7 +42,7 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
         </article>
       <?php }
     } else {
-      echo empty_state('fa-comment-dots', 'No testimonials yet', 'Rented a car with us? Tell other renters how it went.', 'Write a testimonial', 'post-testimonial');
+      echo empty_state('fa-comment-dots', 'No testimonials yet', 'Rented a car with us? Tell other renters how it went.', 'Write a testimonial', 'post-testimonial', 'h2');
     } ?>
     <?php echo account_end(); ?>
   </main>

@@ -77,7 +77,7 @@ function vehicle_image_slot(int $n, ?string $current, bool $required, bool $canR
         <?php if ($hasImage) { ?><span class="a-badge a-badge--success" data-a-drop-status>Current</span><?php } elseif ($current !== '') { ?><span class="a-badge a-badge--danger" data-a-drop-status>File missing</span><?php } else { ?><span class="a-badge" data-a-drop-status>Empty</span><?php } ?>
       </div>
       <label class="d-block mb-0" for="img<?php echo $n; ?>">
-        <input class="a-drop__input" type="file" id="img<?php echo $n; ?>" name="img<?php echo $n; ?>" accept="image/jpeg,image/png,image/webp"<?php echo ($required && !$hasImage) || $alwaysRequired ? ' required' : ''; ?> data-a-drop-input>
+        <input class="a-drop__input" type="file" id="img<?php echo $n; ?>" name="img<?php echo $n; ?>" accept="image/jpeg,image/png,image/webp"<?php echo ($required && !$hasImage) || $alwaysRequired ? ' required' : ''; ?> aria-label="<?php echo h($label . ($hasImage ? ': replace the photo' : ': choose a photo')); ?>" data-a-drop-input>
         <span class="a-drop__preview">
           <?php if ($hasImage) { ?>
             <img src="<?php echo h($src); ?>" alt="Current <?php echo h(strtolower($label)); ?>" data-a-drop-img>
