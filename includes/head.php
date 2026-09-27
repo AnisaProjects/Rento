@@ -20,13 +20,14 @@ $pageDescription = $pageDescription ?? content_raw('seo_default_description');
 <?php } ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>document.documentElement.classList.add('r-js');</script>
+<script src="assets/js/theme.js"></script>
 <title><?php echo htmlentities($pageTitle); ?> | <?php echo content('site_name'); ?></title>
 <meta name="description" content="<?php echo htmlentities($pageDescription); ?>">
 <?php echo seo_head_tags($dbh, $pageTitle, $pageDescription, [
   'canonical' => $pageCanonical ?? null, 'noindex' => $pageNoindex ?? false, 'image' => $pageImage ?? null,
   'ogType' => $pageOgType ?? 'website', 'jsonld' => $pageJsonLd ?? [],
 ]); ?>
-<meta name="theme-color" content="#ff5a36">
+<meta name="theme-color" content="#ff5a36" data-light="#ff5a36" data-dark="#111216">
 <link rel="icon" type="image/png" href="assets/images/favicon-icon/favicon.png">
 <link rel="apple-touch-icon" href="assets/images/favicon-icon/apple-touch-icon-144-precomposed.png">
 <!-- Fonts: Plus Jakarta Sans (headings) + Inter (body) -->

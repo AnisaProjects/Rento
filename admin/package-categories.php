@@ -62,7 +62,7 @@ admin_page_start('Package Categories', 'package-categories.php', [['Packages', '
 <div class="a-grid-2">
   <section class="a-card">
     <div class="a-card__body a-card__body--flush">
-      <div class="table-responsive">
+      <div class="table-responsive" tabindex="0" role="region" aria-label="Package categories">
         <table class="table a-table mb-0">
           <thead><tr><th class="ps-4">Category</th><th>Packages</th><th>Order</th><th>Status</th><th class="text-end pe-4">Actions</th></tr></thead>
           <tbody>

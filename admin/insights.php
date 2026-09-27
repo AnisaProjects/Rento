@@ -143,7 +143,7 @@ admin_page_start('AI Insights', 'insights.php', [], [
     <span class="a-muted">Apply sets the base price to the suggestion; the rules then apply on top of it.</span>
   </div>
   <div class="a-card__body a-card__body--flush">
-    <div class="table-responsive">
+    <div class="table-responsive" tabindex="0" role="region" aria-label="Price suggestions per car">
       <table class="table a-table mb-0">
         <thead>
           <tr><th class="ps-4">Car</th><th>Base</th><th>Avg 30 days</th><th>Avg 60 days</th><th>Lowest day</th><th>Highest day</th><th>Main reasons</th><th>Suggestion</th><th class="pe-4">Actions</th></tr>

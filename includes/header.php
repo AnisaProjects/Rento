@@ -88,6 +88,10 @@ $accountLinks = [
           </a>
         <?php } ?>
 
+        <button type="button" class="r-icon-btn r-theme-toggle" data-theme-toggle aria-label="Colour theme">
+          <i class="fa fa-circle-half-stroke" aria-hidden="true"></i>
+        </button>
+
         <button type="button" class="r-icon-btn r-menu-toggle" data-bs-toggle="offcanvas" data-bs-target="#r-mobile-nav"
           aria-controls="r-mobile-nav" aria-label="Open menu">
           <i class="fa fa-bars" aria-hidden="true"></i>

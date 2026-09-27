@@ -37,6 +37,24 @@
   --rento-paper: #f1efe9;
   --rento-white: #ffffff;
   --rento-line-dark: rgba(255, 255, 255, .09);
+  --rento-on-dark: #c9ccd4;          /* text on ink sections (both themes): 11.8:1 */
+  --rento-on-dark-muted: #9497a6;    /* 6.5:1 */
+
+  /* ---------- Theme roles (redefined for dark mode below) ---------- */
+  --rento-bg: #ffffff;               /* page */
+  --rento-surface: #ffffff;          /* cards, panels, inputs */
+  --rento-surface-2: var(--rento-gray-50);
+  --rento-heading: #101114;          /* headings and strong text */
+  --rento-text-strong: #17181d;
+  --rento-inverse: #101114;          /* selected pills, small badges */
+  --rento-on-inverse: #ffffff;
+  --rento-warning-text: #9a6200;     /* on warning-soft: 4.7:1 */
+  --rento-secondary-soft: #fff6e6;
+  --rento-high-soft: #fff1e6;        /* price calendar: higher-price days */
+  --rento-high-text: #8a3a12;
+  --rento-field-border: #868b98;     /* form field outline: 3.4:1 (WCAG 1.4.11) */
+  --r-skel-base: var(--rento-gray-100); /* skeleton loaders (app.css section 29) */
+  --r-skel-shine: rgba(255, 255, 255, .65);
 
   /* ---------- Status ---------- */
   --rento-success: #1f9d55;
@@ -49,6 +67,7 @@
   --rento-danger-soft: #fdecea;
   --rento-info: #2f7fd1;
   --rento-info-soft: #e9f2fc;
+  --rento-info-text: #1d5a96;        /* on info-soft: 6.3:1 */
 
   /* ---------- Typography ---------- */
   --rento-font-heading: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -132,5 +151,118 @@
     transition-duration: .01ms !important;
     transition-delay: 0s !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Dark mode ----------
+   data-theme="dark" on <html> (set before the page paints by the script in includes/head.php and the
+   admin layout, from the visitor's choice or the system setting). Without JavaScript the system
+   setting applies through the media query. Contrast notes are against --rento-surface (#1a1b21). */
+:root[data-theme="dark"] { color-scheme: dark; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --rento-bg: #111216;
+  --rento-surface: #1a1b21;
+  --rento-surface-2: #202229;
+  --rento-heading: #f4f5f7;          /* 15.7:1 */
+  --rento-text-strong: #e6e7eb;
+  --rento-inverse: #f4f5f7;
+  --rento-on-inverse: #111216;
+  --rento-gray-600: #c6c9d2;         /* body text: 10.4:1 */
+  --rento-gray-500: #a8adba;         /* 7.7:1 */
+  --rento-gray-400: #8d92a1;         /* muted text: 5.5:1 */
+  --rento-gray-300: #474a57;
+  --rento-gray-200: #2f323c;         /* borders */
+  --rento-gray-100: #24262e;
+  --rento-gray-50: #16171c;
+  --rento-paper: #16171c;
+  --rento-ink-900: #0b0c0f;          /* dark sections stay darker than the page */
+  --rento-ink-800: #101116;
+  --rento-ink-700: #16171d;
+  --rento-ink-600: #262833;
+  --rento-line-dark: rgba(255, 255, 255, .08);
+  --rento-primary-soft: #3a211a;
+  --rento-primary-text: #ff8a6b;     /* orange text: 7.4:1 */
+  --rento-primary-text-hover: #ffa98f;
+  --rento-focus-ring: #ff8a6b;
+  --rento-secondary-soft: #33280f;
+  --rento-success-text: #6fdc9c;     /* on success-soft: 8.4:1 */
+  --rento-success-soft: #14301f;
+  --rento-danger-text: #ff9a90;      /* on danger-soft: 7.7:1 */
+  --rento-danger-soft: #3b1815;
+  --rento-warning-text: #f2bd57;     /* on warning-soft: 8.4:1 */
+  --rento-warning-soft: #33280f;
+  --rento-info-soft: #14263a;
+  --rento-info-text: #8cc4ff;        /* on info-soft: 8.4:1 */
+  --rento-high-soft: #3b2418;
+  --rento-high-text: #ffb38f;        /* on high-soft: 8.3:1 */
+  --rento-field-border: #6b7080;     /* 3.5:1 */
+  --rento-shadow-sm: 0 1px 2px rgba(0, 0, 0, .5);
+  --rento-shadow: 0 4px 16px rgba(0, 0, 0, .45);
+  --rento-shadow-lg: 0 12px 32px rgba(0, 0, 0, .55);
+  --r-skel-base: #262830;
+  --r-skel-shine: rgba(255, 255, 255, .06);
+  --bs-body-bg: var(--rento-bg);
+  --bs-body-color: var(--rento-gray-600);
+  --bs-border-color: var(--rento-gray-200);
+  --bs-secondary-bg: var(--rento-surface-2);
+  --bs-tertiary-bg: var(--rento-surface-2);
+  --bs-emphasis-color: var(--rento-heading);
+  --bs-secondary-color: var(--rento-gray-500);
+  --bs-link-color: var(--rento-primary-text);
+  --bs-link-hover-color: var(--rento-primary-text-hover);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --rento-bg: #111216;
+    --rento-surface: #1a1b21;
+    --rento-surface-2: #202229;
+    --rento-heading: #f4f5f7;          /* 15.7:1 */
+    --rento-text-strong: #e6e7eb;
+    --rento-inverse: #f4f5f7;
+    --rento-on-inverse: #111216;
+    --rento-gray-600: #c6c9d2;         /* body text: 10.4:1 */
+    --rento-gray-500: #a8adba;         /* 7.7:1 */
+    --rento-gray-400: #8d92a1;         /* muted text: 5.5:1 */
+    --rento-gray-300: #474a57;
+    --rento-gray-200: #2f323c;         /* borders */
+    --rento-gray-100: #24262e;
+    --rento-gray-50: #16171c;
+    --rento-paper: #16171c;
+    --rento-ink-900: #0b0c0f;          /* dark sections stay darker than the page */
+    --rento-ink-800: #101116;
+    --rento-ink-700: #16171d;
+    --rento-ink-600: #262833;
+    --rento-line-dark: rgba(255, 255, 255, .08);
+    --rento-primary-soft: #3a211a;
+    --rento-primary-text: #ff8a6b;     /* orange text: 7.4:1 */
+    --rento-primary-text-hover: #ffa98f;
+    --rento-focus-ring: #ff8a6b;
+    --rento-secondary-soft: #33280f;
+    --rento-success-text: #6fdc9c;     /* on success-soft: 8.4:1 */
+    --rento-success-soft: #14301f;
+    --rento-danger-text: #ff9a90;      /* on danger-soft: 7.7:1 */
+    --rento-danger-soft: #3b1815;
+    --rento-warning-text: #f2bd57;     /* on warning-soft: 8.4:1 */
+    --rento-warning-soft: #33280f;
+    --rento-info-soft: #14263a;
+    --rento-info-text: #8cc4ff;        /* on info-soft: 8.4:1 */
+    --rento-high-soft: #3b2418;
+    --rento-high-text: #ffb38f;        /* on high-soft: 8.3:1 */
+    --rento-field-border: #6b7080;     /* 3.5:1 */
+    --rento-shadow-sm: 0 1px 2px rgba(0, 0, 0, .5);
+    --rento-shadow: 0 4px 16px rgba(0, 0, 0, .45);
+    --rento-shadow-lg: 0 12px 32px rgba(0, 0, 0, .55);
+    --r-skel-base: #262830;
+    --r-skel-shine: rgba(255, 255, 255, .06);
+    --bs-body-bg: var(--rento-bg);
+    --bs-body-color: var(--rento-gray-600);
+    --bs-border-color: var(--rento-gray-200);
+    --bs-secondary-bg: var(--rento-surface-2);
+    --bs-tertiary-bg: var(--rento-surface-2);
+    --bs-emphasis-color: var(--rento-heading);
+    --bs-secondary-color: var(--rento-gray-500);
+    --bs-link-color: var(--rento-primary-text);
+    --bs-link-hover-color: var(--rento-primary-text-hover);
   }
 }

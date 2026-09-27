@@ -109,7 +109,8 @@ function admin_page_start(string $title, string $active, array $crumbs = [], arr
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#101114">
+<meta name="theme-color" content="#101114" data-light="#101114" data-dark="#0b0c0f">
+<script src="../assets/js/theme.js"></script>
 <title><?php echo h($title); ?> | Rento Admin</title>
 <script>try { if (localStorage.getItem('rento-admin-collapsed') === '1') document.documentElement.classList.add('a-collapsed'); } catch (e) {}</script>
 <link rel="icon" type="image/png" href="../assets/images/favicon-icon/favicon.png">
@@ -278,7 +279,8 @@ function admin_auth_start(string $title): void
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#101114">
+<meta name="theme-color" content="#101114" data-light="#101114" data-dark="#0b0c0f">
+<script src="../assets/js/theme.js"></script>
 <title><?php echo h($title); ?> | Rento Admin</title>
 <link rel="icon" type="image/png" href="../assets/images/favicon-icon/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">

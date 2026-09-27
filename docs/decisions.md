@@ -192,6 +192,45 @@ The customer and booking were then deleted. Revenue is back at Rs 57,000, and pr
 
 **Undo.** Revert the commit "Motion: skeleton loaders…".
 
+### P9. Dark mode
+
+**What.**
+- **Toggle.** A theme button in the public header and the admin top bar cycles **System → Light →
+  Dark**.
+  - "System" (the default) follows the device setting and updates when it changes.
+  - The choice is remembered per visitor in the browser (`localStorage` key `rento-theme`), shared by
+    the site and admin.
+  - `assets/js/theme.js` runs in `<head>` before the page paints, so there is no flash.
+  - Without JavaScript, the system setting still applies through `prefers-color-scheme`.
+- **Palette** (`tokens.css`).
+  - New role tokens: `--rento-bg`, `--rento-surface`, `--rento-heading`, `--rento-text-strong`,
+    `--rento-inverse` / `--rento-on-inverse` (selected pills, small badges), `--rento-on-dark` (text on
+    the ink sections), and status text tokens.
+  - In dark mode the grey scale is inverted, so backgrounds, borders and text keep their relationships.
+  - Ink sections (hero, page headers, footer, call-to-action, admin sidebar) stay dark in both themes,
+    slightly darker than the page.
+  - `app.css` and `admin.css` now use these tokens instead of hard-coded white and ink. Bootstrap gets
+    `data-bs-theme` for its components.
+- **Orange accent.**
+  - Buttons keep #d23f1c with white text (4.7:1).
+  - Orange text and focus rings use #ff8a6b in dark mode: 7.4:1 on cards, 8.1:1 on the page.
+  - Status text on its tinted background is 8.3–8.4:1.
+- **Form field borders** in both themes are now 3:1 or better (`--rento-field-border`), as WCAG 1.4.11 asks.
+  Before, they were 1.3:1.
+- **Text pasted into Manage Pages** with fixed colours follows the theme in dark mode. The saved content
+  is unchanged.
+- **Copy.** The home page reason "One daily price in rupees" (not true with smart pricing) is now "Prices in
+  rupees for each day, with the full total shown before you book." It is editable in Site content.
+- **Admin.** The account menu button now has a name at mobile width. Scrollable tables (Smart Pricing
+  preview, AI Insights, Package categories) are keyboard-focusable named regions. These showed up when
+  every admin page was retested with a fresh session: an expired session had made some earlier admin
+  checks test the sign-in page.
+
+**Result.** axe shows no violations, including colour contrast, on every public and admin page, in light and
+dark, at 1366 and 390.
+**Undo.** Revert the commit "Dark mode…". To force light for everyone, remove `theme.js` from
+`includes/head.php` and `admin/includes/layout.php`, and delete the two dark blocks in `tokens.css`.
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`

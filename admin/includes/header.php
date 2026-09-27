@@ -10,11 +10,14 @@
   </button>
   <span class="a-topbar__title"><?php echo h($title); ?></span>
   <div class="a-topbar__end">
+    <button type="button" class="a-topbar__btn" data-theme-toggle aria-label="Colour theme">
+      <i class="fa fa-circle-half-stroke" aria-hidden="true"></i>
+    </button>
     <a class="a-topbar__btn d-none d-sm-inline-flex" href="../" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="View website" aria-label="View website">
       <i class="fa fa-globe" aria-hidden="true"></i>
     </a>
     <div class="dropdown">
-      <button class="a-user" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <button class="a-user" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu: <?php echo h($adminName); ?>">
         <span class="a-user__avatar" aria-hidden="true"><?php echo h(strtoupper(substr($adminName, 0, 1))); ?></span>
         <span class="a-user__name"><?php echo h($adminName); ?></span>
         <i class="fa fa-chevron-down" aria-hidden="true"></i>

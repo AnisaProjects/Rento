@@ -174,7 +174,7 @@ $runVariant = ['done' => 'success', 'failed' => 'danger', 'running' => 'info', '
     <div class="a-card__body a-card__body--flush">
       <?php if ($preview) {
         $q = pricing_quote($dbh, $preview, date('Y-m-d'), date('Y-m-d', strtotime('+13 days'))); ?>
-        <div class="table-responsive">
+        <div class="table-responsive" tabindex="0" role="region" aria-label="Price preview for the next 14 days">
           <table class="table a-table mb-0">
             <thead><tr><th class="ps-4">Day</th><th>Price</th><th>Change</th><th class="pe-4">Why</th></tr></thead>
             <tbody>
