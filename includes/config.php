@@ -36,13 +36,10 @@ define('PRICING_ENABLED', false);
 define('PRICING_PYTHON_BIN', '/opt/homebrew/bin/python3');
 
 // Never show PHP errors on the page; they go to MAMP's log (/Applications/MAMP/logs/php_error.log).
-// Dev mode logs everything, including notices and deprecations. Admin pages still set
-// their own level (Phase 3), so leave it alone there.
+// Dev mode logs everything, including notices and deprecations (site and admin alike).
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
-if (empty($isAdminArea)) {
-    error_reporting(APP_DEV_MODE ? E_ALL : E_ALL & ~E_DEPRECATED & ~E_NOTICE);
-}
+error_reporting(APP_DEV_MODE ? E_ALL : E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 
 if (!function_exists('rento_fatal')) {
     // Logs the real error and shows the visitor a generic message.
