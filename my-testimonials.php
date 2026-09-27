@@ -18,7 +18,6 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
 <head>
   <?php
   $pageTitle = 'My Testimonials';
-  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>

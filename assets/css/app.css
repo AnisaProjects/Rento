@@ -1,7 +1,7 @@
 /* ==========================================================================
-   Rento app styles (Phase 2 redesign)
-   Components are prefixed "r-" so they never collide with the old template CSS
-   (style.css) while pages move over one by one. Values come from tokens.css.
+   Rento site styles. Components are prefixed "r-"; every value comes from
+   tokens.css. Bootstrap 5 provides the reset, grid, modal, dropdown, collapse,
+   offcanvas and toast behaviour; everything visual is defined here.
 
    1. Base (only on redesigned pages: body.r-page)
    2. Layout helpers & sections
@@ -45,13 +45,13 @@ body.r-page {
 }
 
 .r-page a {
-  color: var(--rento-primary);
+  color: var(--rento-primary-text);
   text-decoration: none;
   transition: color var(--rento-duration) var(--rento-ease);
 }
 
 .r-page a:hover {
-  color: var(--rento-primary-hover);
+  color: var(--rento-primary-text-hover);
 }
 
 .r-page img {
@@ -120,6 +120,14 @@ body.r-page {
   font-weight: var(--rento-weight-bold);
   letter-spacing: .12em;
   text-transform: uppercase;
+  color: var(--rento-primary-text);
+}
+
+.r-section--dark .r-eyebrow,
+.r-hero .r-eyebrow,
+.r-page-hero .r-eyebrow,
+.r-cta .r-eyebrow,
+.r-panel--dark .r-eyebrow {
   color: var(--rento-primary);
 }
 
@@ -182,7 +190,7 @@ body.r-page {
 /* ---------- 3. Buttons ---------- */
 .r-btn {
   --r-btn-bg: var(--rento-primary);
-  --r-btn-color: #fff;
+  --r-btn-color: var(--rento-on-primary);
   --r-btn-border: var(--rento-primary);
   display: inline-flex;
   align-items: center;
@@ -219,22 +227,26 @@ body.r-page {
 
 .r-btn--outline {
   --r-btn-bg: transparent;
-  --r-btn-color: var(--rento-primary);
+  --r-btn-color: var(--rento-primary-text);
+  --r-btn-border: var(--rento-primary-text);
 }
 
 .r-btn--outline:hover {
   --r-btn-bg: var(--rento-primary);
-  --r-btn-color: #fff;
+  --r-btn-border: var(--rento-primary);
+  --r-btn-color: var(--rento-on-primary);
 }
 
 .r-btn--dark {
   --r-btn-bg: var(--rento-ink-900);
   --r-btn-border: var(--rento-ink-900);
+  --r-btn-color: #fff;
 }
 
 .r-btn--dark:hover {
   --r-btn-bg: var(--rento-ink-700);
   --r-btn-border: var(--rento-ink-700);
+  --r-btn-color: #fff;
   box-shadow: var(--rento-shadow);
 }
 
@@ -437,12 +449,12 @@ body.r-page {
 
 .r-badge--primary {
   background: var(--rento-primary-soft);
-  color: var(--rento-primary-active);
+  color: var(--rento-primary-text);
 }
 
 .r-badge--success {
   background: var(--rento-success-soft);
-  color: var(--rento-success);
+  color: var(--rento-success-text);
 }
 
 .r-badge--warning {
@@ -452,7 +464,7 @@ body.r-page {
 
 .r-badge--danger {
   background: var(--rento-danger-soft);
-  color: var(--rento-danger);
+  color: var(--rento-danger-text);
 }
 
 .r-badge--dark {
@@ -566,7 +578,7 @@ a.r-chip:hover {
 }
 
 .r-nav a.is-active {
-  color: var(--rento-primary) !important;
+  color: var(--rento-primary-text) !important;
 }
 
 .r-nav a.is-active::after {
@@ -647,8 +659,8 @@ a.r-chip:hover {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--rento-primary), var(--rento-secondary));
-  color: #fff;
+  background: var(--rento-primary-soft);
+  color: var(--rento-primary-text);
   font-family: var(--rento-font-heading);
   font-size: 13px;
   font-weight: var(--rento-weight-bold);
@@ -742,7 +754,7 @@ a.r-chip:hover {
 }
 
 .r-offcanvas__nav a.is-active {
-  color: var(--rento-primary) !important;
+  color: var(--rento-primary-text) !important;
 }
 
 @media (max-width: 991px) {
@@ -1152,7 +1164,7 @@ a.r-chip:hover {
   gap: 6px;
   font-size: var(--rento-text-sm);
   font-weight: var(--rento-weight-bold);
-  color: var(--rento-primary) !important;
+  color: var(--rento-primary-text) !important;
 }
 
 .r-car-card:hover .r-car-card__cta i {
@@ -1934,7 +1946,7 @@ a.r-chip:hover {
 }
 
 .r-pagination__link:hover {
-  border-color: var(--rento-primary);
+  border-color: var(--rento-primary-text);
 }
 
 .r-pagination__link.is-current {
@@ -1957,7 +1969,7 @@ a.r-chip:hover {
 }
 
 .r-breadcrumb--light a:hover {
-  color: var(--rento-primary) !important;
+  color: var(--rento-primary-text) !important;
 }
 
 .r-breadcrumb--light [aria-current] {
@@ -2251,7 +2263,7 @@ a.r-chip:hover {
 }
 
 .r-match-form output {
-  color: var(--rento-primary);
+  color: var(--rento-primary-text);
   font-family: var(--rento-font-heading);
   font-weight: var(--rento-weight-extrabold);
 }
@@ -2575,7 +2587,7 @@ a.r-chip:hover {
 
 .r-account__nav a.is-active {
   background: var(--rento-primary-soft);
-  color: var(--rento-primary-active) !important;
+  color: var(--rento-primary-text) !important;
   font-weight: var(--rento-weight-semibold);
 }
 
@@ -2728,3 +2740,87 @@ a.r-chip:hover {
   }
 }
 .r-panel--narrow { max-width: 560px; }
+
+.r-panel--center {
+  margin: 0 auto;
+}
+
+.r-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rento-space-3);
+}
+
+/* ---------- 18. 404 ---------- */
+.r-notfound__inner {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.r-notfound__code {
+  margin: 0 0 var(--rento-space-2);
+  color: var(--rento-primary);
+  font-family: var(--rento-font-heading);
+  font-size: clamp(5rem, 3rem + 8vw, 9rem);
+  font-weight: var(--rento-weight-extrabold);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.r-notfound__inner h1 {
+  font-size: clamp(1.8rem, 1.3rem + 1.8vw, 2.6rem);
+}
+
+.r-notfound__search {
+  display: flex;
+  gap: var(--rento-space-2);
+  margin: var(--rento-space-8) 0 var(--rento-space-5);
+}
+
+.r-notfound .r-panel__actions {
+  justify-content: center;
+}
+
+@media (max-width: 575px) {
+  .r-notfound__search {
+    flex-direction: column;
+  }
+}
+
+/* ---------- 19. Inline flash messages (includes/flash.php) ---------- */
+.rento-flash {
+  margin: 0 0 var(--rento-space-5);
+  padding: var(--rento-space-3) var(--rento-space-4);
+  border: 1px solid var(--rento-gray-200);
+  border-left: 4px solid var(--rento-info);
+  border-radius: var(--rento-radius);
+  background: var(--rento-info-soft);
+  color: var(--rento-ink-800);
+  font-size: var(--rento-text-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.rento-flash strong:first-child {
+  font-weight: var(--rento-weight-bold);
+}
+
+.rento-flash--success {
+  border-left-color: var(--rento-success);
+  background: var(--rento-success-soft);
+}
+
+.rento-flash--error {
+  border-left-color: var(--rento-danger);
+  background: var(--rento-danger-soft);
+}
+
+.rento-flash--warning {
+  border-left-color: var(--rento-warning);
+  background: var(--rento-warning-soft);
+}
+
+.r-footer .r-hint {
+  color: var(--rento-gray-400);
+}

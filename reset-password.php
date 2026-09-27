@@ -103,86 +103,19 @@ if (isset($_POST['update'])) {
   $pageDescription = 'Reset your Rento account password with a secure, time-limited link.';
   include('includes/head.php');
   ?>
-  <script type="text/javascript">
-    function resetpassword_valid() {
-      if (document.resetpwd.newpassword.value != document.resetpwd.confirmpassword.value) {
-        alert("New Password and Confirm Password Field do not match  !!");
-        document.resetpwd.confirmpassword.focus();
-        return false;
-      }
-      return true;
-    }
-  </script>
-  <style>
-
-    .reset_wrap {
-      max-width: 560px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 8px;
-      padding: 0 0 20px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
-      border: 1px solid #eee;
-      overflow: hidden;
-    }
-
-    .reset_wrap .field-title {
-      background: #f8f9fa;
-      border-bottom: 1px solid #eee;
-      padding: 16px 30px;
-      margin: 0 0 25px;
-    }
-
-    .reset_wrap .field-title h6 {
-      margin: 0;
-      letter-spacing: 1px;
-      color: #4f5362;
-      font-size: 1.05em;
-    }
-
-    .reset_wrap .reset_body {
-      padding: 0 30px;
-    }
-
-    .reset_wrap .control-label {
-      font-weight: 600;
-      color: #4f5362;
-      margin-bottom: 6px;
-      display: block;
-    }
-  </style>
+  <meta name="robots" content="noindex">
 </head>
 
-<body>
+<body class="r-page">
 
-  <!--Header-->
   <?php include('includes/header.php'); ?>
-  <!-- /Header -->
-  <!--Page Header-->
-  <section class="page-header profile_page">
-    <div class="container">
-      <div class="page-header_wrap">
-        <div class="page-heading">
-          <h1>Reset Password</h1>
-        </div>
-        <ul class="coustom-breadcrumb">
-          <li><a href="./">Home</a></li>
-          <li>Reset Password</li>
-        </ul>
-      </div>
-    </div>
-    <!-- Dark Overlay-->
-    <div class="dark-overlay"></div>
-  </section>
-  <!-- /Page Header-->
 
-  <section class="user_profile inner_pages">
-    <div class="container">
-      <div class="reset_wrap">
-        <div class="field-title">
-          <h6>Reset Password</h6>
-        </div>
-        <div class="reset_body">
+  <main id="main">
+    <?php echo page_hero('Reset password', 'Set a new password with the link we sent you. Links are valid for ' . RESET_TOKEN_TTL_MINUTES . ' minutes.'); ?>
+
+    <section class="r-section r-section--muted">
+      <div class="container">
+        <div class="r-panel r-panel--narrow r-panel--center">
           <?php echo !empty($error) ? flash_message('error', $error) : flash_message('success', $msg ?? ''); ?>
 
           <?php
@@ -194,46 +127,37 @@ if (isset($_POST['update'])) {
           ?>
 
           <?php if ($showResetForm) { ?>
-            <form name="resetpwd" method="post" action="reset-password" onSubmit="return resetpassword_valid();">
-<?php echo csrf_field(); ?>
+            <h2 class="r-panel__title">Choose a new password</h2>
+            <form name="resetpwd" method="post" action="reset-password" onsubmit="return document.getElementById('newpassword').value === document.getElementById('confirmpassword').value;">
+              <?php echo csrf_field(); ?>
               <input type="hidden" name="token" value="<?php echo htmlentities($token); ?>">
-              <div class="form-group">
-                <label class="control-label" for="newpassword">New Password</label>
-                <input class="form-control white_bg" id="newpassword" type="password" name="newpassword" required>
+              <div class="r-field">
+                <label class="r-label" for="newpassword">New password</label>
+                <div class="r-password">
+                  <input class="r-input" id="newpassword" type="password" name="newpassword" autocomplete="new-password" required>
+                  <button type="button" class="r-password__toggle" aria-controls="newpassword" aria-label="Show password" aria-pressed="false"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                </div>
               </div>
-              <div class="form-group">
-                <label class="control-label" for="confirmpassword">Confirm Password</label>
-                <input class="form-control white_bg" id="confirmpassword" type="password" name="confirmpassword" required>
+              <div class="r-field">
+                <label class="r-label" for="confirmpassword">Confirm new password</label>
+                <input class="r-input" id="confirmpassword" type="password" name="confirmpassword" autocomplete="new-password" required>
               </div>
-              <div class="form-group">
-                <input type="submit" value="Reset Password" name="resetpassword" class="btn btn-block">
-              </div>
+              <button type="submit" value="Reset Password" name="resetpassword" class="r-btn r-btn--block r-btn--lg">Save new password</button>
             </form>
           <?php } else { ?>
-            <p>
-              <a href="#loginform" class="btn" data-bs-toggle="modal">Login</a>
-              &nbsp;
-              <a href="#forgotpassword" data-bs-toggle="modal">Request a new reset link</a>
-            </p>
+            <div class="r-panel__actions">
+              <a href="#loginform" class="r-btn" data-bs-toggle="modal">Log in</a>
+              <a href="#forgotpassword" class="r-btn r-btn--outline" data-bs-toggle="modal">Request a new reset link</a>
+            </div>
           <?php } ?>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!--Footer -->
   <?php include('includes/footer.php'); ?>
-  <!-- /Footer-->
-
-  <!--Login-Form -->
   <?php include('includes/login.php'); ?>
-  <!--/Login-Form -->
-
-  <!--Register-Form -->
   <?php include('includes/registration.php'); ?>
-  <!--/Register-Form -->
-
-  <!--Forgot-password-Form -->
   <?php include('includes/forgotpassword.php'); ?>
   <?php include('includes/scripts.php'); ?>
 

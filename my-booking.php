@@ -23,7 +23,6 @@ $bookings = $query->fetchAll(PDO::FETCH_OBJ);
 <head>
   <?php
   $pageTitle = 'My Bookings';
-  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>

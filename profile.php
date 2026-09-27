@@ -46,7 +46,6 @@ $dobValue = ($user && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$user->dob)) ?
 <head>
   <?php
   $pageTitle = 'My Profile';
-  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>

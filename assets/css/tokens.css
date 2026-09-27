@@ -1,7 +1,7 @@
 /* ==========================================================================
    Rento design tokens
    The single source for colour, type, spacing, radius and shadow values.
-   Loaded before style.css on every public page (includes/head.php).
+   Loaded before app.css on every public page (includes/head.php).
    ========================================================================== */
 
 :root {
@@ -12,6 +12,10 @@
   --rento-primary-soft: #fff0eb;     /* tinted backgrounds, badges */
   --rento-primary-rgb: 255, 90, 54;
   --rento-secondary: #ffb238;        /* headlight amber: highlights */
+  /* Accessible pairs (WCAG AA 4.5:1 for normal text): */
+  --rento-on-primary: #101114;       /* text on #ff5a36 buttons: 6.1:1 */
+  --rento-primary-text: #c43c1a;     /* orange text on white / light grey: 5.2:1 */
+  --rento-primary-text-hover: #a33218;
 
   /* ---------- Neutrals (ink = dark, paper = light) ---------- */
   --rento-ink-900: #101114;          /* page-dark sections, footer */
@@ -31,10 +35,12 @@
 
   /* ---------- Status ---------- */
   --rento-success: #1f9d55;
+  --rento-success-text: #136c3a;     /* on success-soft: 5.8:1 */
   --rento-success-soft: #e8f6ee;
   --rento-warning: #d98a00;
   --rento-warning-soft: #fff5e0;
   --rento-danger: #d93a2b;
+  --rento-danger-text: #b3261e;      /* on danger-soft: 5.7:1 */
   --rento-danger-soft: #fdecea;
   --rento-info: #2f7fd1;
   --rento-info-soft: #e9f2fc;
@@ -89,23 +95,13 @@
   --rento-ease: cubic-bezier(.2, .7, .2, 1);
   --rento-duration: .2s;
 
-  /* ---------- Legacy names used by style.css / about-us.css ---------- */
-  --asphalt: var(--rento-ink-900);
-  --panel: var(--rento-ink-800);
-  --panel-2: var(--rento-ink-700);
-  --line: var(--rento-line-dark);
-  --ash: var(--rento-gray-400);
-  --paper: var(--rento-paper);
-  --signal: var(--rento-primary);
-  --signal-2: var(--rento-secondary);
-  --radius: var(--rento-radius-lg);
 
   /* ---------- Bootstrap 5 theme hooks ---------- */
   --bs-primary: var(--rento-primary);
   --bs-primary-rgb: var(--rento-primary-rgb);
-  --bs-link-color: var(--rento-primary);
+  --bs-link-color: var(--rento-primary-text);
   --bs-link-color-rgb: var(--rento-primary-rgb);
-  --bs-link-hover-color: var(--rento-primary-hover);
+  --bs-link-hover-color: var(--rento-primary-text-hover);
   --bs-body-font-family: var(--rento-font-body);
   --bs-body-color: var(--rento-gray-600);
   --bs-border-color: var(--rento-gray-200);

@@ -75,7 +75,7 @@ $accountLinks = [
             </ul>
           </div>
         <?php } else { ?>
-          <a href="#loginform" class="r-btn r-btn--sm" data-bs-toggle="modal">
+          <a href="#loginform" class="r-btn r-btn--sm" data-bs-toggle="modal" aria-label="Login or register">
             <i class="fa fa-user" aria-hidden="true"></i><span class="r-header__login-text">Login / Register</span>
           </a>
         <?php } ?>

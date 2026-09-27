@@ -35,7 +35,6 @@ $detail = clean_cms_html($detail);
   <?php
   $pageTitle = $pageTitles[$pagetype] ?? 'Information';
   $pageDescription = 'Rento ' . $pageTitle . ': how renting a car with Rento in Nepal works.';
-  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>

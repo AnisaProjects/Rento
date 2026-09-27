@@ -26,7 +26,6 @@ if ($searched) {
   <?php
   $pageTitle = 'Find My Car';
   $pageDescription = 'Tell Rento your budget and the type of car you like, and get car suggestions that fit your trip.';
-  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>

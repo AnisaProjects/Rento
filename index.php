@@ -39,7 +39,6 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
   <?php
   $pageTitle = 'Car Rental in Nepal';
   $pageDescription = 'Rento: rent a verified car anywhere in Nepal. Browse hatchbacks, sedans and SUVs, compare daily prices in rupees and book online.';
-  $pageModern = true;
   include('includes/head.php');
   ?>
   <link rel="preload" as="image" href="assets/images/banner-image-1.webp" imagesrcset="assets/images/banner-image-1-960.webp 960w, assets/images/banner-image-1.webp 1920w" imagesizes="100vw">

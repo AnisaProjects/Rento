@@ -33,7 +33,6 @@ if (isset($_POST['submit'])) {
 <head>
   <?php
   $pageTitle = 'Write a Testimonial';
-  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>

@@ -94,7 +94,6 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
   <?php
   $pageTitle = $heading === 'All cars' ? 'Car Listing' : $heading;
   $pageDescription = 'Browse every car available to rent with Rento: filter by type, brand, fuel and budget, with daily prices in rupees.';
-  $pageModern = true;
   include('includes/head.php');
   ?>
   <?php if ($activeChips || $page > 1) { ?><meta name="robots" content="noindex, follow"><?php } ?>

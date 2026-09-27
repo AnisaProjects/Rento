@@ -36,7 +36,6 @@ if (isset($_POST['updatepass'])) {
 <head>
   <?php
   $pageTitle = 'Change Password';
-  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>

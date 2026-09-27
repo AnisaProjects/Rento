@@ -40,7 +40,6 @@ $phone = trim($contact->ContactNo);
   <?php
   $pageTitle = 'Contact Us';
   $pageDescription = 'Contact Rento: address, email, phone number and a form to send us your question.';
-  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>

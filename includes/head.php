@@ -4,8 +4,7 @@
 //   $pageDescription   meta description (optional; falls back to the site description)
 //   $pageUsesCarousel  true on pages with an Owl carousel (optional)
 //   $pageStyles        extra stylesheet URLs loaded after the site CSS (optional)
-//   $pageModern        true once a page uses the redesign (app.css) only, without the
-//                      old template stylesheet; the page's <body> gets class="r-page".
+// Pages use <body class="r-page">; the site CSS is tokens.css + app.css.
 $pageTitle = $pageTitle ?? 'Car Rental in Nepal';
 
 // Pages shown at a deeper clean URL (car/..., or a missing URL in any folder) resolve
@@ -35,9 +34,6 @@ $pageDescription = $pageDescription ?? 'Rento: rent a verified car anywhere in N
 <link rel="stylesheet" href="assets/css/owl.carousel.css">
 <?php } ?>
 <link rel="stylesheet" href="assets/css/tokens.css">
-<?php if (empty($pageModern)) { ?>
-<link rel="stylesheet" href="assets/css/style.css">
-<?php } ?>
 <link rel="stylesheet" href="assets/css/app.css">
 <?php foreach ($pageStyles ?? [] as $href) { ?>
 <link rel="stylesheet" href="<?php echo htmlentities($href); ?>">

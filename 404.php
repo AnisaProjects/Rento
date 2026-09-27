@@ -18,72 +18,35 @@ http_response_code(404);
   <meta name="robots" content="noindex">
 </head>
 
-<body>
+<body class="r-page">
 
-  <!--Header-->
   <?php include(__DIR__ . '/includes/header.php'); ?>
-  <!-- /Header -->
 
-  <section class="page-header listing_page">
-    <div class="container">
-      <div class="page-header_wrap">
-        <div class="page-heading">
-          <h1>Page Not Found</h1>
-        </div>
-        <ul class="coustom-breadcrumb">
-          <li><a href="./">Home</a></li>
-          <li>404</li>
-        </ul>
-      </div>
-    </div>
-    <div class="dark-overlay"></div>
-  </section>
-
-  <section class="content-page section-padding">
-    <div class="container">
-      <div class="content-page__card notfound">
-        <span class="content-page__icon">
-          <i class="fa fa-car" aria-hidden="true"></i>
-        </span>
-        <span class="content-page__badge">Error 404</span>
-        <h2 class="content-page__title">This road doesn't go anywhere</h2>
-        <div class="content-page__body">
-          <p>The page you were looking for doesn't exist, or the car is no longer listed. Try a search, or pick a car
-            from the listing.</p>
-
-          <form class="notfound__search" action="search" method="post" role="search">
-            <?php echo csrf_field(); ?>
+  <main id="main">
+    <section class="r-section r-notfound">
+      <div class="container">
+        <div class="r-notfound__inner">
+          <p class="r-notfound__code" aria-hidden="true">404</p>
+          <h1>This road doesn't go anywhere</h1>
+          <p class="r-section-lead">The page you were looking for doesn't exist, or the car is no longer listed.</p>
+          <form class="r-notfound__search" action="car-listing" method="get" role="search">
             <label class="visually-hidden" for="notfound-search">Search cars</label>
-            <input type="text" id="notfound-search" name="searchdata" class="form-control"
-              placeholder="Search by brand, model, fuel type or year" required>
-            <button type="submit" class="btn">Search</button>
+            <input type="search" id="notfound-search" name="q" class="r-input" placeholder="Search by brand, model, fuel type or year" required>
+            <button type="submit" class="r-btn">Search</button>
           </form>
-
-          <div class="notfound__links">
-            <a href="./" class="btn">Go to Home</a>
-            <a href="car-listing" class="btn notfound__btn-outline">Browse all cars</a>
+          <div class="r-panel__actions">
+            <a href="./" class="r-btn r-btn--dark">Go to home</a>
+            <a href="car-listing" class="r-btn r-btn--outline">Browse all cars</a>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!--Footer -->
   <?php include(__DIR__ . '/includes/footer.php'); ?>
-  <!-- /Footer-->
-
-  <!--Login-Form -->
   <?php include(__DIR__ . '/includes/login.php'); ?>
-  <!--/Login-Form -->
-
-  <!--Register-Form -->
   <?php include(__DIR__ . '/includes/registration.php'); ?>
-  <!--/Register-Form -->
-
-  <!--Forgot-password-Form -->
   <?php include(__DIR__ . '/includes/forgotpassword.php'); ?>
-  <!--/Forgot-password-Form -->
-
   <?php include(__DIR__ . '/includes/scripts.php'); ?>
 
 </body>

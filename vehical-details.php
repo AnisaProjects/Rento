@@ -149,7 +149,6 @@ $today = date('Y-m-d');
   $pageTitle = $carName;
   $pageDescription = 'Rent the ' . $carName . ' in Nepal from ' . format_price_per_day($car->PricePerDay) . '. See photos, features and availability, and book online.';
   $pageUsesCarousel = true;
-  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>
@@ -299,6 +298,8 @@ $today = date('Y-m-d');
         navText: ['<i class="fa fa-angle-left" aria-hidden="true"></i><span class="visually-hidden">Previous photo</span>',
           '<i class="fa fa-angle-right" aria-hidden="true"></i><span class="visually-hidden">Next photo</span>']
       });
+      // Owl marks its arrow buttons role="presentation", hiding them from screen readers.
+      $slider.find('.owl-nav button').removeAttr('role');
       $slider.on('changed.owl.carousel', function (event) {
         $('.r-gallery__thumb').removeClass('is-active').eq(event.item.index).addClass('is-active');
       });
