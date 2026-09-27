@@ -215,3 +215,70 @@ function booking_price_record(array $quote): array
             'reasons' => array_map(fn($r) => $r['label'] . ' ' . ($r['pct'] > 0 ? '+' : '') . $r['pct'] . '%', $d['reasons'])], $quote['days']),
     ], JSON_UNESCAPED_UNICODE)];
 }
+
+// Model health for admin -> Smart Pricing: which pricer runs, thresholds, freshness,
+// coverage and data warnings (each warning is [level: warning|danger|info, text, link]).
+function pricing_health(PDO $dbh): array
+{
+    $confirmed = (int)$dbh->query("SELECT COUNT(*) FROM tblbooking WHERE Status = 1")->fetchColumn();
+    $all = (int)$dbh->query("SELECT COUNT(*) FROM tblbooking WHERE Status IS NULL OR Status <> 2")->fetchColumn();
+    $demandMin = (int)setting('pricing_demand_min_bookings');
+    $mlMin = (int)setting('pricing_ml_threshold');
+    $status = forecast_status($dbh);
+    $horizon = (int)setting('pricing_forecast_days');
+    $horizonEnd = date('Y-m-d', strtotime('+' . ($horizon - 1) . ' days'));
+    $warnings = [];
+
+    $cars = $dbh->query("SELECT id, VehiclesTitle, CarType, SeatingCapacity, PricePerDay, Vimage1 FROM tblvehicles WHERE IsActive = 1")->fetchAll(PDO::FETCH_OBJ);
+    foreach ($cars as $car) {
+        $missing = array_keys(array_filter([
+            'car type' => trim((string)$car->CarType) === '',
+            'seats' => (int)$car->SeatingCapacity < 1,
+            'base price' => (int)$car->PricePerDay < 1,
+            'photo' => trim((string)$car->Vimage1) === '' || str_starts_with((string)$car->Vimage1, 'placeholder-'),
+        ]));
+        if ($missing) {
+            $warnings[] = [in_array('base price', $missing, true) ? 'danger' : 'warning', $car->VehiclesTitle . ': no ' . implode(', no ', $missing) . '.', 'edit-vehicle.php?id=' . $car->id];
+        }
+    }
+    $withForecast = $dbh->query("SELECT DISTINCT f.VehicleId FROM tbl_price_forecast f JOIN tblvehicles v ON v.id = f.VehicleId
+        WHERE v.IsActive = 1 AND f.ForecastDate = CURDATE() AND f.BasePrice = v.PricePerDay")->fetchAll(PDO::FETCH_COLUMN);
+    $notCovered = count($cars) - count($withForecast);
+    if ($notCovered > 0) {
+        $warnings[] = ['danger', "$notCovered active car(s) have no up-to-date forecast for today (new car or changed base price): recompute.", null];
+    }
+    $lastDoneAt = $status['lastDone']->FinishedAt ?? null;
+    if (!$lastDoneAt || strtotime($lastDoneAt) < time() - 26 * 3600) {
+        $warnings[] = ['warning', 'The forecast was last computed ' . ($lastDoneAt ? date('j M Y, H:i', strtotime($lastDoneAt)) : 'never') . '. The nightly job may not be installed (see tools/com.rento.price-forecast.plist).', null];
+    }
+    if ($status['last'] && $status['last']->Status === 'failed') {
+        $warnings[] = ['danger', 'The last recompute failed: ' . $status['last']->Message, null];
+    }
+    $lastFestival = $dbh->query("SELECT MAX(GREATEST(EndDate, COALESCE(TravelTo, EndDate))) FROM tblfestivals")->fetchColumn();
+    if (!$lastFestival || $lastFestival < $horizonEnd) {
+        $warnings[] = ['warning', 'The festival calendar ends ' . ($lastFestival ? date('j M Y', strtotime($lastFestival)) : '(empty)') . ', before the forecast horizon (' . date('j M Y', strtotime($horizonEnd)) . '). Add the next festivals.', 'festivals.php'];
+    }
+    $unchecked = $dbh->prepare("SELECT FestivalName FROM tblfestivals WHERE Verification IN ('unverified', 'disagreement')
+        AND StartDate <= :end AND EndDate >= CURDATE() ORDER BY StartDate");
+    $unchecked->execute([':end' => $horizonEnd]);
+    foreach ($unchecked->fetchAll(PDO::FETCH_COLUMN) as $name) {
+        $warnings[] = ['info', "Festival dates not fully checked, inside the forecast: $name.", 'festivals.php'];
+    }
+    $overrides = (int)$dbh->query("SELECT COUNT(*) FROM tbl_price_overrides WHERE ToDate >= CURDATE()")->fetchColumn();
+    if ($overrides) {
+        $warnings[] = ['info', "$overrides manual price override(s) active (they replace the rule-based price on their days).", 'insights.php'];
+    }
+    if (!PRICING_ENABLED) {
+        $warnings[] = ['info', 'PRICING_ENABLED is off in includes/config.php: the website shows base prices.', null];
+    }
+    return [
+        'pricer' => 'Rule-based pricer (ml/pricing_rules.py)',
+        'live' => PRICING_ENABLED,
+        'confirmed' => $confirmed, 'bookings' => $all,
+        'demandMin' => $demandMin, 'demandOn' => $confirmed >= $demandMin,
+        'mlMin' => $mlMin, 'mlUnlocked' => $all >= $mlMin, 'mlEnabled' => (bool)setting('pricing_ml_enabled'),
+        'status' => $status, 'horizon' => $horizon, 'horizonEnd' => $horizonEnd,
+        'activeCars' => count($cars), 'coveredCars' => count($withForecast),
+        'warnings' => $warnings,
+    ];
+}

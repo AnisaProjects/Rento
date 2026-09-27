@@ -1180,6 +1180,29 @@ div.dt-container .dt-length select {
   margin-bottom: 1rem;
 }
 
+/* Model health warnings (pricing.php) */
+.a-health-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--rento-text-sm);
+}
+
+.a-health-list li {
+  display: flex;
+  gap: .6rem;
+  padding: .45rem 0;
+  border-bottom: 1px solid var(--rento-gray-100);
+}
+
+.a-health-list i {
+  margin-top: 3px;
+}
+
+.a-health-list__danger i { color: var(--rento-danger-text); }
+.a-health-list__warning i { color: #8a5a00; }
+.a-health-list__info i { color: #1d5a96; }
+
 /* ---------- 8. Image manager ---------- */
 .a-images {
   display: grid;

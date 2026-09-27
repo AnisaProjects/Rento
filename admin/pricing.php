@@ -97,7 +97,48 @@ $preview = null;
 foreach ($previewCars as $pc) if ((int)$pc->id === $previewId) $preview = $pc;
 $runVariant = ['done' => 'success', 'failed' => 'danger', 'running' => 'info', 'queued' => 'warning'][$last->Status ?? ''] ?? 'neutral';
 ?>
-<div class="mb-4">
+<?php $health = pricing_health($dbh); ?>
+<section class="a-card" id="model-health">
+  <div class="a-card__head">
+    <h2 class="a-card__title"><i class="fa fa-heart-pulse" aria-hidden="true"></i>Model health</h2>
+    <?php echo $health['live'] ? admin_badge('Live on the website', 'success', 'fa-circle-check') : admin_badge('Not live (base prices shown)', 'warning'); ?>
+  </div>
+  <div class="a-card__body">
+    <div class="a-kpis mb-3">
+      <div class="a-kpi a-kpi--success">
+        <span class="a-kpi__label">Active pricer</span>
+        <span class="a-kpi__value fs-6"><?php echo h($health['pricer']); ?></span>
+        <span class="a-kpi__note">Gradient-boosting model: <?php echo $health['mlUnlocked'] ? ($health['mlEnabled'] ? 'switched on (not used by the forecast yet)' : 'unlocked, off') : 'locked'; ?></span>
+      </div>
+      <div class="a-kpi<?php echo $health['demandOn'] ? ' a-kpi--success' : ' a-kpi--warning'; ?>">
+        <span class="a-kpi__label">Occupancy &amp; demand factors</span>
+        <span class="a-kpi__value"><?php echo $health['confirmed']; ?> / <?php echo $health['demandMin']; ?></span>
+        <span class="a-kpi__note">Confirmed bookings · factors <?php echo $health['demandOn'] ? 'on' : 'off until the threshold'; ?></span>
+      </div>
+      <div class="a-kpi a-kpi--info">
+        <span class="a-kpi__label">ML model threshold</span>
+        <span class="a-kpi__value"><?php echo $health['bookings']; ?> / <?php echo $health['mlMin']; ?></span>
+        <span class="a-kpi__note">Bookings (not cancelled)</span>
+      </div>
+      <div class="a-kpi<?php echo $health['coveredCars'] === $health['activeCars'] ? ' a-kpi--success' : ' a-kpi--warning'; ?>">
+        <span class="a-kpi__label">Forecast coverage</span>
+        <span class="a-kpi__value"><?php echo $health['coveredCars']; ?> / <?php echo $health['activeCars']; ?> cars</span>
+        <span class="a-kpi__note"><?php echo $health['horizon']; ?> days, to <?php echo admin_date($health['horizonEnd']); ?> · last run <?php echo $health['status']['lastDone'] ? admin_date($health['status']['lastDone']->FinishedAt, true) : 'never'; ?></span>
+      </div>
+    </div>
+    <?php if ($health['warnings']) { ?>
+      <h3 class="fs-6 mb-2">Data warnings</h3>
+      <ul class="a-health-list">
+        <?php foreach ($health['warnings'] as [$level, $text, $link]) { ?>
+          <li class="a-health-list__<?php echo $level; ?>"><i class="fa fa-<?php echo $level === 'danger' ? 'circle-exclamation' : ($level === 'warning' ? 'triangle-exclamation' : 'circle-info'); ?>" aria-hidden="true"></i>
+            <span><?php echo h($text); ?><?php if ($link) { ?> <a href="<?php echo h($link); ?>">Fix</a><?php } ?></span></li>
+        <?php } ?>
+      </ul>
+    <?php } else { ?><p class="mb-0 text-success"><i class="fa fa-circle-check" aria-hidden="true"></i> No data warnings.</p><?php } ?>
+  </div>
+</section>
+
+<div class="mb-4 mt-4">
   <section class="a-card" id="forecast-status" data-busy="<?php echo $status['busy'] ? '1' : '0'; ?>">
     <div class="a-card__head">
       <h2 class="a-card__title"><i class="fa fa-calculator" aria-hidden="true"></i>Price forecast</h2>
