@@ -1,246 +1,116 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
-error_reporting(0);
-include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
-}
-else{
-if($_POST['submit']=="Update")
-{
-	$pagetype=$_GET['type'];
-	// Strip script/event handlers but keep the formatting from the editor.
-	$pagedetails=clean_cms_html($_POST['pgedetails']);
-$sql = "UPDATE tblpages SET detail=:pagedetails WHERE type=:pagetype";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':pagetype',$pagetype, PDO::PARAM_STR);
-$query-> bindParam(':pagedetails',$pagedetails, PDO::PARAM_STR);
-$query -> execute();
-$msg="Page data updated  successfully";
+require_once __DIR__ . '/includes/layout.php';
+admin_require_login();
 
+// type => [name, public URL]
+const CMS_PAGES = [
+  'aboutus' => ['About Us', 'about-us'],
+  'faqs' => ['FAQs', 'faqs'],
+  'terms' => ['Terms and Conditions', 'terms'],
+  'privacy' => ['Privacy Policy', 'privacy'],
+];
+$pagetype = (string)($_GET['type'] ?? '');
+$page = CMS_PAGES[$pagetype] ?? null;
+
+if (($_POST['submit'] ?? '') === 'Update' && $page) {
+  // Strip script/event handlers but keep the formatting from the editor.
+  $pagedetails = clean_cms_html($_POST['pgedetails'] ?? '');
+  $query = $dbh->prepare("UPDATE tblpages SET detail = :pagedetails WHERE type = :pagetype");
+  $query->bindParam(':pagetype', $pagetype, PDO::PARAM_STR);
+  $query->bindParam(':pagedetails', $pagedetails, PDO::PARAM_STR);
+  $query->execute();
+  flash_set('success', $page[0] . ' page updated.');
+  redirect_to(current_url());
 }
 
+$detail = '';
+if ($page) {
+  $query = $dbh->prepare("SELECT detail FROM tblpages WHERE type = :pagetype");
+  $query->bindParam(':pagetype', $pagetype, PDO::PARAM_STR);
+  $query->execute();
+  $detail = (string)$query->fetchColumn();
+}
+
+admin_page_start($page ? 'Edit ' . $page[0] : 'Manage Pages', 'manage-pages.php', $page ? [['Manage Pages', 'manage-pages.php']] : [], [
+  'libs' => $page ? ['quill'] : [],
+  'lead' => $page ? 'Changes show on the website as soon as you save.' : 'Choose a page to edit.',
+  'actions' => $page ? '<a class="btn btn-light" href="../' . h($page[1]) . '" target="_blank" rel="noopener"><i class="fa fa-arrow-up-right-from-square" aria-hidden="true"></i>View page</a>' : '',
+]);
 ?>
+<nav class="a-page-tabs" aria-label="Pages">
+  <?php foreach (CMS_PAGES as $type => [$name]) { ?>
+    <a class="a-filter<?php echo $type === $pagetype ? ' is-active' : ''; ?>" href="manage-pages.php?type=<?php echo $type; ?>"<?php echo $type === $pagetype ? ' aria-current="page"' : ''; ?>><?php echo h($name); ?></a>
+  <?php } ?>
+</nav>
 
-<!doctype html>
-<html lang="en" class="no-js">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<meta name="theme-color" content="#3e454c">
-	
-	<title>Car Rental Portal | Admin Create Brand</title>
-
-	<!-- Font awesome -->
-	<link rel="stylesheet" href="css/font-awesome.min.css">
-	<!-- Sandstone Bootstrap CSS -->
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<!-- Bootstrap Datatables -->
-	<link rel="stylesheet" href="css/dataTables.bootstrap.min.css">
-	<!-- Bootstrap social button library -->
-	<link rel="stylesheet" href="css/bootstrap-social.css">
-	<!-- Bootstrap select -->
-	<link rel="stylesheet" href="css/bootstrap-select.css">
-	<!-- Bootstrap file input -->
-	<link rel="stylesheet" href="css/fileinput.min.css">
-	<!-- Awesome Bootstrap checkbox -->
-	<link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
-	<!-- Admin Stye -->
-	<link rel="stylesheet" href="css/style.css">
-	<script type="text/JavaScript">
-<!--
-function MM_findObj(n, d) { //v4.01
-  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
-    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
-  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
-  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
-  if(!x && d.getElementById) x=d.getElementById(n); return x;
-}
-
-function MM_validateForm() { //v4.0
-  var i,p,q,nm,test,num,min,max,errors='',args=MM_validateForm.arguments;
-  for (i=0; i<(args.length-2); i+=3) { test=args[i+2]; val=MM_findObj(args[i]);
-    if (val) { nm=val.name; if ((val=val.value)!="") {
-      if (test.indexOf('isEmail')!=-1) { p=val.indexOf('@');
-        if (p<1 || p==(val.length-1)) errors+='- '+nm+' must contain an e-mail address.\n';
-      } else if (test!='R') { num = parseFloat(val);
-        if (isNaN(val)) errors+='- '+nm+' must contain a number.\n';
-        if (test.indexOf('inRange') != -1) { p=test.indexOf(':');
-          min=test.substring(8,p); max=test.substring(p+1);
-          if (num<min || max<num) errors+='- '+nm+' must contain a number between '+min+' and '+max+'.\n';
-    } } } else if (test.charAt(0) == 'R') errors += '- '+nm+' is required.\n'; }
-  } if (errors) alert('The following error(s) occurred:\n'+errors);
-  document.MM_returnValue = (errors == '');
-}
-
-function MM_jumpMenu(targ,selObj,restore){ //v3.0
-  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
-  if (restore) selObj.selectedIndex=0;
-}
-//-->
-</script>
-<script type="text/javascript" src="nicEdit.js"></script>
-<script type="text/javascript">
-	bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
-</script>
-  <style>
-		.errorWrap {
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #dd3d36;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-.succWrap{
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #5cb85c;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-		</style>
-
-
-</head>
-
-<body>
-	<?php include('includes/header.php');?>
-	<div class="ts-main-content">
-	<?php include('includes/leftbar.php');?>
-		<div class="content-wrapper">
-			<div class="container-fluid">
-
-				<div class="row">
-					<div class="col-md-12">
-					
-						<h2 class="page-title">Manage Pages </h2>
-
-						<div class="row">
-							<div class="col-md-10">
-								<div class="panel panel-default">
-									<div class="panel-heading">Form fields</div>
-									<div class="panel-body">
-										<form method="post" name="chngpwd" class="form-horizontal" onSubmit="return valid();">
-<?php echo csrf_field(); ?>
-										
-											
-  	        	  <?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php } 
-				else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
-											<div class="form-group">
-												<label class="col-sm-4 control-label">select Page</label>
-												<div class="col-sm-8">
-															   <select name="menu1" onChange="MM_jumpMenu('parent',this,0)">
-                  <option value="" selected="selected" class="form-control">***Select One***</option>
-                  <option value="manage-pages.php?type=terms">terms and condition</option>
-                  <option value="manage-pages.php?type=privacy">privacy and policy</option>
-                  <option value="manage-pages.php?type=aboutus">aboutus</option> 
-                  <option value="manage-pages.php?type=faqs">FAQs</option>
-                </select>
-												</div>
-											</div>
-											<div class="hr-dashed"></div>
-											
-											<div class="form-group">
-												<label class="col-sm-4 control-label">selected Page</label>
-												<div class="col-sm-8">
-						<?php
-			
-			switch($_GET['type'])
-			{
-				case "terms" :
-									echo "Terms and Conditions";
-									break;
-				
-				case "privacy" :
-									echo "Privacy And Policy";
-									break;
-				
-				case "aboutus" :
-									echo "About US";
-									break;
-			
-				case "faqs" :
-									echo "FAQs";
-									break;
-											
-				default :
-								echo "";
-								break;
-			
-			}
-			
-			?>
-												</div>
-											</div>
-								
-									<div class="form-group">
-												<label class="col-sm-4 control-label">Page Details </label>
-												<div class="col-sm-8">
-			<textarea class="form-control" rows="5" cols="50" name="pgedetails" id="pgedetails" placeholder="Package Details" required>
-										<?php 
-$pagetype=$_GET['type'];
-$sql = "SELECT detail from tblpages where type=:pagetype";
-$query = $dbh -> prepare($sql);
-$query->bindParam(':pagetype',$pagetype,PDO::PARAM_STR);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{		
-echo htmlentities($result->detail);
-}}
-?>
-
-										</textarea> 
-												</div>
-											</div>
-											
-											<div class="form-group">
-												<div class="col-sm-8 col-sm-offset-4">
-								
-												<button type="submit" name="submit" value="Update" id="submit" class="btn-primary btn">Update</button>
-												</div>
-											</div>
-
-										</form>
-
-									</div>
-								</div>
-							</div>
-							
-						</div>
-						
-					
-
-					</div>
-				</div>
-				
-			
-			</div>
-		</div>
-	</div>
-
-	<!-- Loading Scripts -->
-	<script src="js/jquery.min.js"></script>
-	<script src="js/bootstrap-select.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/jquery.dataTables.min.js"></script>
-	<script src="js/dataTables.bootstrap.min.js"></script>
-	<script src="js/Chart.min.js"></script>
-	<script src="js/fileinput.js"></script>
-	<script src="js/chartData.js"></script>
-	<script src="js/main.js"></script>
-
-</body>
-
-</html>
+<?php if ($page) { ?>
+  <form method="post" class="a-card" id="page-form">
+    <?php echo csrf_field(); ?>
+    <div class="a-card__body">
+      <?php if ($pagetype === 'faqs') { ?>
+        <div class="a-notice mb-3"><i class="fa fa-circle-info mt-1" aria-hidden="true"></i><div>Each question needs its own heading (Heading 3); the text under it is the answer. The FAQs page turns them into an accordion.</div></div>
+      <?php } ?>
+      <label class="form-label" for="pgedetails">Page content</label>
+      <div class="a-editor">
+        <div id="page-editor" hidden></div>
+        <textarea class="form-control" rows="16" name="pgedetails" id="pgedetails" required><?php echo h($detail); ?></textarea>
+      </div>
+    </div>
+    <div class="a-card__foot d-flex justify-content-end gap-2">
+      <a class="btn btn-light" href="manage-pages.php">Cancel</a>
+      <button type="submit" name="submit" value="Update" class="btn btn-primary"><i class="fa fa-check" aria-hidden="true"></i>Save page</button>
+    </div>
+  </form>
+<?php } else { ?>
+  <div class="a-grid-3">
+    <?php foreach (CMS_PAGES as $type => [$name, $url]) { ?>
+      <a class="a-kpi" href="manage-pages.php?type=<?php echo $type; ?>">
+        <span class="a-kpi__icon"><i class="fa fa-file-lines" aria-hidden="true"></i></span>
+        <span class="a-kpi__label">Page</span>
+        <span class="a-kpi__value fs-5"><?php echo h($name); ?></span>
+        <span class="a-kpi__note">/<?php echo h($url); ?></span>
+      </a>
+    <?php } ?>
+  </div>
 <?php } ?>
+
+<?php admin_page_end($page ? <<<'JS'
+(function () {
+  // Quill replaces the textarea; the textarea stays as the submitted field (pgedetails)
+  // and as the editor when JavaScript is off.
+  var textarea = document.getElementById('pgedetails');
+  var holder = document.getElementById('page-editor');
+  holder.hidden = false;
+  textarea.hidden = true;
+  textarea.required = false;
+  var quill = new Quill(holder, {
+    theme: 'snow',
+    placeholder: 'Write the page content…',
+    modules: {
+      toolbar: [
+        [{ header: [2, 3, 4, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'blockquote'],
+        ['clean']
+      ]
+    }
+  });
+  quill.setContents(quill.clipboard.convert({ html: textarea.value }), 'silent');
+  quill.root.setAttribute('aria-label', 'Page content');
+  document.getElementById('page-form').addEventListener('submit', function () {
+    // Semantic HTML gives real <ul>/<ol> lists; Quill 2.0.3 writes every space as &nbsp;.
+    var html = quill.getLength() > 1 ? quill.getSemanticHTML().replace(/&nbsp;/g, ' ') : '';
+    // Quill opens every link in a new tab; links to Rento's own pages should not.
+    var doc = new DOMParser().parseFromString('<div>' + html + '</div>', 'text/html');
+    doc.querySelectorAll('a[href]').forEach(function (a) {
+      if (!/^[a-z][a-z0-9+.-]*:/i.test(a.getAttribute('href'))) {
+        a.removeAttribute('target');
+        a.removeAttribute('rel');
+      }
+    });
+    textarea.value = html ? doc.body.firstChild.innerHTML : '';
+  });
+})();
+JS : ''); ?>
