@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
-require_once('includes/dynamic_pricing.php');
 require_once __DIR__ . '/includes/enquiry-form.php';
 
 $vhid = intval($_GET['vhid'] ?? 0);
@@ -119,11 +118,13 @@ if (isset($_POST['submit'])) {
   redirect_to($backToForm);
 }
 
-// Price shown on the page (dynamic pricing is off by default, see PRICING_ENABLED).
-$pricingQuote = dynamic_price_quote($dbh, (int)$car->id, ['base_price' => (float)$car->PricePerDay]);
-$displayPrice = isset($pricingQuote['recommended_price']) && $pricingQuote['recommended_price'] > 0
-  ? $pricingQuote['recommended_price']
-  : $car->PricePerDay;
+// Price for the default dates (tomorrow to the day after). With PRICING_ENABLED this is the
+// smart price from the forecast; the booking card then asks api/price-quote.php for the
+// chosen dates. Without it, the base price.
+$defaultFrom = date('Y-m-d', strtotime('+1 day'));
+$defaultTo = date('Y-m-d', strtotime('+2 day'));
+$defaultQuote = public_quote($dbh, $car, $defaultFrom, $defaultTo);
+$displayPrice = $defaultQuote['ok'] ? (int)$defaultQuote['days'][0]['price'] : (int)$car->PricePerDay; // tomorrow
 
 $photos = array_values(array_filter([$car->Vimage1, $car->Vimage2, $car->Vimage3, $car->Vimage4, $car->Vimage5]));
 
@@ -204,8 +205,8 @@ $today = date('Y-m-d');
         </div>
         <div class="r-car__price">
           <div class="r-price r-price--lg"><?php echo format_price($displayPrice); ?><small>/day</small></div>
-          <?php if (($pricingQuote['status'] ?? '') === 'model') { ?>
-            <span class="r-badge r-badge--primary">Smart price <?php echo sprintf('%+0.0f%%', (($pricingQuote['multiplier'] ?? 1) - 1) * 100); ?></span>
+          <?php if (PRICING_ENABLED) { ?>
+            <span class="r-car__price-note">Price for tomorrow · changes with your dates</span>
           <?php } ?>
           <a href="#book" class="r-btn r-car__book-jump"><?php echo $driverOnly ? 'Request with driver' : 'Book this car'; ?></a>
         </div>
@@ -263,7 +264,7 @@ $today = date('Y-m-d');
             <div class="r-price"><?php echo format_price($displayPrice); ?><small>/day</small></div>
 
             <?php if (!empty($_SESSION['login'])) { ?>
-              <form method="post" class="r-book__form" data-price="<?php echo (float)$displayPrice; ?>">
+              <form method="post" class="r-book__form" data-price="<?php echo (float)$car->PricePerDay; ?>" data-car="<?php echo (int)$car->id; ?>" data-quote-url="api/price-quote.php">
                 <?php echo csrf_field(); ?>
                 <div class="r-form-row">
                   <div class="r-field">
@@ -272,16 +273,25 @@ $today = date('Y-m-d');
                   </div>
                   <div class="r-field">
                     <label class="r-label" for="todate">Return date</label>
-                    <input type="date" id="todate" name="todate" class="r-input" min="<?php echo $today; ?>" value="<?php echo date('Y-m-d', strtotime('+2 day')); ?>" required>
+                    <input type="date" id="todate" name="todate" class="r-input" min="<?php echo $today; ?>" value="<?php echo $defaultTo; ?>" required>
                   </div>
                 </div>
                 <div class="r-field">
                   <label class="r-label" for="message">Message <span class="r-hint">(optional)</span></label>
                   <textarea id="message" name="message" class="r-textarea" rows="3" maxlength="255" placeholder="Pickup time, trip plans, questions..."></textarea>
                 </div>
-                <dl class="r-book__total" aria-live="polite">
-                  <div><dt><span data-days>1 day</span> &times; <?php echo format_price($displayPrice); ?></dt><dd data-total><?php echo format_price($displayPrice); ?></dd></div>
+                <dl class="r-book__total" aria-live="polite" data-quote-box>
+                  <div><dt data-days><?php echo $defaultQuote['rental_days'] ?? 2; ?> days</dt><dd data-total><?php echo format_price($defaultQuote['total'] ?? $displayPrice * 2); ?></dd></div>
                 </dl>
+                <?php $defaultReasons = $defaultQuote['ok'] ? pricing_reason_lines($defaultQuote) : []; ?>
+                <ul class="r-book__reasons" data-reasons<?php echo $defaultReasons ? '' : ' hidden'; ?>>
+                  <?php foreach ($defaultReasons as $line) { ?><li><?php echo htmlentities($line); ?></li><?php } ?>
+                </ul>
+                <details class="r-book__days" data-days-box hidden>
+                  <summary>Price per day</summary>
+                  <ul data-day-list></ul>
+                </details>
+                <p class="r-book__unavailable" data-unavailable hidden role="alert"><i class="fa fa-circle-exclamation" aria-hidden="true"></i> This car is already booked on some of these days. Please try other dates.</p>
                 <button type="submit" name="submit" value="Book Now" class="r-btn r-btn--block r-btn--lg">Request booking</button>
                 <p class="r-hint r-book__note"><i class="fa fa-circle-info" aria-hidden="true"></i> No payment now. We confirm your booking and get in touch.</p>
               </form>
@@ -339,19 +349,60 @@ $today = date('Y-m-d');
         $slider.trigger('to.owl.carousel', [Number(this.dataset.slide), 300]);
       });
 
-      // Live booking total. Rental days are inclusive: 1st to 3rd = 3 days, same day = 1 (rental_days()).
+      // Live booking total from api/price-quote.php (smart prices when PRICING_ENABLED; the
+      // server recalculates the price again when the booking is saved). Rental days are
+      // inclusive: 1st to 3rd = 3 days, same day = 1. Falls back to days x base price offline.
       var form = document.querySelector('.r-book__form');
       if (!form) return;
-      var price = Number(form.dataset.price);
+      var basePrice = Number(form.dataset.price);
       var from = document.getElementById('fromdate');
       var to = document.getElementById('todate');
+      var submit = form.querySelector('[type="submit"]');
+      var box = form.querySelector('[data-quote-box]');
+      var reasonsList = form.querySelector('[data-reasons]');
+      var daysBox = form.querySelector('[data-days-box]');
+      var dayList = form.querySelector('[data-day-list]');
+      var unavailable = form.querySelector('[data-unavailable]');
       var fmt = function (n) { return 'Rs ' + Math.round(n).toLocaleString('en-US'); };
+      var pct = function (p) { return (p > 0 ? '+' : '') + (Math.round(p * 10) / 10) + '%'; };
+      var request = 0;
+      function showDays(n) { form.querySelector('[data-days]').textContent = n + (n === 1 ? ' day' : ' days'); }
+      function fallback() {
+        var days = from.value && to.value ? Math.max(1, Math.round((new Date(to.value) - new Date(from.value)) / 86400000) + 1) : 1;
+        showDays(days);
+        form.querySelector('[data-total]').textContent = fmt(days * basePrice);
+      }
       function update() {
         if (from.value) to.min = from.value;
         if (from.value && to.value && to.value < from.value) to.value = from.value;
-        var days = from.value && to.value ? Math.max(1, Math.round((new Date(to.value) - new Date(from.value)) / 86400000) + 1) : 1;
-        form.querySelector('[data-days]').textContent = days + (days === 1 ? ' day' : ' days');
-        form.querySelector('[data-total]').textContent = fmt(days * price);
+        if (!from.value || !to.value) return;
+        var id = ++request;
+        box.setAttribute('aria-busy', 'true');
+        fetch(form.dataset.quoteUrl + '?car=' + form.dataset.car + '&from=' + from.value + '&to=' + to.value, { headers: { Accept: 'application/json' } })
+          .then(function (r) { return r.json(); })
+          .then(function (q) {
+            if (id !== request) return;
+            box.removeAttribute('aria-busy');
+            if (!q.ok) { fallback(); return; }
+            showDays(q.rental_days);
+            form.querySelector('[data-total]').textContent = fmt(q.total);
+            reasonsList.innerHTML = '';
+            q.reason_text.forEach(function (line) { var li = document.createElement('li'); li.textContent = line; reasonsList.appendChild(li); });
+            reasonsList.hidden = q.reason_text.length === 0;
+            dayList.innerHTML = '';
+            q.per_day.forEach(function (d) {
+              var li = document.createElement('li');
+              var date = new Date(d.date + 'T00:00:00');
+              li.innerHTML = '<span></span><strong></strong>';
+              li.firstChild.textContent = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) + (d.change_pct ? ' (' + pct(d.change_pct) + ')' : '');
+              li.lastChild.textContent = fmt(d.price);
+              dayList.appendChild(li);
+            });
+            daysBox.hidden = q.per_day.length < 2 || q.pricing !== 'smart';
+            unavailable.hidden = q.available;
+            submit.disabled = !q.available;
+          })
+          .catch(function () { if (id === request) { box.removeAttribute('aria-busy'); fallback(); } });
       }
       from.addEventListener('change', update);
       to.addEventListener('change', update);

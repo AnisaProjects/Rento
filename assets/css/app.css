@@ -4204,3 +4204,72 @@ body.r-ai-busy {
 .r-account__signout:hover {
   background: var(--rento-gray-50);
 }
+
+/* ---------- 24. Smart price on the car page ---------- */
+.r-car__price-note {
+  display: block;
+  margin-top: 2px;
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-xs);
+}
+
+.r-book__total[aria-busy="true"] dd {
+  opacity: .5;
+}
+
+.r-book__reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: calc(-1 * var(--rento-space-2)) 0 var(--rento-space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.r-book__reasons li {
+  padding: 3px 10px;
+  border-radius: var(--rento-radius-pill);
+  background: var(--rento-primary-soft);
+  color: var(--rento-ink-800);
+  font-size: var(--rento-text-xs);
+  font-weight: var(--rento-weight-medium);
+}
+
+.r-book__days {
+  margin-bottom: var(--rento-space-3);
+  font-size: var(--rento-text-sm);
+}
+
+.r-book__days summary {
+  color: var(--rento-primary-text);
+  font-weight: var(--rento-weight-semibold);
+  cursor: pointer;
+}
+
+.r-book__days ul {
+  margin: var(--rento-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.r-book__days li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rento-space-3);
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--rento-gray-200);
+}
+
+.r-book__unavailable {
+  display: flex;
+  gap: var(--rento-space-2);
+  padding: var(--rento-space-3);
+  border-radius: var(--rento-radius);
+  background: var(--rento-danger-soft);
+  color: var(--rento-danger-text);
+  font-size: var(--rento-text-sm);
+}
+
+.r-book__unavailable[hidden] {
+  display: none;
+}

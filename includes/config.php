@@ -20,9 +20,10 @@ define('RATE_LIMIT_MAX_ATTEMPTS', 5);
 define('RATE_LIMIT_WINDOW_MINUTES', 15);
 define('RATE_LIMIT_EMAIL_CHECKS', 20);
 
-// Dynamic (AI) pricing. While false, every page shows the base PricePerDay and the
-// Python model is never called. Phase 4 turns this back on with proper data.
-define('PRICING_ENABLED', false);
+// Smart pricing (Phase 4). True: prices come from the precomputed forecast
+// (tbl_price_forecast, rules in ml/pricing_rules.py, settings in admin -> Smart Pricing).
+// False: every page, quote and booking uses the base PricePerDay.
+define('PRICING_ENABLED', true);
 
 // Python for the pricing scripts: the dedicated venv (Python 3.12, ml/requirements.txt).
 // Scripts get the DB settings from environment variables set by includes/forecast.php.
