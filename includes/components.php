@@ -43,10 +43,13 @@ function car_card(object $car, array $opts = []): string
             <?php } ?>
           </ul>
         <?php } ?>
-        <?php if (!empty($opts['reasons'])) { ?>
+        <?php if (!empty($opts['reasons']) || !empty($opts['cautions'])) { ?>
           <ul class="r-car-card__reasons">
-            <?php foreach ($opts['reasons'] as $reason) { ?>
+            <?php foreach ($opts['reasons'] ?? [] as $reason) { ?>
               <li><i class="fa fa-check" aria-hidden="true"></i><?php echo htmlentities($reason); ?></li>
+            <?php } ?>
+            <?php foreach ($opts['cautions'] ?? [] as $caution) { ?>
+              <li class="r-car-card__caution"><i class="fa fa-triangle-exclamation" aria-hidden="true"></i><?php echo htmlentities($caution); ?></li>
             <?php } ?>
           </ul>
         <?php } ?>

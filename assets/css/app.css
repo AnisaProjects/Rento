@@ -4273,3 +4273,11 @@ body.r-ai-busy {
 .r-book__unavailable[hidden] {
   display: none;
 }
+
+.r-car-card__reasons .r-car-card__caution {
+  color: #7a4f00;
+}
+
+.r-car-card__reasons .r-car-card__caution i {
+  color: var(--rento-warning);
+}

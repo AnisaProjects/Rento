@@ -24,11 +24,29 @@ function trip_amount(string $raw): ?int
     return ($n >= 100 && $n <= 100000) ? (int)round($n) : null;
 }
 
-// Returns ['type', 'typeWhy', 'tripType' (city|highway|mountain), 'budget', 'people', 'fuel'] (null when not found).
+// Words that describe who travels and what matters, used by the recommendation engine.
+const TRIP_CONTEXT_WORDS = [
+    'family' => ['family', 'kids', 'children', 'parents', 'grandparents', 'elders'],
+    'luggage' => ['luggage', 'bags', 'suitcases', 'airport', 'moving'],
+    'business' => ['business', 'meeting', 'client', 'office', 'wedding'],
+    'group' => ['group', 'friends', 'team'],
+    'comfort' => ['comfort', 'comfortable', 'quiet', 'long drive', 'long trip', 'luxury', 'premium'],
+];
+// Car types a visitor can name outright (then the type counts as "asked for").
+const TRIP_NAMED_TYPES = ['hatchback' => 'Hatchback', 'sedan' => 'Sedan', 'suv' => 'SUV', 'jeep' => 'SUV', 'muv' => 'MUV',
+    'crossover' => 'Crossover', 'coupe' => 'Coupe', 'sports car' => 'Coupe', 'pickup' => 'Pickup', 'van' => 'Van'];
+
+// Returns ['type', 'typeWhy', 'typeNamed' (bool: the visitor typed the type), 'tripType' (city|highway|mountain),
+// 'budget', 'people', 'fuel', 'context' => [family, luggage, business, group, comfort]] (null/[] when not found).
 function trip_understand(?string $input): array
 {
     $text = ' ' . mb_strtolower((string)$input) . ' ';
-    $r = ['type' => null, 'typeWhy' => null, 'tripType' => null, 'budget' => null, 'people' => null, 'fuel' => null];
+    $r = ['type' => null, 'typeWhy' => null, 'typeNamed' => false, 'tripType' => null, 'budget' => null, 'people' => null, 'fuel' => null, 'context' => []];
+    foreach (TRIP_CONTEXT_WORDS as $context => $words) {
+        foreach ($words as $word) {
+            if (trip_has_word($text, $word)) { $r['context'][] = $context; break; }
+        }
+    }
 
     if (preg_match('/(\d{1,2})\s*(people|persons|person|passengers|pax|seats|of us|adults|friends|members)/', $text, $m)) {
         $r['people'] = (int)$m[1];
@@ -56,12 +74,21 @@ function trip_understand(?string $input): array
     if ($best) {
         $r['tripType'] = $best[2];
     }
-    if ($r['people'] && $r['people'] > 5) {
-        $r['type'] = 'SUV';
-        $r['typeWhy'] = $r['people'] . ' travellers';
-    } elseif ($best) {
-        $r['type'] = $best[1];
-        $r['typeWhy'] = trip_has_word($text, strtolower($best[1])) ? null : $best[3];
+    foreach (TRIP_NAMED_TYPES as $word => $type) {
+        if (trip_has_word($text, $word)) {
+            $r['type'] = $type;
+            $r['typeNamed'] = true;
+            break;
+        }
+    }
+    if (!$r['typeNamed']) {
+        if ($r['people'] && $r['people'] > 5) {
+            $r['type'] = 'SUV';
+            $r['typeWhy'] = $r['people'] . ' travellers';
+        } elseif ($best) {
+            $r['type'] = $best[1];
+            $r['typeWhy'] = $best[3];
+        }
     }
     return $r;
 }

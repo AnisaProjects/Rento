@@ -81,8 +81,9 @@ if ($filters['trip'] !== '' && $sort === 'newest') {
   $allCars = $all->fetchAll(PDO::FETCH_OBJ);
   $understood = trip_understand($filters['trip']);
   $matchScores = (new CarRecommendationEngine($dbh))->scoreCars($allCars, [
-    'type' => $filters['type'] ?: $understood['type'], 'budget' => $filters['max'] ?: $understood['budget'],
-    'people' => $understood['people'], 'fuel' => $filters['fueltype'] ?: $understood['fuel'], 'tripType' => $understood['tripType'],
+    'type' => $filters['type'] ?: $understood['type'], 'typeNamed' => $understood['typeNamed'], 'typeWhy' => $understood['typeWhy'],
+    'budget' => $filters['max'] ?: $understood['budget'], 'people' => $understood['people'],
+    'fuel' => $filters['fueltype'] ?: $understood['fuel'], 'tripType' => $understood['tripType'], 'context' => $understood['context'],
   ], $_SESSION['login'] ?? null);
   usort($allCars, fn($a, $b) => [($matchScores[$b->id]['score'] ?? -1), $a->PricePerDay] <=> [($matchScores[$a->id]['score'] ?? -1), $b->PricePerDay]);
   $cars = array_slice($allCars, ($page - 1) * LISTING_PER_PAGE, LISTING_PER_PAGE);
@@ -233,7 +234,7 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
                   $match = $matchScores[$car->id] ?? null;
                   echo car_card($car, ['heading' => 'h2', 'sizes' => '(min-width: 1200px) 300px, (min-width: 768px) 45vw, 100vw',
                     'badge' => $match && $match['percent'] !== null ? $match['percent'] . '% match' : '',
-                    'reasons' => $match ? array_slice($match['reasons'], 0, 3) : []]);
+                    'reasons' => $match ? array_slice($match['reasons'], 0, 3) : [], 'cautions' => $match['cautions'] ?? []]);
                 } ?>
               </div>
 

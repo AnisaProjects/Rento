@@ -31,9 +31,13 @@ if ($searched) {
   // The form's budget and type win; the trip text adds travellers, fuel and the kind of road.
   $understood = trip_understand($trip);
   $recommendationEngine = new CarRecommendationEngine($dbh);
+  // The type counts as "asked for" when typed in the description, chosen without a
+  // description, or changed by hand from the one the page suggested.
+  $typeNamed = $carType !== 'Any' && ($understood['typeNamed'] || $trip === '' || $carType !== $understood['type']);
   $result = $recommendationEngine->recommend([
-    'type' => $carType, 'budget' => $budget, 'people' => $understood['people'], 'fuel' => $understood['fuel'],
-    'tripType' => $understood['tripType'], 'from' => $pickupDate ?: null, 'to' => $returnDate ?: null,
+    'type' => $carType, 'typeNamed' => $typeNamed, 'typeWhy' => $understood['typeWhy'], 'budget' => $budget,
+    'people' => $understood['people'], 'fuel' => $understood['fuel'], 'tripType' => $understood['tripType'],
+    'context' => $understood['context'], 'from' => $pickupDate ?: null, 'to' => $returnDate ?: null,
   ], $userEmail);
   $recommendations = $result['matches'];
   $withDriver = $result['withDriver'];
@@ -162,7 +166,7 @@ $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 
                 $shown->PricePerDay = $match['price'];
                 // The match % is the car's real weighted score for what was asked (see the engine).
                 $badge = $match['percent'] !== null ? $match['percent'] . '% match' : ($i === 0 ? 'Best match' : '');
-                echo '<div class="r-ai-result" style="--i:' . min($i, 8) . '">' . car_card($shown, ['heading' => 'h3', 'badge' => $badge, 'reasons' => array_slice($match['reasons'], 0, 4)]) . '</div>';
+                echo '<div class="r-ai-result" style="--i:' . min($i, 8) . '">' . car_card($shown, ['heading' => 'h3', 'badge' => $badge, 'reasons' => array_slice($match['reasons'], 0, 4), 'cautions' => $match['cautions']]) . '</div>';
               } ?>
             </div>
           <?php } else {

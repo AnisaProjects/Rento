@@ -48,6 +48,9 @@ if ($trip === '' && $type === '' && $budget === '' && $seats === '' && $fuel ===
 
 $criteria = [
     'type' => $type !== '' ? $type : ($understood['type'] ?? 'Any'),
+    'typeNamed' => $type !== '' ? $type !== 'Any' : $understood['typeNamed'],
+    'typeWhy' => $understood['typeWhy'],
+    'context' => $understood['context'],
     'budget' => $budget !== '' ? (int)$budget : $understood['budget'],
     'people' => $seats !== '' ? (int)$seats : $understood['people'],
     'fuel' => $fuel !== '' ? $fuel : $understood['fuel'],
@@ -64,11 +67,13 @@ $format = fn($m) => [
     'price_per_day' => $m['price'],
     'trip_total' => $m['tripTotal'],
     'reasons' => $m['reasons'],
+    'cautions' => $m['cautions'],
 ];
 api_json([
     'ok' => true,
     'understood' => array_filter([
         'type' => $criteria['type'] !== 'Any' ? $criteria['type'] : null, 'budget' => $criteria['budget'],
+        'type_named' => $criteria['typeNamed'] ?: null, 'context' => $criteria['context'] ?: null,
         'seats' => $criteria['people'], 'fuel' => $criteria['fuel'], 'trip_type' => $criteria['tripType'],
         'from' => $from, 'to' => $to,
     ], fn($v) => $v !== null),
