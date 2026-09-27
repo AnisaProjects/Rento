@@ -51,8 +51,16 @@ function csrf_is_valid(): bool
 
 // Every POST request must carry a valid token; reject it before any page code runs.
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !csrf_is_valid()) {
-    http_response_code(400);
     $tooLarge = empty($_POST) && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0;
+    // Bigger than post_max_size: PHP dropped every field (the token too). Nothing was
+    // saved, so send the visitor back to the same page with a message (a plain GET).
+    if ($tooLarge && session_status() === PHP_SESSION_ACTIVE && !headers_sent()) {
+        $_SESSION['flash'][] = ['error', 'The upload was larger than the server accepts (' . ini_get('post_max_size')
+            . ' in total), so nothing was saved. Try fewer or smaller files at a time.'];
+        header('Location: ' . ($_SERVER['REQUEST_URI'] ?? '/'), true, 303);
+        exit;
+    }
+    http_response_code(400);
     $message = $tooLarge
         ? 'The upload was too large. Please choose smaller files and try again.'
         : 'Your session expired or the form was not valid. Please go back, refresh the page and try again.';

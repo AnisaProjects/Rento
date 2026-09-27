@@ -1,5 +1,8 @@
 <?php
 // Validated storage for vehicle images uploaded from the admin panel.
+// The browser shrinks photos before upload (js/image-manager.js); these checks still
+// apply to every file, so a request that skips the browser gets the same validation.
+require_once __DIR__ . '/../../includes/webp.php';
 
 const VEHICLE_IMAGE_DIR = __DIR__ . '/../img/vehicleimages/';
 const VEHICLE_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
@@ -44,6 +47,47 @@ function store_vehicle_image(string $field): string
     if (!move_uploaded_file($_FILES[$field]['tmp_name'], VEHICLE_IMAGE_DIR . $name)) {
         throw new RuntimeException('The image could not be saved. Please try again.');
     }
+    // WebP sizes for the public pages; the original is still used if this fails.
+    vehicle_webp_generate($name);
     return $name;
+}
+
+// Deletes image files (and their WebP copies) that no vehicle uses any more.
+function delete_unused_vehicle_images(PDO $dbh, array $files): void
+{
+    $check = $dbh->prepare("SELECT COUNT(*) FROM tblvehicles WHERE :f IN (Vimage1, Vimage2, Vimage3, Vimage4, Vimage5)");
+    foreach (array_unique(array_map('basename', $files)) as $file) {
+        if ($file === '' || $file === '.' || $file === '..') {
+            continue;
+        }
+        $check->execute([':f' => $file]);
+        if ((int)$check->fetchColumn() === 0) {
+            @unlink(VEHICLE_IMAGE_DIR . $file);
+            foreach (WEBP_WIDTHS as $width) {
+                @unlink(VEHICLE_IMAGE_DIR . "webp/$file-$width.webp");
+            }
+        }
+    }
+}
+
+// Replaces image $n (1-5) of a vehicle with the validated upload in field img$n.
+// Returns the stored file name. Throws RuntimeException with a message for the admin.
+function replace_vehicle_image(PDO $dbh, int $vehicleId, int $n): string
+{
+    if ($n < 1 || $n > 5) {
+        throw new RuntimeException('Unknown image slot.');
+    }
+    validate_vehicle_image("img$n", "Image $n");
+    // The column name comes from the checked number above, never from input.
+    $old = $dbh->prepare("SELECT Vimage$n FROM tblvehicles WHERE id = :id");
+    $old->execute([':id' => $vehicleId]);
+    $oldFile = (string)$old->fetchColumn();
+    $file = store_vehicle_image("img$n");
+    $query = $dbh->prepare("UPDATE tblvehicles SET Vimage$n = :file WHERE id = :id");
+    $query->bindParam(':file', $file, PDO::PARAM_STR);
+    $query->bindParam(':id', $vehicleId, PDO::PARAM_INT);
+    $query->execute();
+    delete_unused_vehicle_images($dbh, [$oldFile]);
+    return $file;
 }
 ?>

@@ -88,6 +88,8 @@ a:hover {
 
 .form-control,
 .form-select {
+  --bs-body-bg: #fff;
+  background-color: #fff;
   border-color: var(--rento-gray-200);
   border-radius: var(--rento-radius);
   min-height: 44px;
@@ -98,6 +100,18 @@ a:hover {
 .form-check-input:focus {
   border-color: var(--rento-primary);
   box-shadow: 0 0 0 .2rem rgba(var(--rento-primary-rgb), .2);
+}
+
+.form-check-input {
+  --bs-body-bg: #fff;
+  border-color: var(--rento-gray-300);
+}
+
+.dropdown-menu,
+.modal-content {
+  --bs-body-bg: #fff;
+  --bs-dropdown-bg: #fff;
+  --bs-modal-bg: #fff;
 }
 
 .form-check-input:checked {

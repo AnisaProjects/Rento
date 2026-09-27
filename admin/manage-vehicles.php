@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
 require_once __DIR__ . '/includes/layout.php';
+require_once __DIR__ . '/includes/upload.php';
 admin_require_login();
 
 if (isset($_POST['del'])) {
@@ -13,9 +14,16 @@ if (isset($_POST['del'])) {
   if ($bookingCount > 0) {
     flash_set('error', "This vehicle has $bookingCount booking(s), so it can't be deleted.");
   } else {
+    $query = $dbh->prepare("SELECT Vimage1, Vimage2, Vimage3, Vimage4, Vimage5 FROM tblvehicles WHERE id = :delid");
+    $query->bindParam(':delid', $delid, PDO::PARAM_INT);
+    $query->execute();
+    $images = array_filter((array)$query->fetch(PDO::FETCH_NUM));
     $query = $dbh->prepare("DELETE FROM tblvehicles WHERE id = :delid");
     $query->bindParam(':delid', $delid, PDO::PARAM_INT);
     $query->execute();
+    if ($query->rowCount()) {
+      delete_unused_vehicle_images($dbh, $images);
+    }
     flash_set($query->rowCount() ? 'success' : 'error', $query->rowCount() ? 'Vehicle deleted.' : 'That vehicle no longer exists.');
   }
   redirect_to(current_url());
