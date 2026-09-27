@@ -1,8 +1,11 @@
 <?php
 // Server-side copy of the trip parser in assets/js/rento-ai.js: reads a plain-language trip
-// ("family trip to Pokhara under Rs 3000, 6 people") and finds the car type, daily budget,
+// ("family trip to Pokhara under Rs 8000, 6 people") and finds the car type, daily budget,
 // travellers, fuel and the kind of road. Keep the keyword lists in step with rento-ai.js.
 
+// "cheap" and "luxury" without an amount (Rs per day; same values in assets/js/rento-ai.js).
+const TRIP_BUDGET_CHEAP = 5500;
+const TRIP_BUDGET_PREMIUM = 15000;
 const TRIP_TYPE_RULES = [
     ['SUV', 'mountain', 'rough roads', ['suv', 'mountain', 'mountains', 'hill', 'hills', 'off road', 'offroad', 'off-road', 'rough', 'mustang', 'jomsom', 'manang', 'trek', 'trekking', 'adventure', 'snow', 'monsoon', 'village', 'dirt', 'jungle', 'chitwan', 'group', 'luggage']],
     ['Sedan', 'highway', 'comfortable highway drives', ['sedan', 'highway', 'long drive', 'long trip', 'business', 'meeting', 'comfort', 'comfortable', 'airport', 'wedding', 'family', 'pokhara', 'lumbini', 'quiet']],
@@ -58,8 +61,8 @@ function trip_understand(?string $input): array
         || preg_match('/(\d[\d,]*(?:\.\d+)?\s*(?:k|thousand)?)\s*(?:rs|npr|rupees)/', $text, $m)) {
         $r['budget'] = trip_amount($m[1]);
     }
-    if (!$r['budget'] && preg_match('/(cheap|cheapest|budget|low cost|affordable|economy)/', $text)) $r['budget'] = 1000;
-    if (!$r['budget'] && preg_match('/(luxury|premium|best car|top end)/', $text)) $r['budget'] = 5000;
+    if (!$r['budget'] && preg_match('/(cheap|cheapest|budget|low cost|affordable|economy)/', $text)) $r['budget'] = TRIP_BUDGET_CHEAP;
+    if (!$r['budget'] && preg_match('/(luxury|premium|best car|top end)/', $text)) $r['budget'] = TRIP_BUDGET_PREMIUM;
 
     if (str_contains($text, 'electric') || trip_has_word($text, 'ev')) $r['fuel'] = 'Electric';
     elseif (str_contains($text, 'cng')) $r['fuel'] = 'CNG';

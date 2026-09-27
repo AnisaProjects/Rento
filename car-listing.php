@@ -4,15 +4,18 @@ include('includes/config.php');
 
 // Filters come from the URL (GET), so every result list can be bookmarked and shared:
 //   q (keyword), type, brand (id), fueltype, max (price per day), sort, page
+// Budget and price sort use the price the cards show: "from" = the lowest price in the next 30 days
+// (includes/price-insights.php), the base price when there is no forecast.
 const LISTING_PER_PAGE = 12;
 const LISTING_SORTS = [
   'newest' => ['Newest first', 'tblvehicles.id DESC'],
-  'price_asc' => ['Price: low to high', 'tblvehicles.PricePerDay ASC, tblvehicles.id DESC'],
-  'price_desc' => ['Price: high to low', 'tblvehicles.PricePerDay DESC, tblvehicles.id DESC'],
+  'price_asc' => ['Price: low to high', 'tblvehicles.id DESC'],
+  'price_desc' => ['Price: high to low', 'tblvehicles.id DESC'],
   'year_desc' => ['Model year: newest', 'tblvehicles.ModelYear DESC, tblvehicles.id DESC'],
 ];
-const LISTING_TYPES = ['Hatchback', 'Sedan', 'SUV'];
-const LISTING_BUDGETS = [1000, 2000, 3000, 5000];
+// Types in this order; the filter only offers the ones with an active car.
+const LISTING_TYPES = ['Hatchback', 'Sedan', 'SUV', 'Crossover', 'MUV', 'Coupe', 'Convertible', 'Pickup', 'Van'];
+const LISTING_BUDGETS = [5000, 7500, 10000, 15000];
 
 // Only brands with at least one active car can be chosen.
 $brands = $dbh->query("SELECT id, BrandName FROM tblbrands WHERE EXISTS (SELECT 1 FROM tblvehicles v WHERE v.VehiclesBrand = tblbrands.id AND v.IsActive = 1) ORDER BY BrandName")->fetchAll(PDO::FETCH_OBJ);
@@ -20,12 +23,14 @@ $brandNames = [];
 foreach ($brands as $brand) {
   $brandNames[(int)$brand->id] = $brand->BrandName;
 }
+$activeTypes = $dbh->query("SELECT DISTINCT CarType FROM tblvehicles WHERE IsActive = 1")->fetchAll(PDO::FETCH_COLUMN);
+$listingTypes = array_values(array_intersect(LISTING_TYPES, $activeTypes));
 $fuelTypes = $dbh->query("SELECT DISTINCT FuelType FROM tblvehicles WHERE IsActive = 1 AND FuelType IS NOT NULL AND FuelType <> '' ORDER BY FuelType")->fetchAll(PDO::FETCH_COLUMN);
 
 $param = fn(string $key) => is_string($_GET[$key] ?? null) ? trim($_GET[$key]) : '';
 $filters = [
   'q' => mb_substr($param('q'), 0, 80),
-  'type' => in_array($param('type'), LISTING_TYPES, true) ? $param('type') : '',
+  'type' => in_array($param('type'), $listingTypes, true) ? $param('type') : '',
   'brand' => isset($brandNames[(int)$param('brand')]) ? (int)$param('brand') : '',
   'fueltype' => in_array($param('fueltype'), $fuelTypes, true) ? $param('fueltype') : '',
   'max' => in_array((int)$param('max'), LISTING_BUDGETS, true) ? (int)$param('max') : '',
@@ -55,43 +60,44 @@ if ($filters['fueltype'] !== '') {
   $where[] = "tblvehicles.FuelType = :fuel";
   $bind[':fuel'] = $filters['fueltype'];
 }
-if ($filters['max'] !== '') {
-  $where[] = "tblvehicles.PricePerDay <= :max";
-  $bind[':max'] = $filters['max'];
-}
 // Inactive vehicles (admin -> Edit vehicle) are never listed.
 $where[] = 'tblvehicles.IsActive = 1';
 $from = "FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE " . implode(' AND ', $where);
 
-$count = $dbh->prepare("SELECT COUNT(*) $from");
-$count->execute($bind);
-$total = (int)$count->fetchColumn();
+$columns = "SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
+    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblvehicles.DriverOnly, tblbrands.BrandName";
+// The fleet is small, so the list is filtered by price and paged here, with the card's "from" price.
+$all = $dbh->prepare("$columns $from ORDER BY " . LISTING_SORTS[$sort][1]);
+$all->execute($bind);
+$allCars = $all->fetchAll(PDO::FETCH_OBJ);
+foreach ($allCars as $car) {
+  $car->FromPrice = car_price_info($dbh, (int)$car->id)['from'] ?? (int)$car->PricePerDay;
+}
+if ($filters['max'] !== '') {
+  $allCars = array_values(array_filter($allCars, fn($c) => $c->FromPrice <= $filters['max']));
+}
+if ($sort === 'price_asc' || $sort === 'price_desc') {
+  $dir = $sort === 'price_asc' ? 1 : -1;
+  usort($allCars, fn($a, $b) => [$dir * $a->FromPrice, $b->id] <=> [$dir * $b->FromPrice, $a->id]);
+}
+$total = count($allCars);
 $pages = max(1, (int)ceil($total / LISTING_PER_PAGE));
 $page = min($page, $pages);
 
-$columns = "SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
-    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblvehicles.DriverOnly, tblbrands.BrandName";
 $matchScores = [];
 if ($filters['trip'] !== '' && $sort === 'newest') {
   // Smart search: rank every car in the filtered list by its real match score (recommendation engine).
   require_once __DIR__ . '/includes/recommendation_engine.php';
   require_once __DIR__ . '/includes/trip-parser.php';
-  $all = $dbh->prepare("$columns $from ORDER BY tblvehicles.id DESC");
-  $all->execute($bind);
-  $allCars = $all->fetchAll(PDO::FETCH_OBJ);
   $understood = trip_understand($filters['trip']);
   $matchScores = (new CarRecommendationEngine($dbh))->scoreCars($allCars, [
     'type' => $filters['type'] ?: $understood['type'], 'typeNamed' => $understood['typeNamed'], 'typeWhy' => $understood['typeWhy'],
     'budget' => $filters['max'] ?: $understood['budget'], 'people' => $understood['people'],
     'fuel' => $filters['fueltype'] ?: $understood['fuel'], 'tripType' => $understood['tripType'], 'context' => $understood['context'],
   ], $_SESSION['login'] ?? null);
-  usort($allCars, fn($a, $b) => [($matchScores[$b->id]['score'] ?? -1), $a->PricePerDay] <=> [($matchScores[$a->id]['score'] ?? -1), $b->PricePerDay]);
-  $cars = array_slice($allCars, ($page - 1) * LISTING_PER_PAGE, LISTING_PER_PAGE);
-} else {
-  $list = $dbh->prepare("$columns $from ORDER BY " . LISTING_SORTS[$sort][1] . " LIMIT " . LISTING_PER_PAGE . " OFFSET " . (($page - 1) * LISTING_PER_PAGE));
-  $list->execute($bind);
-  $cars = $list->fetchAll(PDO::FETCH_OBJ);
+  usort($allCars, fn($a, $b) => [($matchScores[$b->id]['score'] ?? -1), $a->FromPrice] <=> [($matchScores[$a->id]['score'] ?? -1), $b->FromPrice]);
 }
+$cars = array_slice($allCars, ($page - 1) * LISTING_PER_PAGE, LISTING_PER_PAGE);
 
 // URL of this listing with some parameters changed (null removes one).
 function listing_url(array $filters, string $sort, array $changes = []): string
@@ -139,7 +145,7 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
       <div class="r-ai-prompt">
         <label class="visually-hidden" for="smart-q">Describe the car you need</label>
         <i class="fa fa-wand-magic-sparkles r-ai-prompt__icon" aria-hidden="true"></i>
-        <input type="search" id="smart-q" name="q" maxlength="80" autocomplete="off" placeholder="Try &quot;Toyota SUV for the mountains under Rs 5,000&quot;">
+        <input type="search" id="smart-q" name="q" maxlength="80" autocomplete="off" placeholder="Try &quot;Toyota SUV for the mountains under Rs 10,000&quot;">
         <button type="submit" class="r-btn">Search</button>
       </div>
       <div class="r-ai-understood" id="smart-understood" aria-live="polite" hidden></div>
@@ -165,7 +171,7 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
                 <label class="r-label" for="f-type">Car type</label>
                 <select id="f-type" name="type" class="r-select">
                   <option value="">Any type</option>
-                  <?php foreach (LISTING_TYPES as $type) { ?>
+                  <?php foreach ($listingTypes as $type) { ?>
                     <option value="<?php echo $type; ?>" <?php echo $filters['type'] === $type ? 'selected' : ''; ?>><?php echo $type; ?></option>
                   <?php } ?>
                 </select>

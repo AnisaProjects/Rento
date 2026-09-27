@@ -1,6 +1,6 @@
 /*
  * Rento trip understanding (Find My Car, car listing smart search).
- * Reads a plain-language description ("family trip to Pokhara under Rs 3000") and
+ * Reads a plain-language description ("family trip to Pokhara under Rs 8000") and
  * works out a car type, a daily budget and the number of travellers. It is a
  * transparent keyword parser, not a language model: it only fills in the same
  * filters a visitor could set by hand.
@@ -37,8 +37,8 @@
     var money = text.match(/(?:rs\.?|npr|रु|budget|under|below|less than|max(?:imum)?|upto|up to|within)\s*(?:rs\.?|npr)?\s*(\d[\d,]*(?:\.\d+)?\s*(?:k|thousand)?)/) ||
       text.match(/(\d[\d,]*(?:\.\d+)?\s*(?:k|thousand)?)\s*(?:rs|npr|rupees)/);
     if (money) result.budget = parseAmount(money[1].trim());
-    if (!result.budget && /(cheap|cheapest|budget|low cost|affordable|economy)/.test(text)) { result.budget = 1000; result.notes.push('a low budget'); }
-    if (!result.budget && /(luxury|premium|best car|top end)/.test(text)) { result.budget = 5000; result.notes.push('a premium car'); }
+    if (!result.budget && /(cheap|cheapest|budget|low cost|affordable|economy)/.test(text)) { result.budget = 5500; result.notes.push('a low budget'); }
+    if (!result.budget && /(luxury|premium|best car|top end)/.test(text)) { result.budget = 15000; result.notes.push('a premium car'); }
 
     if (/electric/.test(text) || hasWord(text, 'ev')) result.fuel = 'Electric';
     else if (/(cng)/.test(text)) result.fuel = 'CNG';

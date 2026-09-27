@@ -118,3 +118,34 @@ image, and I did not add photos I have no rights to.
 **What.** Kept at 50 confirmed bookings (`pricing_demand_min_bookings`, the default). Currently 2 of 50,
 so the factors are off.
 **Undo.** Admin → Smart Pricing → "Confirmed bookings needed for the occupancy and demand factors".
+
+### D8. Listing filter and sort use the "from" price
+
+**What.**
+- **Listing:** the budget filter and "Price: low/high" sort on `car-listing` use the price the cards show
+  ("from", the lowest price in the next 30 days), with the base price when there is no forecast. The list
+  is now filtered and paged in PHP, which is fine for a fleet of this size (hundreds of cars would still be
+  fast).
+- **Home page:** the type and brand cards ("from Rs X/day") use the same price.
+- **Find My Car and the smart search:** without dates, they also compare the budget with the "from"
+  price. With dates, they use the price on those dates, as before.
+
+**Why.** What customers filter by now matches what the cards show.
+**Undo.** Revert the commit "Listing and budgets: 'from' price…".
+
+### D9. Budget options sized for the new prices
+
+**What.** The old budgets (Rs 1,000–5,000) would have hidden most cars after D1.
+- Listing and home budget choices are now Rs 5,000 / 7,500 / 10,000 / 15,000 (the field name `max` is
+  unchanged). An old bookmarked `max=1000` is simply ignored and shows all cars.
+- The Find My Car slider now runs Rs 1,000–20,000 in Rs 500 steps, starting at Rs 10,000 (was
+  Rs 200–5,000, starting at Rs 1,000).
+- "Cheap" without an amount now means Rs 5,500 (was Rs 1,000) and "luxury/premium" Rs 15,000 (was
+  Rs 5,000), in both `includes/trip-parser.php` and `assets/js/rento-ai.js`.
+- The example prompt "Family trip to Pokhara under Rs 3,000" is now "under Rs 8,000", in the default
+  text and the placeholders. It had not been edited in Site content, so no saved text was overwritten.
+- Only types with an active car are offered in the listing's type filter, so Coupe (the GT-R) now
+  appears there.
+
+**Why.** Keep every search usable with market-based prices.
+**Undo.** Revert the same commit; the Find My Car example can also be edited in admin → Site content.

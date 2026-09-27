@@ -92,7 +92,8 @@ class CarRecommendationEngine
         return $prefs;
     }
 
-    // Daily price for the trip: the smart price on the dates (average), else the base price.
+    // Daily price for the trip: the smart price on the dates (average), else the card's "from" price
+    // (lowest in the next 30 days, price-insights.php), else the base price.
     private function dailyPrice(object $car, ?string $from, ?string $to): array
     {
         if ($from && $to && function_exists('public_quote')) {
@@ -101,7 +102,8 @@ class CarRecommendationEngine
                 return [(int)round($quote['total'] / max(1, $quote['rental_days'])), $quote['total'], $quote['available'], $quote];
             }
         }
-        return [(int)$car->PricePerDay, null, true, null];
+        $from = function_exists('car_price_info') ? (car_price_info($this->dbh, (int)$car->id)['from'] ?? null) : null;
+        return [(int)($from ?? $car->PricePerDay), null, true, null];
     }
 
     public function recommend(array $trip, ?string $userEmail = null, int $limit = 12): array

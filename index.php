@@ -28,6 +28,18 @@ $brands = $dbh->query("SELECT tblbrands.id, tblbrands.BrandName, tblbrands.Brand
   FROM tblbrands JOIN tblvehicles ON tblvehicles.VehiclesBrand = tblbrands.id AND tblvehicles.IsActive = 1
   GROUP BY tblbrands.id, tblbrands.BrandName, tblbrands.BrandLogo ORDER BY cars DESC, tblbrands.BrandName")->fetchAll(PDO::FETCH_OBJ);
 
+// "From" prices on the type and brand cards: the lowest card price ("from", price-insights.php).
+foreach (car_price_infos($dbh) as $info) {
+  foreach ([[$carTypes, $info['car']->CarType, 'CarType'], [$brands, $info['car']->BrandName, 'BrandName']] as [$list, $key, $field]) {
+    foreach ($list as $row) {
+      if ($row->$field === $key) {
+        $row->fromPrice = isset($row->fromSet) ? min($row->fromPrice, $info['from']) : $info['from'];
+        $row->fromSet = true;
+      }
+    }
+  }
+}
+
 // Hero slides: admin -> Site content -> Home page. Values are HTML-escaped.
 $heroSlides = [];
 foreach ([1, 2, 3] as $n) {
@@ -119,7 +131,7 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
             <label class="r-label" for="hero-max">Budget per day</label>
             <select id="hero-max" name="max" class="r-select">
               <option value="">Any budget</option>
-              <?php foreach ([1000, 2000, 3000, 5000] as $max) { ?>
+              <?php foreach ([5000, 7500, 10000, 15000] as $max) { // same budgets as car-listing.php ?>
                 <option value="<?php echo $max; ?>">Up to <?php echo format_price($max); ?></option>
               <?php } ?>
             </select>

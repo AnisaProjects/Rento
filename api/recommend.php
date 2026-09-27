@@ -1,5 +1,5 @@
 <?php
-// GET api/recommend.php?trip=<text>[&budget=3000][&type=SUV][&seats=6][&fuel=Diesel][&from=YYYY-MM-DD&to=YYYY-MM-DD]
+// GET api/recommend.php?trip=<text>[&budget=8000][&type=SUV][&seats=6][&fuel=Diesel][&from=YYYY-MM-DD&to=YYYY-MM-DD]
 // -> active self-drive cars ranked by their real match score, with reasons; driver-only
 //    cars that fit are listed separately under with_driver. Explicit parameters win over
 //    what is read from the trip text.

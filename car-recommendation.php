@@ -7,7 +7,9 @@ require_once __DIR__ . '/includes/trip-parser.php';
 $recommendations = [];
 $userEmail = $_SESSION['login'] ?? null;
 $carTypes = ['Any' => 'Any type', 'Hatchback' => 'Hatchback', 'Sedan' => 'Sedan', 'SUV' => 'SUV'];
-$budget = 1000;
+// Budget slider (Rs per day), sized for the fleet's market-based prices (docs/decisions.md).
+const FINDCAR_BUDGET = ['min' => 1000, 'max' => 20000, 'step' => 500, 'default' => 10000];
+$budget = FINDCAR_BUDGET['default'];
 $carType = 'Any';
 $trip = '';
 $searched = isset($_POST['getRecommendations']);
@@ -17,7 +19,7 @@ $withDriver = [];
 $understood = [];
 
 if ($searched) {
-  $budget = max(200, min(5000, intval($_POST['budget'] ?? 1000)));
+  $budget = max(FINDCAR_BUDGET['min'], min(FINDCAR_BUDGET['max'], intval($_POST['budget'] ?? FINDCAR_BUDGET['default'])));
   $carType = isset($carTypes[$_POST['carType'] ?? '']) ? $_POST['carType'] : 'Any';
   // Optional plain-language description; the browser turns it into the budget and car type above.
   $trip = is_string($_POST['trip'] ?? null) ? mb_substr(trim($_POST['trip']), 0, 200) : '';
@@ -81,7 +83,7 @@ $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 
           <div class="r-ai-prompt">
             <label class="visually-hidden" for="trip">Describe your trip</label>
             <i class="fa fa-wand-magic-sparkles r-ai-prompt__icon" aria-hidden="true"></i>
-            <textarea id="trip" name="trip" rows="1" maxlength="200" placeholder="e.g. Weekend in Pokhara with family, under Rs 3,000 a day"><?php echo htmlentities($trip); ?></textarea>
+            <textarea id="trip" name="trip" rows="1" maxlength="200" placeholder="e.g. Weekend in Pokhara with family, under Rs 8,000 a day"><?php echo htmlentities($trip); ?></textarea>
             <button type="submit" class="r-btn r-btn--lg r-ai-prompt__submit"><span>Find matches</span><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
           </div>
 
@@ -99,8 +101,8 @@ $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 
             <div class="r-ai-tune__body">
               <div class="r-field">
                 <label class="r-label" for="budget">Budget per day: <output id="budgetValue" for="budget"><?php echo format_price($budget); ?></output></label>
-                <input type="range" class="form-range r-range" id="budget" name="budget" min="200" max="5000" step="100" value="<?php echo $budget; ?>">
-                <div class="r-range__scale"><span>Rs 200</span><span>Rs 5,000</span></div>
+                <input type="range" class="form-range r-range" id="budget" name="budget" min="<?php echo FINDCAR_BUDGET['min']; ?>" max="<?php echo FINDCAR_BUDGET['max']; ?>" step="<?php echo FINDCAR_BUDGET['step']; ?>" value="<?php echo $budget; ?>">
+                <div class="r-range__scale"><span><?php echo format_price(FINDCAR_BUDGET['min']); ?></span><span><?php echo format_price(FINDCAR_BUDGET['max']); ?></span></div>
               </div>
               <fieldset class="r-field">
                 <legend class="r-label">Car type</legend>
@@ -215,7 +217,7 @@ $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 
         var result = RentoAI.understand(trip.value);
         RentoAI.renderChips(understood, result);
         if (result.budget) {
-          budget.value = Math.max(200, Math.min(5000, Math.round(result.budget / 100) * 100));
+          budget.value = Math.max(budget.min, Math.min(budget.max, Math.round(result.budget / budget.step) * budget.step));
           showBudget();
         }
         if (result.type) document.getElementById('type-' + result.type).checked = true;
