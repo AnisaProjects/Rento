@@ -46,6 +46,7 @@ $dobValue = ($user && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$user->dob)) ?
 <head>
   <?php
   $pageTitle = 'My Profile';
+  $pageNoindex = true; // account / utility page: not for search engines
   include('includes/head.php');
   ?>
 </head>

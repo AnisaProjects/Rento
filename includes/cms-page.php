@@ -40,6 +40,11 @@ if ($isAboutUs) {
   <?php
   $pageTitle = $pageTitles[$pagetype] ?? 'Information';
   $pageDescription = $knownPage ? content_raw('seo_' . $pagetype . '_description') : null;
+  if ($pagetype === 'faqs' && ($seoFaqs = faq_items($detail))) {
+    // FAQPage: the same questions and answers as the accordion.
+    $pageJsonLd = [['@type' => 'FAQPage', 'mainEntity' => array_map(fn($f) => ['@type' => 'Question', 'name' => $f['question'],
+      'acceptedAnswer' => ['@type' => 'Answer', 'text' => trim(strip_tags($f['answer'], '<a><p><br><ul><ol><li><strong><em>'))]], $seoFaqs)]];
+  }
   include('includes/head.php');
   ?>
 </head>

@@ -100,10 +100,10 @@ if (isset($_POST['update'])) {
 <head>
   <?php
   $pageTitle = 'Reset Password';
+  $pageNoindex = true; // account / utility page: not for search engines
   $pageDescription = 'Reset your Rento account password with a secure, time-limited link.';
   include('includes/head.php');
   ?>
-  <meta name="robots" content="noindex">
 </head>
 
 <body class="r-page">

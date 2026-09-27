@@ -28,7 +28,9 @@ function vehicle_form_input(PDO $dbh): array
     $v = [
         'VehiclesTitle' => trim((string)($_POST['vehicletitle'] ?? '')),
         'VehiclesBrand' => (int)($_POST['brandname'] ?? 0),
-        'VehiclesOverview' => trim((string)($_POST['vehicalorcview'] ?? '')),
+        'VehiclesOverview' => trim(str_replace("\r\n", "\n", (string)($_POST['vehicalorcview'] ?? ''))), // browsers send CRLF
+        // New field seodescription: optional meta description (empty = built from the car's data).
+        'SeoDescription' => mb_substr(trim((string)($_POST['seodescription'] ?? '')), 0, 300) ?: null,
         'PricePerDay' => (int)($_POST['priceperday'] ?? 0),
         'FuelType' => (string)($_POST['fueltype'] ?? ''),
         'ModelYear' => (int)($_POST['modelyear'] ?? 0),
@@ -162,6 +164,11 @@ function vehicle_form_sections(PDO $dbh, ?object $vehicle): void
         <div class="a-span-all">
           <label class="form-label" for="vehicalorcview">Overview <span class="a-req">*</span></label>
           <textarea id="vehicalorcview" name="vehicalorcview" class="form-control" rows="4" required placeholder="What makes this car a good pick: comfort, boot space, where it drives best…"><?php echo h($val('vehicalorcview', 'VehiclesOverview')); ?></textarea>
+        </div>
+        <div class="a-span-all">
+          <label class="form-label" for="seodescription">Search description <span class="a-muted">(optional)</span></label>
+          <textarea id="seodescription" name="seodescription" class="form-control" rows="2" maxlength="300" aria-describedby="seodescription-hint" placeholder="Leave empty to build it from the car's name, type and price"><?php echo h($val('seodescription', 'SeoDescription')); ?></textarea>
+          <div class="form-text" id="seodescription-hint">Shown by Google and in share previews. About 150 characters works best.</div>
         </div>
       </div>
     </section>

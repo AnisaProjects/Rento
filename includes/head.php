@@ -4,6 +4,7 @@
 //   $pageDescription   meta description (optional; falls back to the site description)
 //   $pageUsesCarousel  true on pages with an Owl carousel (optional)
 //   $pageStyles        extra stylesheet URLs loaded after the site CSS (optional)
+//   $pageCanonical, $pageNoindex, $pageImage, $pageOgType, $pageJsonLd   search and sharing (includes/seo.php)
 // Pages use <body class="r-page">; the site CSS is tokens.css + app.css.
 $pageTitle = $pageTitle ?? 'Car Rental in Nepal';
 
@@ -21,6 +22,10 @@ $pageDescription = $pageDescription ?? content_raw('seo_default_description');
 <script>document.documentElement.classList.add('r-js');</script>
 <title><?php echo htmlentities($pageTitle); ?> | <?php echo content('site_name'); ?></title>
 <meta name="description" content="<?php echo htmlentities($pageDescription); ?>">
+<?php echo seo_head_tags($dbh, $pageTitle, $pageDescription, [
+  'canonical' => $pageCanonical ?? null, 'noindex' => $pageNoindex ?? false, 'image' => $pageImage ?? null,
+  'ogType' => $pageOgType ?? 'website', 'jsonld' => $pageJsonLd ?? [],
+]); ?>
 <meta name="theme-color" content="#ff5a36">
 <link rel="icon" type="image/png" href="assets/images/favicon-icon/favicon.png">
 <link rel="apple-touch-icon" href="assets/images/favicon-icon/apple-touch-icon-144-precomposed.png">

@@ -59,7 +59,21 @@ if ($prices) {
 <head>
   <?php
   $pageTitle = $package->Title;
-  $pageDescription = trim($package->Summary ?: $package->Title) . ' From ' . format_price($package->StartingPrice) . '. Send Rento a booking request.';
+  $pageDescription = trim((string)($package->SeoDescription ?? '')) ?: trim($package->Summary ?: $package->Title) . ' From ' . format_price($package->StartingPrice) . '. Send Rento a booking request.';
+  // Search and sharing: TouristTrip with the itinerary and the starting price.
+  $pageCanonical = package_url($package->id, $package->Title);
+  if (package_cover($package) !== PACKAGE_PLACEHOLDER) $pageImage = package_cover($package);
+  $seoTrip = ['@type' => 'TouristTrip', 'name' => $package->Title, 'url' => seo_url($pageCanonical),
+    'description' => trim((string)($package->Summary ?: $package->Description)), 'provider' => ['@id' => seo_url() . '#business'],
+    'offers' => ['@type' => 'Offer', 'price' => (int)$package->StartingPrice, 'priceCurrency' => 'NPR', 'url' => seo_url($pageCanonical),
+      'availability' => 'https://schema.org/InStock']];
+  if (!empty($package->CategoryName)) $seoTrip['touristType'] = $package->CategoryName;
+  if ($itinerary = package_itinerary($package)) {
+    $seoTrip['itinerary'] = ['@type' => 'ItemList', 'numberOfItems' => count($itinerary), 'itemListElement' => array_map(fn($d, $i) => ['@type' => 'ListItem',
+      'position' => $i + 1, 'item' => ['@type' => 'TouristAttraction', 'name' => $d['title'] ?: 'Day ' . $d['day'], 'description' => $d['text']]], $itinerary, array_keys($itinerary))];
+  }
+  if (isset($pageImage)) $seoTrip['image'] = seo_url($pageImage);
+  $pageJsonLd = [$seoTrip, seo_breadcrumbs([[content_raw('seo_packages_title'), 'packages'], [$package->Title, $pageCanonical]])];
   include('includes/head.php');
   ?>
 </head>

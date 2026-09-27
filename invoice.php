@@ -34,9 +34,9 @@ $issued = $b->priced_at ?: $b->PostingDate;
 <head>
   <?php
   $pageTitle = 'Invoice #' . $b->BookingNumber;
+  $pageNoindex = true; // account / utility page: not for search engines
   include('includes/head.php');
   ?>
-  <meta name="robots" content="noindex">
 </head>
 
 <body class="r-page r-invoice-page">

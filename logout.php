@@ -28,9 +28,9 @@ if (empty($_SESSION['login'])) {
 <head>
   <?php
   $pageTitle = 'Sign out';
+  $pageNoindex = true; // account / utility page: not for search engines
   include('includes/head.php');
   ?>
-  <meta name="robots" content="noindex">
 </head>
 
 <body class="r-page">

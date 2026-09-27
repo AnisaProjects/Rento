@@ -82,7 +82,9 @@ if (isset($_POST['savepackage'])) {
     ':title' => $title,
     ':slug' => trim(preg_replace('/[^a-z0-9]+/', '-', strtolower($title)), '-'),
     ':summary' => mb_substr(trim((string)($_POST['summary'] ?? '')), 0, 300),
-    ':description' => trim((string)($_POST['description'] ?? '')),
+    ':description' => trim(str_replace("\r\n", "\n", (string)($_POST['description'] ?? ''))), // browsers send CRLF
+    // New field seodescription: optional meta description (empty = the summary and starting price).
+    ':seo' => mb_substr(trim((string)($_POST['seodescription'] ?? '')), 0, 300) ?: null,
     ':durationlabel' => mb_substr(trim((string)($_POST['durationlabel'] ?? '')), 0, 80),
     ':days' => $days,
     ':route' => mb_substr(trim((string)($_POST['routestops'] ?? '')), 0, 300),
@@ -98,14 +100,14 @@ if (isset($_POST['savepackage'])) {
     ':festival' => empty($_POST['festivalpricing']) ? 0 : 1,
   ];
   if ($package) {
-    $dbh->prepare("UPDATE tblpackages SET CategoryId = :cat, Title = :title, Slug = :slug, Summary = :summary, Description = :description,
+    $dbh->prepare("UPDATE tblpackages SET CategoryId = :cat, Title = :title, Slug = :slug, Summary = :summary, Description = :description, SeoDescription = :seo,
       DurationLabel = :durationlabel, DurationDays = :days, RouteStops = :route, StartingPrice = :starting, PricesJson = :prices,
       ItineraryJson = :itinerary, Inclusions = :inclusions, Exclusions = :exclusions, CoverImage = :cover, SortOrder = :sort, IsActive = :active,
       FestivalPricing = :festival WHERE id = :id")->execute($values + [':id' => $id]);
   } else {
-    $dbh->prepare("INSERT INTO tblpackages (CategoryId, Title, Slug, Summary, Description, DurationLabel, DurationDays, RouteStops, StartingPrice,
+    $dbh->prepare("INSERT INTO tblpackages (CategoryId, Title, Slug, Summary, Description, SeoDescription, DurationLabel, DurationDays, RouteStops, StartingPrice,
       PricesJson, ItineraryJson, Inclusions, Exclusions, CoverImage, SortOrder, IsActive, FestivalPricing)
-      VALUES (:cat, :title, :slug, :summary, :description, :durationlabel, :days, :route, :starting, :prices, :itinerary, :inclusions, :exclusions, :cover, :sort, :active, :festival)")->execute($values);
+      VALUES (:cat, :title, :slug, :summary, :description, :seo, :durationlabel, :days, :route, :starting, :prices, :itinerary, :inclusions, :exclusions, :cover, :sort, :active, :festival)")->execute($values);
     $id = (int)$dbh->lastInsertId();
   }
   if ($oldCover) delete_site_image($oldCover);
@@ -212,6 +214,11 @@ admin_page_start($package ? 'Edit Package' : 'Add Package', 'package-edit.php', 
       <div class="a-span-all">
         <label class="form-label" for="description">Description</label>
         <textarea class="form-control" id="description" name="description" rows="4"><?php echo h($val('description', 'Description')); ?></textarea>
+      </div>
+      <div class="a-span-all">
+        <label class="form-label" for="seodescription">Search description <span class="a-muted">(optional)</span></label>
+        <textarea id="seodescription" name="seodescription" class="form-control" rows="2" maxlength="300" aria-describedby="seodescription-hint" placeholder="Leave empty to build it from the summary and starting price"><?php echo h($val('seodescription', 'SeoDescription')); ?></textarea>
+        <div class="form-text" id="seodescription-hint">Shown by Google and in share previews. About 150 characters works best.</div>
       </div>
       <div>
         <label class="form-label" for="durationlabel">Duration (as shown)</label>

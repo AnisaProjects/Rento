@@ -18,6 +18,7 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
 <head>
   <?php
   $pageTitle = 'My Testimonials';
+  $pageNoindex = true; // account / utility page: not for search engines
   include('includes/head.php');
   ?>
 </head>

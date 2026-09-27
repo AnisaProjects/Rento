@@ -115,7 +115,8 @@ if ($filters['fueltype'] !== '') $activeChips[] = [$filters['fueltype'], 'fuelty
 if ($filters['max'] !== '') $activeChips[] = ['Up to ' . format_price($filters['max']), 'max'];
 if ($filters['trip'] !== '') $activeChips[] = ['Best match for "' . mb_strimwidth($filters['trip'], 0, 40, '…') . '"', 'trip'];
 
-$heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filters['type'] !== '' ? $filters['type'] . ' cars' : 'All cars');
+$listLabel = trim(($filters['brand'] !== '' ? $brandNames[$filters['brand']] . ' ' : '') . $filters['type']); // "Toyota SUV"
+$heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($listLabel !== '' ? $listLabel . ' cars' : 'All cars');
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
@@ -124,10 +125,19 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
   <?php
   $pageTitle = $heading === 'All cars' ? content_raw('seo_cars_title') : $heading;
   $pageDescription = content_raw('seo_cars_description');
+  if ($listLabel !== '' && $allCars) {
+    // Type / brand landing pages: their own description from the cars shown (the cards' "from" prices).
+    $article = preg_match('/^([AEIOU]|SUV|MUV)/i', $listLabel) ? 'an' : 'a'; // "an Audi", "an SUV"
+    $pageDescription = 'Rent ' . $article . ' ' . $listLabel . ' car in Nepal with Rento: ' . $total . ($total === 1 ? ' car' : ' cars') . ' from '
+      . format_price_per_day(min(array_map(fn($c) => $c->FromPrice, $allCars))) . '. Compare prices by day and book online.';
+  }
+  // Type and brand lists (and their later pages) are landing pages; keyword, trip, fuel, budget and
+  // sort variants are not indexed (their canonical is the plain type / brand list).
+  $pageCanonical = 'car-listing' . (($canon = http_build_query(array_filter(['type' => $filters['type'], 'brand' => $filters['brand'], 'page' => $page > 1 ? $page : null]))) ? '?' . $canon : '');
+  $pageNoindex = $filters['q'] !== '' || $filters['trip'] !== '' || $filters['fueltype'] !== '' || $filters['max'] !== '' || $sort !== 'newest';
   $pageScripts = ['assets/js/rento-ai.js'];
   include('includes/head.php');
   ?>
-  <?php if ($activeChips || $page > 1) { ?><meta name="robots" content="noindex, follow"><?php } ?>
 </head>
 
 <body class="r-page">

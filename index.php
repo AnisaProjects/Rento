@@ -68,6 +68,8 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
   <?php
   $pageTitle = content_raw('seo_home_title');
   $pageDescription = content_raw('seo_home_description');
+  $pageJsonLd = [seo_local_business($dbh), ['@type' => 'WebSite', 'name' => content_raw('site_name'), 'url' => seo_url(),
+    'potentialAction' => ['@type' => 'SearchAction', 'target' => seo_url('car-listing') . '?q={search_term_string}', 'query-input' => 'required name=search_term_string']]];
   include('includes/head.php');
   ?>
   <?php if (is_file(__DIR__ . '/' . $heroPreload . '-960.webp')) { ?>

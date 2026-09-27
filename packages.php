@@ -27,6 +27,7 @@ $total = array_sum(array_map(fn($c) => (int)$c->packages, $categories));
   <?php
   $pageTitle = $selected ? $selected->CategoryName . ' packages' : content_raw('seo_packages_title');
   $pageDescription = content_raw('seo_packages_description');
+  $pageCanonical = 'packages' . ($selected ? '?category=' . rawurlencode((string)($selected->Slug ?? $selected->id)) : '');
   include('includes/head.php');
   ?>
 </head>

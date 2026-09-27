@@ -12,10 +12,10 @@ http_response_code(404);
 <head>
   <?php
   $pageTitle = content_raw('seo_notfound_title');
+  $pageNoindex = true; // account / utility page: not for search engines
   $pageDescription = content_raw('seo_notfound_description');
   include(__DIR__ . '/includes/head.php');
   ?>
-  <meta name="robots" content="noindex">
 </head>
 
 <body class="r-page">

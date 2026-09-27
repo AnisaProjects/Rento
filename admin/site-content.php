@@ -17,7 +17,8 @@ function site_content_valid_url(string $key, string $value): bool
 {
   if ($value === '') return true;
   if (preg_match('#^https?://[^\s<>"]+$#i', $value)) return true;
-  return !str_starts_with($key, 'social_') && preg_match('#^[a-z0-9][a-z0-9/_\-.?=&%\#]*$#i', $value);
+  // Social links and the site address must be full http(s) URLs.
+  return !str_starts_with($key, 'social_') && $key !== 'site_url' && preg_match('#^[a-z0-9][a-z0-9/_\-.?=&%\#]*$#i', $value);
 }
 
 if (isset($_POST['savecontent'])) {

@@ -33,6 +33,7 @@ if (isset($_POST['submit'])) {
 <head>
   <?php
   $pageTitle = 'Write a Testimonial';
+  $pageNoindex = true; // account / utility page: not for search engines
   include('includes/head.php');
   ?>
 </head>

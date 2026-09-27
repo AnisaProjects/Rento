@@ -171,7 +171,30 @@ $today = date('Y-m-d');
 <head>
   <?php
   $pageTitle = $carName;
-  $pageDescription = 'Rent the ' . $carName . ' in Nepal from ' . format_price_per_day($car->PricePerDay) . '. See photos, features and availability, and book online.';
+  // Search and sharing: the admin's search description, else one built from the card's "from" price.
+  $seoFrom = car_price_info($dbh, (int)$car->id)['from'] ?? (int)$car->PricePerDay;
+  $pageDescription = trim((string)($car->SeoDescription ?? '')) ?: ($driverOnly
+    ? 'Hire the ' . $carName . ' with a driver in Nepal: ' . (int)$car->SeatingCapacity . ' seats. See photos and features, and send a request.'
+    : 'Rent the ' . $carName . ' in Nepal from ' . format_price_per_day($seoFrom) . ': ' . trim($car->CarType . ', ' . (int)$car->SeatingCapacity . ' seats, ' . $car->FuelType, ', ') . '. See photos, prices by day and availability, and book online.');
+  $pageCanonical = vehicle_url($car->id, $car->BrandName, $car->VehiclesTitle);
+  $seoPhotos = array_values(array_filter(array_map(fn($f) => basename((string)$f), [$car->Vimage1, $car->Vimage2, $car->Vimage3, $car->Vimage4, $car->Vimage5]),
+    fn($f) => $f !== '' && is_file(__DIR__ . '/admin/img/vehicleimages/' . $f)));
+  $seoPhotoUrls = array_map(fn($f) => 'admin/img/vehicleimages/' . rawurlencode($f), $seoPhotos);
+  if ($seoPhotoUrls) $pageImage = $seoPhotoUrls[0];
+  $pageOgType = 'product';
+  $seoCar = ['@type' => 'Car', 'name' => $carName, 'url' => seo_url($pageCanonical), 'description' => mb_substr(trim((string)$car->VehiclesOverview), 0, 500),
+    'brand' => ['@type' => 'Brand', 'name' => $car->BrandName], 'model' => $car->VehiclesTitle, 'bodyType' => $car->CarType,
+    'fuelType' => $car->FuelType, 'vehicleSeatingCapacity' => (int)$car->SeatingCapacity];
+  if ((int)$car->ModelYear) $seoCar['vehicleModelDate'] = (string)(int)$car->ModelYear;
+  if ($seoPhotoUrls) $seoCar['image'] = array_map('seo_url', $seoPhotoUrls);
+  if (!$driverOnly) {
+    // Lowest price per day in the next 30 days, as on the card.
+    $seoCar['offers'] = ['@type' => 'Offer', 'url' => seo_url($pageCanonical), 'price' => $seoFrom, 'priceCurrency' => 'NPR',
+      'availability' => 'https://schema.org/InStock', 'businessFunction' => 'http://purl.org/goodrelations/v1#LeaseOut',
+      'priceSpecification' => ['@type' => 'UnitPriceSpecification', 'price' => $seoFrom, 'priceCurrency' => 'NPR', 'unitCode' => 'DAY', 'unitText' => 'per day'],
+      'seller' => ['@id' => seo_url() . '#business']];
+  }
+  $pageJsonLd = [$seoCar, seo_breadcrumbs([[content_raw('seo_cars_title'), 'car-listing'], [$carName, $pageCanonical]])];
   $pageUsesCarousel = true;
   if (PRICING_ENABLED && !$driverOnly) $pageScripts = ['assets/js/price-calendar.js'];
   include('includes/head.php');

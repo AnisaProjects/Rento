@@ -40,6 +40,7 @@ $phone = trim($contact->ContactNo);
   <?php
   $pageTitle = content_raw('seo_contact_title');
   $pageDescription = content_raw('seo_contact_description');
+  $pageJsonLd = [seo_local_business($dbh)];
   include('includes/head.php');
   ?>
 </head>
