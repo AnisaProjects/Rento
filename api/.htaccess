@@ -1,0 +1,4 @@
+# Shared API code (_*.php) is never requested directly.
+<FilesMatch "^_">
+    Require all denied
+</FilesMatch>

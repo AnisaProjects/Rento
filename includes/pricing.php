@@ -159,3 +159,23 @@ function pricing_reason_lines(array $quote): array
         return $r['label'] . ' ' . $pct . ($quote['rental_days'] > 1 ? ' (' . $r['days'] . ' of ' . $quote['rental_days'] . ' days)' : '');
     }, $quote['reasons']);
 }
+
+// True when the car has no pending or confirmed booking overlapping $from..$to (inclusive),
+// the same rule as the booking form.
+function vehicle_is_free(PDO $dbh, int $carId, string $from, string $to): bool
+{
+    $query = $dbh->prepare("SELECT 1 FROM tblbooking WHERE VehicleId = :id AND (Status IS NULL OR Status <> 2)
+        AND date(FromDate) <= :to AND date(ToDate) >= :from LIMIT 1");
+    $query->execute([':id' => $carId, ':from' => $from, ':to' => $to]);
+    return !$query->fetchColumn();
+}
+
+// Public quote: smart prices when PRICING_ENABLED, otherwise the base price.
+function public_quote(PDO $dbh, object $car, string $from, string $to): array
+{
+    $quote = pricing_quote($dbh, $car, $from, $to, PRICING_ENABLED);
+    if ($quote['ok']) {
+        $quote['available'] = $quote['available'] && vehicle_is_free($dbh, (int)$car->id, $from, $to);
+    }
+    return $quote;
+}
