@@ -34,7 +34,9 @@ $accountLinks = [
 <header class="r-header" id="top">
   <div class="container">
     <div class="r-header__bar">
-      <a class="r-header__logo r-wordmark" href="./" aria-label="Rento home">Rent<span>o</span></a>
+      <a class="r-header__logo r-wordmark" href="./" aria-label="<?php echo content('site_name'); ?> home"><?php
+        $siteLogo = content_image('site_logo');
+        echo $siteLogo !== '' ? site_picture($siteLogo, content_raw('site_name'), ['imgClass' => 'r-header__logo-img', 'priority' => true]) : site_wordmark(); ?></a>
 
       <nav aria-label="Main">
         <ul class="r-nav">

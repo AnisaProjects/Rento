@@ -14,14 +14,6 @@ define('DB_NAME', 'rento');
 // Set it to false on any server that real users can reach.
 define('APP_DEV_MODE', true);
 
-// Social profiles shown in the footer. Leave a value empty to hide that icon.
-const SOCIAL_LINKS = [
-    'facebook' => '',
-    'instagram' => '',
-    'x' => '',
-    'linkedin' => '',
-];
-
 // Rate limiting (includes/rate_limit.php): failed logins and reset requests allowed
 // per IP and per email within the window; the registration email check is per IP.
 define('RATE_LIMIT_MAX_ATTEMPTS', 5);
@@ -67,4 +59,5 @@ require_once __DIR__ . '/rate_limit.php';
 require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/flash.php';
 require_once __DIR__ . '/components.php';
+require_once __DIR__ . '/site-content.php';
 ?>

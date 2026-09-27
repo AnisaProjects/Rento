@@ -70,6 +70,40 @@ function delete_unused_vehicle_images(PDO $dbh, array $files): void
     }
 }
 
+// Stores a validated upload (same checks as vehicle photos) in assets/images/content/ with
+// its WebP sizes. Returns the site-relative path, e.g. assets/images/content/ab12.jpg.
+function store_site_image(string $field, string $label): string
+{
+    validate_vehicle_image($field, $label);
+    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($_FILES[$field]['tmp_name']);
+    $relative = SITE_CONTENT_IMAGE_DIR . bin2hex(random_bytes(12)) . '.' . VEHICLE_IMAGE_TYPES[$mime];
+    $target = __DIR__ . '/../../' . $relative;
+    if (!is_dir(dirname($target)) && !mkdir(dirname($target), 0755, true)) {
+        throw new RuntimeException('The image folder could not be created.');
+    }
+    if (!move_uploaded_file($_FILES[$field]['tmp_name'], $target)) {
+        throw new RuntimeException('The image could not be saved. Please try again.');
+    }
+    site_image_webp($target);
+    return $relative;
+}
+
+// Deletes an uploaded site image (only files in assets/images/content/) and its WebP sizes.
+function delete_site_image(?string $relative): void
+{
+    $relative = (string)$relative;
+    if (!str_starts_with($relative, SITE_CONTENT_IMAGE_DIR) || str_contains($relative, '..')) {
+        return;
+    }
+    $path = __DIR__ . '/../../' . $relative;
+    $base = preg_replace('/\.[a-z0-9]+$/i', '', $path);
+    foreach ([$path, $base . '.webp', $base . '-960.webp'] as $file) {
+        if (is_file($file)) {
+            @unlink($file);
+        }
+    }
+}
+
 // Replaces image $n (1-5) of a vehicle with the validated upload in field img$n.
 // Returns the stored file name. Throws RuntimeException with a message for the admin.
 function replace_vehicle_image(PDO $dbh, int $vehicleId, int $n): string

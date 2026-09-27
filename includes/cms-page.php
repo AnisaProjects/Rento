@@ -13,13 +13,10 @@ $query->bindParam(':pagetype', $pagetype, PDO::PARAM_STR);
 $query->execute();
 $cmsPage = $query->fetch(PDO::FETCH_OBJ);
 
-$pageTitles = ['aboutus' => 'About Us', 'faqs' => 'FAQs', 'terms' => 'Terms and Conditions', 'privacy' => 'Privacy Policy'];
-$pageLeads = [
-  'aboutus' => 'Est. 2022 in Kathmandu. Cars for city runs and mountain roads, with prices you can see before you book.',
-  'faqs' => 'Answers to the questions renters ask us most.',
-  'terms' => 'The terms that apply when you rent a car with Rento.',
-  'privacy' => 'How we collect, use and protect your personal information.',
-];
+// Titles, descriptions and header texts: admin -> Site content (Site & SEO, About page, Other pages).
+$knownPage = in_array($pagetype, ['aboutus', 'faqs', 'terms', 'privacy'], true);
+$pageTitles = $knownPage ? [$pagetype => content_raw('seo_' . $pagetype . '_title')] : [];
+$pageLeads = $knownPage ? [$pagetype => content_raw(($pagetype === 'aboutus' ? 'about' : $pagetype) . '_lead')] : [];
 $heading = trim($cmsPage->PageName ?? '') ?: ($pageTitles[$pagetype] ?? 'Information');
 $detail = $cmsPage->detail ?? '';
 if ($isAboutUs) {
@@ -42,7 +39,7 @@ if ($isAboutUs) {
 <head>
   <?php
   $pageTitle = $pageTitles[$pagetype] ?? 'Information';
-  $pageDescription = 'Rento ' . $pageTitle . ': how renting a car with Rento in Nepal works.';
+  $pageDescription = $knownPage ? content_raw('seo_' . $pagetype . '_description') : null;
   include('includes/head.php');
   ?>
 </head>
@@ -52,15 +49,15 @@ if ($isAboutUs) {
   <?php include('includes/header.php'); ?>
 
   <main id="main">
-    <?php echo page_hero($heading, $pageLeads[$pagetype] ?? '', [], $isAboutUs ? 'aboutus-page-header-img' : ''); ?>
+    <?php echo page_hero($heading, $pageLeads[$pagetype] ?? '', [], $isAboutUs ? content_image('about_hero_image') : ''); ?>
 
     <?php if ($isAboutUs) { ?>
       <section class="r-section">
         <div class="container">
           <div class="r-about">
             <div class="r-reveal">
-              <span class="r-eyebrow">Our story</span>
-              <h2 class="r-section-title">Kathmandu traffic taught us what renters actually need.</h2>
+              <span class="r-eyebrow"><?php echo content('about_story_eyebrow'); ?></span>
+              <h2 class="r-section-title"><?php echo content('about_story_title'); ?></h2>
               <div class="r-prose"><?php echo $detail !== '' ? $detail : '<p>More about Rento is coming soon.</p>'; ?></div>
             </div>
             <?php if (count($fleetPhotos) >= 3) { ?>
@@ -78,10 +75,10 @@ if ($isAboutUs) {
         <section class="r-section--tight r-stats-band">
           <div class="container">
             <dl class="r-stats">
-              <div><dt>Cars in the fleet</dt><dd><?php echo (int)$fleet->cars; ?></dd></div>
-              <div><dt>Brands</dt><dd><?php echo (int)$fleet->brands; ?></dd></div>
-              <div><dt>Car types</dt><dd><?php echo (int)$fleet->types; ?></dd></div>
-              <div><dt>Daily prices from</dt><dd><?php echo format_price($fleet->fromPrice); ?></dd></div>
+              <div><dt><?php echo content('about_stat_cars'); ?></dt><dd><?php echo (int)$fleet->cars; ?></dd></div>
+              <div><dt><?php echo content('about_stat_brands'); ?></dt><dd><?php echo (int)$fleet->brands; ?></dd></div>
+              <div><dt><?php echo content('about_stat_types'); ?></dt><dd><?php echo (int)$fleet->types; ?></dd></div>
+              <div><dt><?php echo content('about_stat_price'); ?></dt><dd><?php echo format_price($fleet->fromPrice); ?></dd></div>
             </dl>
           </div>
         </section>
@@ -91,29 +88,26 @@ if ($isAboutUs) {
         <div class="container">
           <div class="r-grid r-grid--3">
             <div class="r-panel r-reveal">
-              <span class="r-eyebrow">Our mission</span>
-              <p class="r-panel__big">Pair every renter in Nepal with the right car, at a fair price, with nothing hidden.</p>
+              <span class="r-eyebrow"><?php echo content('about_mission_label'); ?></span>
+              <p class="r-panel__big"><?php echo content('about_mission_text'); ?></p>
             </div>
             <div class="r-panel r-panel--dark r-reveal">
-              <span class="r-eyebrow">Our vision</span>
-              <p class="r-panel__big">A country where booking a car takes less time than hailing one on the street.</p>
+              <span class="r-eyebrow"><?php echo content('about_vision_label'); ?></span>
+              <p class="r-panel__big"><?php echo content('about_vision_text'); ?></p>
             </div>
             <div class="r-panel r-reveal">
-              <span class="r-eyebrow">How we work</span>
-              <p class="r-panel__big">Checked cars, clear daily prices in rupees, and a real person to call.</p>
+              <span class="r-eyebrow"><?php echo content('about_work_label'); ?></span>
+              <p class="r-panel__big"><?php echo content('about_work_text'); ?></p>
             </div>
           </div>
         </div>
       </section>
 
       <section class="r-photo-band">
-        <picture>
-          <source type="image/webp" srcset="assets/images/fun-facts-bg.webp">
-          <img src="assets/images/fun-facts-bg.jpg" alt="" loading="lazy">
-        </picture>
+        <?php echo site_picture(content_image('about_band_image')); ?>
         <div class="container r-photo-band__copy r-reveal">
-          <span class="r-eyebrow">On the road</span>
-          <p class="r-photo-band__quote">From the Ring Road to the Prithvi Highway, we keep cars ready for the way Nepal drives.</p>
+          <span class="r-eyebrow"><?php echo content('about_band_eyebrow'); ?></span>
+          <p class="r-photo-band__quote"><?php echo content('about_band_quote'); ?></p>
         </div>
       </section>
 
@@ -122,10 +116,10 @@ if ($isAboutUs) {
           <div class="container">
             <div class="r-section-row">
               <div class="r-section-head r-section-head--start">
-                <span class="r-eyebrow">The fleet</span>
-                <h2 class="r-section-title">Meet some of our cars</h2>
+                <span class="r-eyebrow"><?php echo content('about_fleet_eyebrow'); ?></span>
+                <h2 class="r-section-title"><?php echo content('about_fleet_title'); ?></h2>
               </div>
-              <a href="car-listing" class="r-btn r-btn--outline">See every car <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+              <a href="car-listing" class="r-btn r-btn--outline"><?php echo content('about_fleet_button'); ?> <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
             </div>
             <ul class="r-gallery-grid">
               <?php foreach ($fleetPhotos as $photo) { ?>
@@ -179,9 +173,9 @@ if ($isAboutUs) {
             } ?>
             <aside class="r-article__aside">
               <div class="r-panel">
-                <h2 class="r-panel__title">Still have a question?</h2>
-                <p>We're happy to help with bookings, cars and trips.</p>
-                <a class="r-btn r-btn--block" href="contact-us">Contact us</a>
+                <h2 class="r-panel__title"><?php echo content('help_title'); ?></h2>
+                <p><?php echo content('help_text'); ?></p>
+                <a class="r-btn r-btn--block" href="contact-us"><?php echo content('help_button'); ?></a>
               </div>
             </aside>
           </div>

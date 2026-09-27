@@ -54,3 +54,34 @@ function vehicle_webp_generate(string $file, bool $force = false): ?array
     imagedestroy($image);
     return $result;
 }
+
+// WebP copies for a site image (hero slides, logos, package photos): <base>.webp at up to
+// 1920 px and <base>-960.webp, next to the original. site_picture() picks them up.
+function site_image_webp(string $path): bool
+{
+    $info = @getimagesize($path);
+    $image = match ($info[2] ?? null) {
+        IMAGETYPE_JPEG => @imagecreatefromjpeg($path),
+        IMAGETYPE_PNG => @imagecreatefrompng($path),
+        IMAGETYPE_WEBP => @imagecreatefromwebp($path),
+        default => false,
+    };
+    if (!$image) {
+        return false;
+    }
+    imagepalettetotruecolor($image);
+    $base = preg_replace('/\.[a-z0-9]+$/i', '', $path);
+    [$width, $height] = [imagesx($image), imagesy($image)];
+    foreach (['' => 1920, '-960' => 960] as $suffix => $maxWidth) {
+        $newWidth = min($width, $maxWidth);
+        $newHeight = (int)round($height * $newWidth / $width);
+        $resized = imagecreatetruecolor($newWidth, $newHeight);
+        imagealphablending($resized, false);
+        imagesavealpha($resized, true);
+        imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+        imagewebp($resized, $base . $suffix . '.webp', WEBP_QUALITY);
+        imagedestroy($resized);
+    }
+    imagedestroy($image);
+    return true;
+}

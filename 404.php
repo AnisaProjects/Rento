@@ -11,8 +11,8 @@ http_response_code(404);
 
 <head>
   <?php
-  $pageTitle = 'Page Not Found';
-  $pageDescription = 'The page you were looking for could not be found. Browse the Rento fleet or search for a car.';
+  $pageTitle = content_raw('seo_notfound_title');
+  $pageDescription = content_raw('seo_notfound_description');
   include(__DIR__ . '/includes/head.php');
   ?>
   <meta name="robots" content="noindex">
@@ -27,8 +27,8 @@ http_response_code(404);
       <div class="container">
         <div class="r-notfound__inner">
           <p class="r-notfound__code" aria-hidden="true">404</p>
-          <h1>This road doesn't go anywhere</h1>
-          <p class="r-section-lead">The page you were looking for doesn't exist, or the car is no longer listed.</p>
+          <h1><?php echo content('notfound_title'); ?></h1>
+          <p class="r-section-lead"><?php echo content('notfound_lead'); ?></p>
           <form class="r-notfound__search" action="car-listing" method="get" role="search">
             <label class="visually-hidden" for="notfound-search">Search cars</label>
             <input type="search" id="notfound-search" name="q" class="r-input" placeholder="Search by brand, model, fuel type or year" required>

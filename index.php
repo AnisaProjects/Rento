@@ -14,23 +14,26 @@ foreach ($dbh->query("SELECT CarType, COUNT(*) AS cars, MIN(PricePerDay) AS from
     WHERE CarType IS NOT NULL AND CarType <> '' GROUP BY CarType ORDER BY MIN(PricePerDay)")->fetchAll(PDO::FETCH_OBJ) as $row) {
   $carTypes[$row->CarType] = $row;
 }
+// Texts: admin -> Site content -> Home page.
 $typeInfo = [
-  'Hatchback' => ['fa-car-side', 'Easy to park and light on fuel. Great for city trips.'],
-  'Sedan' => ['fa-car', 'Comfortable and quiet for highways and family trips.'],
-  'SUV' => ['fa-truck-monster', 'Ground clearance and space for hills and rough roads.'],
+  'Hatchback' => ['fa-car-side', content('home_type_hatchback')],
+  'Sedan' => ['fa-car', content('home_type_sedan')],
+  'SUV' => ['fa-truck-monster', content('home_type_suv')],
 ];
 
 // Brands with cars: count, lowest daily price and the photo of their cheapest car.
-$brands = $dbh->query("SELECT tblbrands.id, tblbrands.BrandName, COUNT(tblvehicles.id) AS cars, MIN(tblvehicles.PricePerDay) AS fromPrice,
+$brands = $dbh->query("SELECT tblbrands.id, tblbrands.BrandName, tblbrands.BrandLogo, COUNT(tblvehicles.id) AS cars, MIN(tblvehicles.PricePerDay) AS fromPrice,
     (SELECT v2.Vimage1 FROM tblvehicles v2 WHERE v2.VehiclesBrand = tblbrands.id ORDER BY v2.PricePerDay, v2.id LIMIT 1) AS photo
   FROM tblbrands JOIN tblvehicles ON tblvehicles.VehiclesBrand = tblbrands.id
-  GROUP BY tblbrands.id, tblbrands.BrandName ORDER BY cars DESC, tblbrands.BrandName")->fetchAll(PDO::FETCH_OBJ);
+  GROUP BY tblbrands.id, tblbrands.BrandName, tblbrands.BrandLogo ORDER BY cars DESC, tblbrands.BrandName")->fetchAll(PDO::FETCH_OBJ);
 
-$heroSlides = [
-  ['banner-image-1', 'Car rental across Nepal', 'The right car for every road in Nepal', 'Hatchbacks for the city, SUVs for the hills. Choose a car, pick your dates and book online.', 'Browse all cars', 'car-listing'],
-  ['banner-image-2', 'Comfort for long drives', 'Sedans for highways and family trips', 'Quiet, comfortable cars for the Kathmandu–Pokhara highway and every trip in between.', 'See sedans', 'car-listing?type=Sedan'],
-  ['banner-image-3', 'Not sure what to pick?', 'Tell us your trip, we match the car', 'Share your budget and the kind of car you like, and get suggestions that fit.', 'Find my car', 'car-recommendation'],
-];
+// Hero slides: admin -> Site content -> Home page. Values are HTML-escaped.
+$heroSlides = [];
+foreach ([1, 2, 3] as $n) {
+  $heroSlides[] = [content_image("home_hero_{$n}_image"), content("home_hero_{$n}_eyebrow"), content("home_hero_{$n}_title"),
+    content("home_hero_{$n}_text"), content("home_hero_{$n}_button"), content("home_hero_{$n}_link")];
+}
+$heroPreload = preg_replace('/\.[a-z0-9]+$/i', '', $heroSlides[0][0]);
 
 $tid = 1;
 $query = $dbh->prepare("SELECT tbltestimonial.Testimonial, tblusers.FullName FROM tbltestimonial
@@ -45,11 +48,13 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
 
 <head>
   <?php
-  $pageTitle = 'Car Rental in Nepal';
-  $pageDescription = 'Rento: rent a verified car anywhere in Nepal. Browse hatchbacks, sedans and SUVs, compare daily prices in rupees and book online.';
+  $pageTitle = content_raw('seo_home_title');
+  $pageDescription = content_raw('seo_home_description');
   include('includes/head.php');
   ?>
-  <link rel="preload" as="image" href="assets/images/banner-image-1.webp" imagesrcset="assets/images/banner-image-1-960.webp 960w, assets/images/banner-image-1.webp 1920w" imagesizes="100vw" fetchpriority="high">
+  <?php if (is_file(__DIR__ . '/' . $heroPreload . '-960.webp')) { ?>
+    <link rel="preload" as="image" href="<?php echo htmlentities($heroPreload); ?>.webp" imagesrcset="<?php echo htmlentities($heroPreload); ?>-960.webp 960w, <?php echo htmlentities($heroPreload); ?>.webp 1920w" imagesizes="100vw" fetchpriority="high">
+  <?php } ?>
 </head>
 
 <body class="r-page">
@@ -64,10 +69,7 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
         <div class="carousel-inner">
           <?php foreach ($heroSlides as $i => [$image, $eyebrow, $title, $text, $cta, $url]) { ?>
             <div class="carousel-item <?php echo $i === 0 ? 'active' : ''; ?>" role="group" aria-roledescription="slide" aria-label="<?php echo ($i + 1) . ' of ' . count($heroSlides); ?>">
-              <picture class="r-hero__bg">
-                <source type="image/webp" srcset="assets/images/<?php echo $image; ?>-960.webp 960w, assets/images/<?php echo $image; ?>.webp 1920w" sizes="100vw">
-                <img src="assets/images/<?php echo $image; ?>.jpg" alt="" width="1918" height="821" <?php echo $i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>
-              </picture>
+              <?php echo site_picture($image, '', ['class' => 'r-hero__bg', 'sizes' => '100vw', 'priority' => $i === 0]); ?>
               <div class="container r-hero__copy">
                 <span class="r-eyebrow"><?php echo $eyebrow; ?></span>
                 <<?php echo $i === 0 ? 'h1' : 'p'; ?> class="r-hero__title"><?php echo $title; ?></<?php echo $i === 0 ? 'h1' : 'p'; ?>>
@@ -121,9 +123,9 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
           </button>
         </form>
         <ul class="r-hero__trust">
-          <li><i class="fa fa-circle-check" aria-hidden="true"></i>Cars checked before every trip</li>
-          <li><i class="fa fa-tag" aria-hidden="true"></i>Daily prices in rupees</li>
-          <li><i class="fa fa-headset" aria-hidden="true"></i>Local support when you need it</li>
+          <li><i class="fa fa-circle-check" aria-hidden="true"></i><?php echo content('home_trust_1'); ?></li>
+          <li><i class="fa fa-tag" aria-hidden="true"></i><?php echo content('home_trust_2'); ?></li>
+          <li><i class="fa fa-headset" aria-hidden="true"></i><?php echo content('home_trust_3'); ?></li>
         </ul>
       </div>
     </section>
@@ -158,11 +160,11 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
       <div class="container">
         <div class="r-section-row">
           <div class="r-section-head r-section-head--start">
-            <span class="r-eyebrow">The fleet</span>
-            <h2 class="r-section-title">Recently added cars</h2>
-            <p class="r-section-lead">Every car is listed with its real photos, specs and daily price.</p>
+            <span class="r-eyebrow"><?php echo content('home_fleet_eyebrow'); ?></span>
+            <h2 class="r-section-title"><?php echo content('home_fleet_title'); ?></h2>
+            <p class="r-section-lead"><?php echo content('home_fleet_lead'); ?></p>
           </div>
-          <a href="car-listing" class="r-btn r-btn--outline">View all cars <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+          <a href="car-listing" class="r-btn r-btn--outline"><?php echo content('home_fleet_button'); ?> <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
         </div>
 
         <?php if ($featuredCars) { ?>
@@ -181,24 +183,24 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
     <section class="r-section">
       <div class="container">
         <div class="r-section-head">
-          <span class="r-eyebrow">How it works</span>
-          <h2 class="r-section-title">On the road in three steps</h2>
+          <span class="r-eyebrow"><?php echo content('home_steps_eyebrow'); ?></span>
+          <h2 class="r-section-title"><?php echo content('home_steps_title'); ?></h2>
         </div>
         <ol class="r-steps">
           <li class="r-reveal">
             <span class="r-steps__num">1</span>
-            <h3>Choose a car</h3>
-            <p>Filter by type, brand and budget, or let us suggest a car for your trip.</p>
+            <h3><?php echo content('home_step_1_title'); ?></h3>
+            <p><?php echo content('home_step_1_text'); ?></p>
           </li>
           <li class="r-reveal">
             <span class="r-steps__num">2</span>
-            <h3>Pick your dates</h3>
-            <p>Choose pickup and return dates and send your booking request in a minute.</p>
+            <h3><?php echo content('home_step_2_title'); ?></h3>
+            <p><?php echo content('home_step_2_text'); ?></p>
           </li>
           <li class="r-reveal">
             <span class="r-steps__num">3</span>
-            <h3>Drive away</h3>
-            <p>We confirm your booking and the car is ready when you arrive.</p>
+            <h3><?php echo content('home_step_3_title'); ?></h3>
+            <p><?php echo content('home_step_3_text'); ?></p>
           </li>
         </ol>
       </div>
@@ -208,29 +210,29 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
     <section class="r-section r-section--dark">
       <div class="container">
         <div class="r-section-head">
-          <span class="r-eyebrow">Why Rento</span>
-          <h2 class="r-section-title">Renting a car should be the easy part</h2>
+          <span class="r-eyebrow"><?php echo content('home_why_eyebrow'); ?></span>
+          <h2 class="r-section-title"><?php echo content('home_why_title'); ?></h2>
         </div>
         <div class="r-grid r-grid--4">
           <div class="r-feature r-reveal">
             <span class="r-feature__icon"><i class="fa fa-shield-halved" aria-hidden="true"></i></span>
-            <h3>Checked cars</h3>
-            <p>Cars are inspected and cleaned before every rental.</p>
+            <h3><?php echo content('home_why_1_title'); ?></h3>
+            <p><?php echo content('home_why_1_text'); ?></p>
           </div>
           <div class="r-feature r-reveal">
             <span class="r-feature__icon"><i class="fa fa-tag" aria-hidden="true"></i></span>
-            <h3>Clear pricing</h3>
-            <p>One daily price in rupees, shown before you book.</p>
+            <h3><?php echo content('home_why_2_title'); ?></h3>
+            <p><?php echo content('home_why_2_text'); ?></p>
           </div>
           <div class="r-feature r-reveal">
             <span class="r-feature__icon"><i class="fa fa-calendar-days" aria-hidden="true"></i></span>
-            <h3>Flexible dates</h3>
-            <p>Rent for a day, a weekend or longer trips.</p>
+            <h3><?php echo content('home_why_3_title'); ?></h3>
+            <p><?php echo content('home_why_3_text'); ?></p>
           </div>
           <div class="r-feature r-reveal">
             <span class="r-feature__icon"><i class="fa fa-headset" aria-hidden="true"></i></span>
-            <h3>Local support</h3>
-            <p>Questions before or during your trip? Call or message us.</p>
+            <h3><?php echo content('home_why_4_title'); ?></h3>
+            <p><?php echo content('home_why_4_text'); ?></p>
           </div>
         </div>
       </div>
@@ -242,10 +244,10 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
         <div class="r-callout r-reveal">
           <span class="r-callout__icon"><i class="fa fa-wand-magic-sparkles" aria-hidden="true"></i></span>
           <div class="r-callout__body">
-            <h2>Not sure which car fits your trip?</h2>
-            <p>Tell us your budget and the kind of car you like, and we'll suggest the best matches.</p>
+            <h2><?php echo content('home_findcar_title'); ?></h2>
+            <p><?php echo content('home_findcar_text'); ?></p>
           </div>
-          <a href="car-recommendation" class="r-btn r-btn--dark r-btn--lg">Find my car</a>
+          <a href="car-recommendation" class="r-btn r-btn--dark r-btn--lg"><?php echo content('home_findcar_button'); ?></a>
         </div>
       </div>
     </section>
@@ -255,8 +257,8 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
       <section class="r-section r-section--muted">
         <div class="container">
           <div class="r-section-head">
-            <span class="r-eyebrow">Testimonials</span>
-            <h2 class="r-section-title">What renters say</h2>
+            <span class="r-eyebrow"><?php echo content('home_testimonials_eyebrow'); ?></span>
+            <h2 class="r-section-title"><?php echo content('home_testimonials_title'); ?></h2>
           </div>
           <div class="r-slider" data-r-slider>
             <div class="r-slider__track" tabindex="0" aria-label="Testimonials">
@@ -286,8 +288,8 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
         <div class="container">
           <div class="r-section-row">
             <div class="r-section-head r-section-head--start">
-              <span class="r-eyebrow">Brands</span>
-              <h2 class="r-section-title">Browse by brand</h2>
+              <span class="r-eyebrow"><?php echo content('home_brands_eyebrow'); ?></span>
+              <h2 class="r-section-title"><?php echo content('home_brands_title'); ?></h2>
             </div>
           </div>
           <div class="r-slider" data-r-slider>
@@ -295,7 +297,11 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
               <?php foreach ($brands as $brand) { ?>
                 <li class="r-slider__item">
                   <a class="r-brand-card" href="car-listing?brand=<?php echo (int)$brand->id; ?>">
-                    <span class="r-brand-card__media"><?php echo vehicle_image($brand->photo, '', ['sizes' => '280px']); ?></span>
+                    <span class="r-brand-card__media<?php echo $brand->BrandLogo && is_file(__DIR__ . '/' . $brand->BrandLogo) ? ' r-brand-card__media--logo' : ''; ?>"><?php
+                      // Brand logo (admin -> Brands) when there is one, otherwise a photo of the brand's cheapest car.
+                      echo $brand->BrandLogo && is_file(__DIR__ . '/' . $brand->BrandLogo)
+                        ? site_picture($brand->BrandLogo, $brand->BrandName . ' logo')
+                        : vehicle_image($brand->photo, '', ['sizes' => '280px']); ?></span>
                     <span class="r-brand-card__body">
                       <span class="r-brand-card__name"><?php echo htmlentities($brand->BrandName); ?></span>
                       <span class="r-brand-card__meta"><?php echo (int)$brand->cars; ?> <?php echo $brand->cars == 1 ? 'car' : 'cars'; ?> &middot; from <?php echo format_price_per_day($brand->fromPrice); ?></span>

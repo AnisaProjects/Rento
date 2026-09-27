@@ -66,7 +66,10 @@ function page_hero(string $title, string $lead = '', array $crumbs = [], string 
 {
     ob_start(); ?>
     <section class="r-page-hero<?php echo $image !== '' ? ' r-page-hero--image' : ''; ?>">
-      <?php if ($image !== '') { ?>
+      <?php if ($image !== '' && str_contains($image, '/')) {
+        // A site path such as assets/images/content/x.jpg (admin -> Site content).
+        echo site_picture($image, '', ['class' => 'r-page-hero__bg', 'priority' => true]);
+      } elseif ($image !== '') { ?>
         <picture class="r-page-hero__bg">
           <source type="image/webp" srcset="assets/images/<?php echo htmlentities($image); ?>.webp">
           <img src="assets/images/<?php echo htmlentities($image); ?>.jpg" alt="">

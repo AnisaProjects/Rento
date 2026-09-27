@@ -1,6 +1,6 @@
 <?php
 // Shared <head> contents for every public page. Set before including:
-//   $pageTitle         page name, shown as "<title> | Rento"
+//   $pageTitle         page name, shown as "<title> | <site name>" (site name: admin -> Site content -> Site & SEO)
 //   $pageDescription   meta description (optional; falls back to the site description)
 //   $pageUsesCarousel  true on pages with an Owl carousel (optional)
 //   $pageStyles        extra stylesheet URLs loaded after the site CSS (optional)
@@ -11,7 +11,7 @@ $pageTitle = $pageTitle ?? 'Car Rental in Nepal';
 // relative links from the site root. Pages at the root don't need (or get) a <base>.
 $siteBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
 $requestDir = preg_replace('#[^/]*$#', '', (string)parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
-$pageDescription = $pageDescription ?? 'Rento: rent a verified car anywhere in Nepal. Browse the fleet, compare daily prices in rupees and book online.';
+$pageDescription = $pageDescription ?? content_raw('seo_default_description');
 ?>
 <meta charset="utf-8">
 <?php if ($requestDir !== $siteBase) { ?>
@@ -19,7 +19,7 @@ $pageDescription = $pageDescription ?? 'Rento: rent a verified car anywhere in N
 <?php } ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>document.documentElement.classList.add('r-js');</script>
-<title><?php echo htmlentities($pageTitle); ?> | Rento</title>
+<title><?php echo htmlentities($pageTitle); ?> | <?php echo content('site_name'); ?></title>
 <meta name="description" content="<?php echo htmlentities($pageDescription); ?>">
 <meta name="theme-color" content="#ff5a36">
 <link rel="icon" type="image/png" href="assets/images/favicon-icon/favicon.png">

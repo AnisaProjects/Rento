@@ -38,8 +38,8 @@ $phone = trim($contact->ContactNo);
 
 <head>
   <?php
-  $pageTitle = 'Contact Us';
-  $pageDescription = 'Contact Rento: address, email, phone number and a form to send us your question.';
+  $pageTitle = content_raw('seo_contact_title');
+  $pageDescription = content_raw('seo_contact_description');
   include('includes/head.php');
   ?>
 </head>
@@ -49,13 +49,13 @@ $phone = trim($contact->ContactNo);
   <?php include('includes/header.php'); ?>
 
   <main id="main">
-    <?php echo page_hero('Contact us', 'Questions about a car, a booking or a trip? Send us a message and we will get back to you.'); ?>
+    <?php echo page_hero(content_raw('contact_title'), content_raw('contact_lead')); ?>
 
     <section class="r-section r-section--muted">
       <div class="container">
         <div class="r-contact">
           <div class="r-panel">
-            <h2 class="r-panel__title">Send us a message</h2>
+            <h2 class="r-panel__title"><?php echo content('contact_form_title'); ?></h2>
             <?php echo flash_render(); ?>
             <form method="post">
               <?php echo csrf_field(); ?>

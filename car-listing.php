@@ -92,8 +92,8 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
 
 <head>
   <?php
-  $pageTitle = $heading === 'All cars' ? 'Car Listing' : $heading;
-  $pageDescription = 'Browse every car available to rent with Rento: filter by type, brand, fuel and budget, with daily prices in rupees.';
+  $pageTitle = $heading === 'All cars' ? content_raw('seo_cars_title') : $heading;
+  $pageDescription = content_raw('seo_cars_description');
   $pageScripts = ['assets/js/rento-ai.js'];
   include('includes/head.php');
   ?>
@@ -120,7 +120,7 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
       </div>
       <div class="r-ai-understood" id="smart-understood" aria-live="polite" hidden></div>
     </form>
-    <?php echo page_hero($heading, 'Describe what you need, or use the filters. Every price is per day, in rupees.', $heading === 'All cars' ? [] : [['Cars', 'car-listing']], '', ob_get_clean()); ?>
+    <?php echo page_hero($heading, content_raw('cars_lead'), $heading === 'All cars' ? [] : [['Cars', 'car-listing']], '', ob_get_clean()); ?>
 
     <section class="r-section r-section--muted r-listing">
       <div class="container">

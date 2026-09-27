@@ -22,20 +22,16 @@ if ($searched) {
   $userPreferences = $recommendationEngine->getUserPreferences($userEmail);
 }
 $fleetCount = (int)$dbh->query("SELECT COUNT(*) FROM tblvehicles")->fetchColumn();
-$examples = [
-  'Family trip to Pokhara under Rs 3,000',
-  'Mountain roads to Mustang, 6 people',
-  'Daily city commute in Kathmandu, cheap',
-  'Airport pickup for a business meeting',
-];
+// Example prompts: admin -> Site content -> Other pages.
+$examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 4]);
 ?>
 <!DOCTYPE HTML>
 <html lang="en">
 
 <head>
   <?php
-  $pageTitle = 'Find My Car';
-  $pageDescription = 'Describe your trip and Rento suggests the cars that fit your budget and the roads you will drive.';
+  $pageTitle = content_raw('seo_findcar_title');
+  $pageDescription = content_raw('seo_findcar_description');
   $pageScripts = ['assets/js/rento-ai.js'];
   include('includes/head.php');
   ?>
@@ -54,9 +50,9 @@ $examples = [
             <li aria-current="page">Find my car</li>
           </ol>
         </nav>
-        <span class="r-eyebrow"><i class="fa fa-wand-magic-sparkles" aria-hidden="true"></i> Smart match</span>
-        <h1>Describe your trip. We'll find the car.</h1>
-        <p class="r-ai-hero__lead">Say where you're going, how many of you there are and your budget. We match it against <?php echo $fleetCount; ?> cars<?php echo $userEmail ? ' and your past rentals' : ''; ?>.</p>
+        <span class="r-eyebrow"><i class="fa fa-wand-magic-sparkles" aria-hidden="true"></i> <?php echo content('findcar_eyebrow'); ?></span>
+        <h1><?php echo content('findcar_title'); ?></h1>
+        <p class="r-ai-hero__lead"><?php echo content('findcar_lead'); ?> We match it against <?php echo $fleetCount; ?> cars<?php echo $userEmail ? ' and your past rentals' : ''; ?>.</p>
 
         <form method="post" class="r-ai-form" id="ai-form" aria-label="Describe your trip">
           <?php echo csrf_field(); ?>

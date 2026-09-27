@@ -44,7 +44,14 @@ const ADMIN_MENU = [
     ['Testimonials', 'fa-comment-dots', 'testimonials.php'],
     ['Contact Us Queries', 'fa-envelope-open-text', 'manage-conactusquery.php'],
     ['Subscribers', 'fa-at', 'manage-subscribers.php'],
-    ['Manage Pages', 'fa-file-lines', 'manage-pages.php'],
+    ['Site content', 'fa-pen-ruler', [
+        ['Home page', 'site-content.php?group=home', []],
+        ['About page', 'site-content.php?group=about', []],
+        ['Other pages', 'site-content.php?group=pages', []],
+        ['Footer & social', 'site-content.php?group=footer', []],
+        ['Site & SEO', 'site-content.php?group=seo', []],
+        ['Manage Pages', 'manage-pages.php', []],
+    ]],
     ['Contact Info', 'fa-address-card', 'update-contactinfo.php'],
 ];
 
@@ -313,4 +320,39 @@ function admin_password_input(string $name, string $label, string $autocomplete,
         . ($minLength ? ' minlength="' . $minLength . '"' : '') . '>'
         . '<button type="button" data-a-pass="' . h($name) . '" aria-label="Show password"><i class="fa fa-eye" aria-hidden="true"></i></button></div>'
         . ($hint !== '' ? '<div class="form-text">' . h($hint) . '</div>' : '') . '</div>';
+}
+
+// Drag-and-drop image field (js/image-manager.js; add 'images' to the page's libs).
+//   $name       file input name
+//   $src        current image URL relative to admin/ ('' = none)
+//   $removeName optional checkbox name to remove the current image / restore the default
+function admin_image_field(string $name, string $label, string $src, string $hint = '', string $removeName = '', string $removeLabel = 'Remove'): string
+{
+    $has = $src !== '';
+    ob_start(); ?>
+    <div class="a-drop<?php echo $has ? ' has-image' : ''; ?>" data-a-drop>
+      <div class="a-drop__label">
+        <span><?php echo h($label); ?></span>
+        <span class="a-badge<?php echo $has ? ' a-badge--success' : ''; ?>" data-a-drop-status><?php echo $has ? 'Current' : 'Empty'; ?></span>
+      </div>
+      <label class="d-block mb-0" for="<?php echo h($name); ?>">
+        <input class="a-drop__input" type="file" id="<?php echo h($name); ?>" name="<?php echo h($name); ?>" accept="image/jpeg,image/png,image/webp" data-a-drop-input>
+        <span class="a-drop__preview">
+          <?php if ($has) { ?><img src="<?php echo h($src); ?>" alt="Current <?php echo h(strtolower($label)); ?>"><?php } else { ?>
+            <span><i class="fa fa-cloud-arrow-up" aria-hidden="true"></i><span class="a-drop__hint">Drop a photo here or click to choose</span></span>
+          <?php } ?>
+        </span>
+      </label>
+      <div class="a-drop__foot">
+        <span class="a-drop__info" data-a-drop-info><?php echo h($hint !== '' ? $hint : 'JPG, PNG or WebP'); ?></span>
+        <span class="d-inline-flex gap-1">
+          <label class="btn btn-light btn-sm" for="<?php echo h($name); ?>"><i class="fa fa-<?php echo $has ? 'rotate' : 'plus'; ?>" aria-hidden="true"></i><?php echo $has ? 'Replace' : 'Choose'; ?></label>
+          <?php if ($removeName !== '') { ?>
+            <label class="btn btn-light btn-sm mb-0"><input type="checkbox" class="form-check-input me-1" name="<?php echo h($removeName); ?>" value="1"> <?php echo h($removeLabel); ?></label>
+          <?php } ?>
+        </span>
+      </div>
+    </div>
+    <?php
+    return ob_get_clean();
 }

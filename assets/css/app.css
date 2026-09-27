@@ -519,6 +519,14 @@ a.r-chip:hover {
   min-height: 72px;
 }
 
+.r-header__logo-img {
+  display: block;
+  width: auto;
+  max-width: 180px;
+  height: 40px;
+  object-fit: contain;
+}
+
 .r-header__logo {
   display: flex;
   align-items: center;
@@ -1705,6 +1713,22 @@ a.r-chip:hover {
   opacity: .8;
   transition: filter .4s var(--rento-ease), opacity .4s var(--rento-ease), transform .6s var(--rento-ease);
 }
+
+.r-brand-card__media--logo {
+  display: grid;
+  place-items: center;
+  padding: var(--rento-space-6);
+  background: #fff;
+}
+
+.r-brand-card__media--logo img {
+  width: auto !important;
+  max-width: 70%;
+  height: auto !important;
+  max-height: 70%;
+  object-fit: contain !important;
+}
+
 
 .r-brand-card:hover .r-brand-card__media img,
 .r-brand-card:focus-visible .r-brand-card__media img {

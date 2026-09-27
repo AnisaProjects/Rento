@@ -29,18 +29,21 @@ $socialIcons = [
   'facebook' => ['Facebook', '<path d="M13.5 22v-8.2h2.8l.4-3.2h-3.2V8.5c0-.9.3-1.6 1.6-1.6h1.7V4.1c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.3H7.3v3.2h2.8V22h3.4z"/>'],
   'instagram' => ['Instagram', '<path d="M12 7.2A4.8 4.8 0 1 0 12 16.8 4.8 4.8 0 0 0 12 7.2zm0 7.9a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2zm6.1-8.1a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0zM21.9 8.2c-.1-1.5-.4-2.9-1.5-4-1.1-1.1-2.5-1.4-4-1.5-1.6-.1-6.3-.1-7.9 0-1.5.1-2.9.4-4 1.5-1.1 1.1-1.4 2.5-1.5 4-.1 1.6-.1 6.3 0 7.9.1 1.5.4 2.9 1.5 4 1.1 1.1 2.5 1.4 4 1.5 1.6.1 6.3.1 7.9 0 1.5-.1 2.9-.4 4-1.5 1.1-1.1 1.4-2.5 1.5-4 .1-1.6.1-6.3 0-7.9zm-2.1 9.6a3.2 3.2 0 0 1-1.8 1.8c-1.3.5-4.2.4-5.9.4s-4.6.1-5.9-.4a3.2 3.2 0 0 1-1.8-1.8c-.5-1.3-.4-4.2-.4-5.8s-.1-4.6.4-5.8a3.2 3.2 0 0 1 1.8-1.8c1.3-.5 4.2-.4 5.9-.4s4.6-.1 5.9.4a3.2 3.2 0 0 1 1.8 1.8c.5 1.3.4 4.2.4 5.8s.1 4.6-.4 5.8z"/>'],
   'x' => ['X', '<path d="M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L1.9 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/>'],
+  'tiktok' => ['TikTok', '<path d="M16.6 2h-3.3v13.4a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9.2a6.2 6.2 0 1 0 5.3 6.2V8.6a7.9 7.9 0 0 0 4.6 1.5V6.8a4.6 4.6 0 0 1-4.6-4.8z"/>'],
+  'youtube' => ['YouTube', '<path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.7 15V9l5.8 3-5.8 3z"/>'],
+  'whatsapp' => ['WhatsApp', '<path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.2 0-.4.1-.5l.4-.4.2-.4v-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.7 11.7 0 0 0 4.5 4c.6.3 1.1.4 1.5.5a3.6 3.6 0 0 0 1.6.1 2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/>'],
   'linkedin' => ['LinkedIn', '<path d="M6.9 21H3.2V9h3.7v12zM5 7.4a2.1 2.1 0 1 1 0-4.3 2.1 2.1 0 0 1 0 4.3zM21 21h-3.7v-5.8c0-1.4 0-3.2-2-3.2s-2.3 1.5-2.3 3.1V21H9.3V9h3.5v1.6h.1c.5-.9 1.7-2 3.5-2 3.8 0 4.5 2.5 4.5 5.7V21z"/>'],
 ];
-$socials = array_filter(SOCIAL_LINKS);
+// Only networks with a URL (admin -> Site content -> Footer & social) are shown.
+$socials = site_social_links();
 ?>
 
 <footer class="r-footer">
   <div class="container">
     <div class="r-footer__top">
       <div>
-        <a class="r-footer__brand" href="./">Rent<span>o</span></a>
-        <p>Verified cars and clear daily prices in rupees, across Nepal. Booking a car should be the easy part of the
-          trip.</p>
+        <a class="r-footer__brand" href="./"><?php echo site_wordmark(); ?></a>
+        <p><?php echo content('footer_about'); ?></p>
         <?php if ($socials) { ?>
           <ul class="r-social">
             <?php foreach ($socials as $socialNetwork => $socialUrl) {
@@ -93,13 +96,13 @@ $socials = array_filter(SOCIAL_LINKS);
           <input type="email" id="newsletter-email" name="subscriberemail" class="r-input" required placeholder="Your email">
           <button type="submit" name="emailsubscibe" class="r-btn r-btn--sm">Subscribe</button>
         </form>
-        <p class="r-hint">Deals and new cars, about once a month.</p>
+        <p class="r-hint"><?php echo content('footer_newsletter_hint'); ?></p>
       </div>
     </div>
 
     <div class="r-footer__bottom">
-      <p>&copy; <?php echo date('Y'); ?> Rento. All rights reserved.</p>
-      <p>Car rental in Nepal &middot; prices in NPR</p>
+      <p>&copy; <?php echo date('Y'); ?> <?php echo content('footer_copyright'); ?></p>
+      <p><?php echo content('footer_tagline'); ?></p>
     </div>
   </div>
 </footer>
