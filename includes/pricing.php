@@ -179,3 +179,39 @@ function public_quote(PDO $dbh, object $car, string $from, string $to): array
     }
     return $quote;
 }
+
+// Amount of a booking: the stored quoted_price when present (Phase 4 bookings), else
+// rental days x the car's base price (older bookings). $b needs FromDate, ToDate,
+// PricePerDay and optionally quoted_price / pricing_details.
+// Returns ['total', 'rental_days', 'per_day' (from the stored details, may be []), 'source' => quoted|base].
+function booking_total(object $b): array
+{
+    $days = rental_days($b->FromDate ?? null, $b->ToDate ?? null);
+    if (isset($b->quoted_price) && $b->quoted_price !== null && $b->quoted_price !== '') {
+        $details = json_decode((string)($b->pricing_details ?? ''), true) ?: [];
+        return ['total' => (int)$b->quoted_price, 'rental_days' => (int)($details['rental_days'] ?? $days),
+            'per_day' => $details['per_day'] ?? [], 'base_total' => (int)($details['base_total'] ?? $days * (int)($b->PricePerDay ?? 0)),
+            'pricing' => $details['pricing'] ?? 'base', 'source' => 'quoted'];
+    }
+    return ['total' => $days * (int)($b->PricePerDay ?? 0), 'rental_days' => $days, 'per_day' => [],
+        'base_total' => $days * (int)($b->PricePerDay ?? 0), 'pricing' => 'base', 'source' => 'base'];
+}
+
+// SQL for a booking's amount (b = tblbooking, v = tblvehicles), for revenue totals.
+function booking_total_sql(): string
+{
+    return 'COALESCE(b.quoted_price, ' . rental_days_sql('b.FromDate', 'b.ToDate') . ' * v.PricePerDay)';
+}
+
+// The quote saved with a new booking: [quoted_price, pricing_details JSON].
+function booking_price_record(array $quote): array
+{
+    return [$quote['total'], json_encode([
+        'rental_days' => $quote['rental_days'],
+        'base_total' => $quote['base_total'],
+        'pricing' => PRICING_ENABLED ? 'smart' : 'base',
+        'source' => $quote['source'],
+        'per_day' => array_map(fn($d) => ['date' => $d['date'], 'price' => $d['price'], 'pct' => $d['pct'],
+            'reasons' => array_map(fn($r) => $r['label'] . ' ' . ($r['pct'] > 0 ? '+' : '') . $r['pct'] . '%', $d['reasons'])], $quote['days']),
+    ], JSON_UNESCAPED_UNICODE)];
+}

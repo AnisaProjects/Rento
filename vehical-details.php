@@ -90,7 +90,15 @@ if (isset($_POST['submit'])) {
     redirect_to($backToForm);
   }
 
-  $sql = "INSERT INTO  tblbooking(BookingNumber,userEmail,VehicleId,FromDate,ToDate,message,Status) VALUES(:bookingno,:useremail,:vhid,:fromdate,:todate,:message,:status)";
+  // The price is worked out here on the server (never taken from the browser) and stored.
+  $quote = public_quote($dbh, $car, $fromdate, $todate);
+  if (!$quote['ok']) {
+    flash_set('error', 'Please choose valid pickup and return dates.');
+    redirect_to($backToForm);
+  }
+  [$quotedPrice, $pricingDetails] = booking_price_record($quote);
+  $sql = "INSERT INTO  tblbooking(BookingNumber,userEmail,VehicleId,FromDate,ToDate,message,Status,quoted_price,pricing_details,priced_at)
+    VALUES(:bookingno,:useremail,:vhid,:fromdate,:todate,:message,:status,:quoted,:details,NOW())";
   $query = $dbh->prepare($sql);
   $query->bindParam(':bookingno', $bookingno, PDO::PARAM_STR);
   $query->bindParam(':useremail', $useremail, PDO::PARAM_STR);
@@ -99,10 +107,12 @@ if (isset($_POST['submit'])) {
   $query->bindParam(':todate', $todate, PDO::PARAM_STR);
   $query->bindParam(':message', $message, PDO::PARAM_STR);
   $query->bindParam(':status', $status, PDO::PARAM_STR);
+  $query->bindParam(':quoted', $quotedPrice, PDO::PARAM_INT);
+  $query->bindParam(':details', $pricingDetails, PDO::PARAM_STR);
   $query->execute();
   if ($dbh->lastInsertId()) {
     forecast_request_recompute($dbh, 'new booking #' . $bookingno);
-    flash_set('success', 'Booking request sent (#' . $bookingno . '). We will confirm it shortly.');
+    flash_set('success', 'Booking request sent (#' . $bookingno . ', ' . format_price($quotedPrice) . ' for ' . $quote['rental_days'] . ($quote['rental_days'] === 1 ? ' day' : ' days') . '). We will confirm it shortly.');
     redirect_to('my-booking');
   }
   flash_set('error', 'Something went wrong. Please try again.');

@@ -3,7 +3,7 @@
 // Status: 0 (or NULL) = new / pending, 1 = confirmed, 2 = cancelled.
 
 const BOOKING_SELECT = "SELECT b.id, b.BookingNumber, b.userEmail, b.VehicleId AS vid, b.FromDate, b.ToDate, b.message,
-    b.Status, b.PostingDate, b.LastUpdationDate, u.id AS uid, u.FullName, u.ContactNo, u.Address, u.City, u.Country, u.RegDate,
+    b.Status, b.PostingDate, b.LastUpdationDate, b.quoted_price, b.pricing_details, b.priced_at, u.id AS uid, u.FullName, u.ContactNo, u.Address, u.City, u.Country, u.RegDate,
     v.VehiclesTitle, v.PricePerDay, v.Vimage1, br.BrandName
   FROM tblbooking b
   LEFT JOIN tblusers u ON u.EmailId = b.userEmail

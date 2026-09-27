@@ -8,8 +8,8 @@ define('BOOKING_DAYS_SQL', rental_days_sql('b.FromDate', 'b.ToDate'));
 const UTILISATION_WINDOW_DAYS = 30;
 
 $kpi = [];
-// Revenue: confirmed bookings, days x the vehicle's current price per day.
-$kpi['revenue'] = (int)$dbh->query("SELECT COALESCE(SUM(" . BOOKING_DAYS_SQL . " * v.PricePerDay), 0)
+// Revenue: confirmed bookings at their stored price (older bookings: days x base price).
+$kpi['revenue'] = (int)$dbh->query("SELECT COALESCE(SUM(" . booking_total_sql() . "), 0)
   FROM tblbooking b JOIN tblvehicles v ON v.id = b.VehicleId WHERE b.Status = 1")->fetchColumn();
 // Active: confirmed and not yet finished (on the road now or starting later).
 $kpi['active'] = (int)$dbh->query("SELECT COUNT(*) FROM tblbooking WHERE Status = 1 AND ToDate >= CURDATE()")->fetchColumn();
@@ -79,7 +79,7 @@ admin_page_start('Dashboard', 'dashboard.php', [], [
     <span class="a-kpi__icon"><i class="fa fa-sack-dollar" aria-hidden="true"></i></span>
     <span class="a-kpi__label">Total revenue</span>
     <span class="a-kpi__value"><?php echo format_price($kpi['revenue']); ?></span>
-    <span class="a-kpi__note">Confirmed bookings, days × price per day</span>
+    <span class="a-kpi__note">Confirmed bookings at their booked price</span>
   </a>
   <a class="a-kpi a-kpi--info" href="confirmed-bookings.php">
     <span class="a-kpi__icon"><i class="fa fa-car-side" aria-hidden="true"></i></span>

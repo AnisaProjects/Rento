@@ -114,12 +114,26 @@ admin_page_start('Booking #' . $b->BookingNumber, 'bookig-details.php', [['Booki
     <section class="a-card">
       <div class="a-card__head"><h2 class="a-card__title"><i class="fa fa-receipt" aria-hidden="true"></i>Price</h2></div>
       <div class="a-card__body">
-        <ul class="a-price">
-          <li><span>Daily price</span><span class="a-money"><?php echo format_price($rate); ?></span></li>
-          <li><span>Days</span><span>× <?php echo $days; ?></span></li>
-          <li><span class="a-strong">Total</span><span class="a-price__total"><?php echo format_price($days * $rate); ?></span></li>
-        </ul>
-        <p class="a-muted mb-0 mt-2">Worked out from the car's current daily price.</p>
+        <?php $amount = booking_total($b); ?>
+        <?php if ($amount['source'] === 'quoted' && $amount['per_day']) { ?>
+          <ul class="a-price">
+            <?php foreach ($amount['per_day'] as $d) { ?>
+              <li>
+                <span><?php echo h(date('D j M', strtotime($d['date']))); ?><?php if (!empty($d['reasons'])) { ?><span class="a-muted d-block small"><?php echo h(implode(', ', $d['reasons'])); ?></span><?php } ?></span>
+                <span class="a-money"><?php echo format_price($d['price']); ?></span>
+              </li>
+            <?php } ?>
+            <li><span class="a-strong">Total, <?php echo $amount['rental_days']; ?> day<?php echo $amount['rental_days'] === 1 ? '' : 's'; ?></span><span class="a-price__total"><?php echo format_price($amount['total']); ?></span></li>
+          </ul>
+          <p class="a-muted mb-0 mt-2">Price quoted when the booking was made<?php echo $b->priced_at ? ' (' . admin_date($b->priced_at, true) . ')' : ''; ?><?php echo $amount['pricing'] === 'smart' ? ', smart pricing' : ', base price'; ?>. Base price for these days: <?php echo format_price($amount['base_total']); ?>.</p>
+        <?php } else { ?>
+          <ul class="a-price">
+            <li><span>Daily price</span><span class="a-money"><?php echo format_price($rate); ?></span></li>
+            <li><span>Days</span><span>× <?php echo $days; ?></span></li>
+            <li><span class="a-strong">Total</span><span class="a-price__total"><?php echo format_price($amount['total']); ?></span></li>
+          </ul>
+          <p class="a-muted mb-0 mt-2">Older booking without a stored price: worked out from the car's current daily price.</p>
+        <?php } ?>
       </div>
     </section>
   </div>

@@ -57,7 +57,8 @@ admin_page_start($filterTitle, $filterPage, [['Bookings', 'manage-bookings.php']
       </thead>
       <tbody>
         <?php foreach ($bookings as $b) {
-          $days = admin_rental_days($b->FromDate, $b->ToDate);
+          $amount = booking_total($b);
+          $days = $amount['rental_days'];
           $name = $b->VehiclesTitle !== null ? vehicle_display_name($b->BrandName, $b->VehiclesTitle) : 'Removed vehicle'; ?>
           <tr>
             <td><a class="a-strong text-decoration-none" href="bookig-details.php?bid=<?php echo (int)$b->id; ?>">#<?php echo h($b->BookingNumber); ?></a></td>
@@ -75,7 +76,7 @@ admin_page_start($filterTitle, $filterPage, [['Bookings', 'manage-bookings.php']
               <span class="d-block text-nowrap"><?php echo admin_date($b->FromDate); ?> – <?php echo admin_date($b->ToDate); ?></span>
               <span class="a-muted"><?php echo $days; ?> day<?php echo $days === 1 ? '' : 's'; ?></span>
             </td>
-            <td data-order="<?php echo $days * (int)$b->PricePerDay; ?>"><span class="a-money"><?php echo format_price($days * (int)$b->PricePerDay); ?></span></td>
+            <td data-order="<?php echo $amount['total']; ?>"><span class="a-money"><?php echo format_price($amount['total']); ?></span><?php echo $amount['source'] === 'base' ? '<span class="a-muted d-block">base price</span>' : ''; ?></td>
             <td data-order="<?php echo (int)$b->Status; ?>"><?php echo admin_booking_badge($b->Status); ?></td>
             <?php echo admin_date_cell($b->PostingDate, true); ?>
             <td>

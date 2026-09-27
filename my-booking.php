@@ -8,7 +8,7 @@ if (empty($_SESSION['login'])) {
 }
 
 $sql = "SELECT tblvehicles.Vimage1 AS Vimage1, tblvehicles.VehiclesTitle, tblvehicles.id AS vid, tblbrands.BrandName, tblbooking.FromDate,
-    tblbooking.ToDate, tblbooking.message, tblbooking.Status, tblbooking.PostingDate, tblvehicles.PricePerDay,
+    tblbooking.ToDate, tblbooking.message, tblbooking.Status, tblbooking.PostingDate, tblvehicles.PricePerDay, tblbooking.quoted_price, tblbooking.pricing_details,
     " . rental_days_sql('tblbooking.FromDate', 'tblbooking.ToDate') . " AS totaldays, tblbooking.BookingNumber
   FROM tblbooking JOIN tblvehicles ON tblbooking.VehicleId = tblvehicles.id JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand
   WHERE tblbooking.userEmail = :useremail ORDER BY tblbooking.id DESC";
@@ -35,8 +35,9 @@ $bookings = $query->fetchAll(PDO::FETCH_OBJ);
     <?php echo account_start($dbh, 'my-booking', 'My bookings', 'Your booking requests and their status.'); ?>
     <?php if ($bookings) {
       foreach ($bookings as $booking) {
-        // A same-day rental counts as one day (same rule as the booking form).
-        $days = (int)$booking->totaldays;
+        // Stored price for new bookings, days x base price for older ones (booking_total()).
+        $amount = booking_total($booking);
+        $days = $amount['rental_days'];
         $carName = vehicle_display_name($booking->BrandName, $booking->VehiclesTitle);
         $url = vehicle_url($booking->vid, $booking->BrandName, $booking->VehiclesTitle); ?>
         <article class="r-booking">
@@ -54,7 +55,7 @@ $bookings = $query->fetchAll(PDO::FETCH_OBJ);
             <dl class="r-booking__facts">
               <div><dt>Pickup</dt><dd><?php echo htmlentities(date('D, j M Y', strtotime($booking->FromDate))); ?></dd></div>
               <div><dt>Return</dt><dd><?php echo htmlentities(date('D, j M Y', strtotime($booking->ToDate))); ?></dd></div>
-              <div><dt><?php echo $days; ?> <?php echo $days === 1 ? 'day' : 'days'; ?> &times; <?php echo format_price($booking->PricePerDay); ?></dt><dd><?php echo format_price($days * $booking->PricePerDay); ?></dd></div>
+              <div><dt><?php echo $days; ?> <?php echo $days === 1 ? 'day' : 'days'; ?><?php echo $amount['source'] === 'base' ? ' &times; ' . format_price($booking->PricePerDay) : ''; ?></dt><dd><?php echo format_price($amount['total']); ?></dd></div>
             </dl>
             <?php if (trim((string)$booking->message) !== '') { ?>
               <p class="r-booking__message"><strong>Your message:</strong> <?php echo htmlentities($booking->message); ?></p>
