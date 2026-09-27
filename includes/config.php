@@ -28,6 +28,10 @@ define('PRICING_ENABLED', false);
 // Scripts get the DB settings from environment variables set by includes/forecast.php.
 define('PRICING_PYTHON_BIN', __DIR__ . '/../ml/.venv/bin/python');
 
+// Nepal time for every date ("today", booking dates, forecasts). MySQL and the Python
+// scripts use the server's local time, which is Asia/Kathmandu on this Mac.
+date_default_timezone_set('Asia/Kathmandu');
+
 // Never show PHP errors on the page; they go to MAMP's log (/Applications/MAMP/logs/php_error.log).
 // Dev mode logs everything, including notices and deprecations (site and admin alike).
 ini_set('display_errors', '0');
@@ -63,4 +67,5 @@ require_once __DIR__ . '/components.php';
 require_once __DIR__ . '/site-content.php';
 require_once __DIR__ . '/packages.php';
 require_once __DIR__ . '/settings.php';
+require_once __DIR__ . '/pricing.php';
 ?>

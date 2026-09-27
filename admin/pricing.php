@@ -7,6 +7,21 @@ admin_require_login();
 $bookingCount = (int)$dbh->query("SELECT COUNT(*) FROM tblbooking WHERE Status IS NULL OR Status <> 2")->fetchColumn();
 $mlThreshold = (int)setting('pricing_ml_threshold');
 
+// Live status for the page while a recompute runs (?status=json).
+if (($_GET['status'] ?? '') === 'json') {
+  $st = forecast_status($dbh);
+  header('Content-Type: application/json');
+  echo json_encode(['busy' => $st['busy'], 'status' => $st['last']->Status ?? null, 'message' => $st['last']->Message ?? null,
+    'finished' => $st['last']->FinishedAt ?? null, 'rows' => (int)($st['coverage']->rows_ ?? 0)]);
+  exit;
+}
+
+if (isset($_POST['recompute'])) {
+  $runId = forecast_request_recompute($dbh, 'admin: Recompute prices');
+  flash_set($runId ? 'success' : 'error', $runId ? 'Recompute started. Prices update in a few seconds.' : 'The recompute could not be started. See logs/forecast.log.');
+  redirect_to('pricing.php');
+}
+
 if (isset($_POST['savesettings'])) {
   $upsert = $dbh->prepare("INSERT INTO tblsettings (SettingKey, SettingValue) VALUES (:k, :v) ON DUPLICATE KEY UPDATE SettingValue = VALUES(SettingValue)");
   $remove = $dbh->prepare("DELETE FROM tblsettings WHERE SettingKey = :k");
@@ -49,7 +64,7 @@ if (isset($_POST['savesettings'])) {
   }
   if ($changed) {
     settings_saved($dbh, true);
-    if (function_exists('forecast_request_recompute')) forecast_request_recompute($dbh, 'settings changed');
+    forecast_request_recompute($dbh, 'pricing settings changed');
   }
   flash_set($errors ? 'error' : 'success', $errors ? implode(' ', $errors) . ($changed ? " The other $changed change(s) were saved." : '')
     : ($changed ? "Pricing settings saved ($changed change" . ($changed === 1 ? '' : 's') . '). Prices are being recomputed.' : 'Nothing changed.'));
@@ -71,7 +86,73 @@ admin_page_start('Smart Pricing', 'pricing.php', [], [
   'lead' => 'Prices = base price × (1 + the factors that apply), kept between −' . setting('pricing_max_discount') . '% and +' . setting('pricing_max_surcharge') . '%.' . (PRICING_ENABLED ? '' : ' Smart prices are not shown on the website yet (PRICING_ENABLED is off).'),
 ]);
 ?>
-<!-- forecast-status -->
+<?php
+$status = forecast_status($dbh);
+$last = $status['last'];
+$cov = $status['coverage'];
+$previewCars = $dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, br.BrandName FROM tblvehicles v LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand
+  WHERE v.IsActive = 1 ORDER BY v.VehiclesTitle")->fetchAll(PDO::FETCH_OBJ);
+$previewId = intval($_GET['car'] ?? ($previewCars[0]->id ?? 0));
+$preview = null;
+foreach ($previewCars as $pc) if ((int)$pc->id === $previewId) $preview = $pc;
+$runVariant = ['done' => 'success', 'failed' => 'danger', 'running' => 'info', 'queued' => 'warning'][$last->Status ?? ''] ?? 'neutral';
+?>
+<div class="mb-4">
+  <section class="a-card" id="forecast-status" data-busy="<?php echo $status['busy'] ? '1' : '0'; ?>">
+    <div class="a-card__head">
+      <h2 class="a-card__title"><i class="fa fa-calculator" aria-hidden="true"></i>Price forecast</h2>
+      <?php if ($last) echo admin_badge(ucfirst($status['stale'] ? 'stalled' : $last->Status), $status['stale'] ? 'danger' : $runVariant); ?>
+    </div>
+    <div class="a-card__body">
+      <dl class="a-dl">
+        <dt>Coverage</dt><dd><?php echo (int)$cov->rows_; ?> prices for <?php echo (int)$cov->cars; ?> of <?php echo $status['activeCars']; ?> active cars<?php echo $cov->first_ ? ', ' . admin_date($cov->first_) . ' – ' . admin_date($cov->last_) : ''; ?></dd>
+        <dt>Last run</dt><dd><?php echo $last ? h($last->TriggerReason) . ' · ' . (admin_date($last->FinishedAt ?: $last->RequestedAt, true)) : 'Never'; ?></dd>
+        <dt>Result</dt><dd data-run-message><?php echo h($last->Message ?? '–'); ?></dd>
+        <dt>Automatic</dt><dd>After changes to festivals, pricing settings, vehicles and bookings, and nightly (launchd job).</dd>
+      </dl>
+      <?php if ($status['activeCars'] > (int)$cov->cars && !$status['busy']) { ?><div class="a-notice a-notice--warning mt-3">Some active cars have no forecast yet: recompute to fill it.</div><?php } ?>
+      <form method="post" class="mt-3">
+        <?php echo csrf_field(); ?>
+        <button class="btn btn-primary" name="recompute" value="1" type="submit"<?php echo $status['busy'] ? ' disabled' : ''; ?> data-recompute>
+          <i class="fa fa-rotate<?php echo $status['busy'] ? ' fa-spin' : ''; ?>" aria-hidden="true"></i><?php echo $status['busy'] ? 'Recomputing…' : 'Recompute prices'; ?>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <section class="a-card">
+    <div class="a-card__head">
+      <h2 class="a-card__title"><i class="fa fa-eye" aria-hidden="true"></i>Preview: next 14 days</h2>
+      <form method="get" class="d-flex gap-2">
+        <label class="visually-hidden" for="car">Car</label>
+        <select class="form-select form-select-sm" id="car" name="car" onchange="this.form.submit()">
+          <?php foreach ($previewCars as $pc) { ?><option value="<?php echo (int)$pc->id; ?>"<?php echo (int)$pc->id === $previewId ? ' selected' : ''; ?>><?php echo h(vehicle_display_name($pc->BrandName, $pc->VehiclesTitle)); ?></option><?php } ?>
+        </select>
+      </form>
+    </div>
+    <div class="a-card__body a-card__body--flush">
+      <?php if ($preview) {
+        $q = pricing_quote($dbh, $preview, date('Y-m-d'), date('Y-m-d', strtotime('+13 days'))); ?>
+        <div class="table-responsive">
+          <table class="table a-table mb-0">
+            <thead><tr><th class="ps-4">Day</th><th>Price</th><th>Change</th><th class="pe-4">Why</th></tr></thead>
+            <tbody>
+              <?php foreach ($q['days'] as $d) { ?>
+                <tr>
+                  <td class="ps-4 text-nowrap"><?php echo date('D j M', strtotime($d['date'])); ?><?php echo $d['available'] ? '' : ' ' . admin_badge('Booked', 'neutral'); ?></td>
+                  <td><span class="a-money"><?php echo format_price($d['price']); ?></span></td>
+                  <td class="text-nowrap"><?php echo $d['source'] === 'base' ? '<span class="a-muted">base</span>' : ($d['pct'] > 0 ? '+' : '') . rtrim(rtrim(number_format($d['pct'], 1), '0'), '.') . '%' . ($d['capped'] ? ' <span class="a-muted">(capped)</span>' : ''); ?></td>
+                  <td class="pe-4 a-muted"><?php echo h(implode(', ', array_map(fn($r) => $r['label'] . ' ' . ($r['pct'] > 0 ? '+' : '') . rtrim(rtrim(number_format($r['pct'], 1), '0'), '.') . '%', $d['reasons']))) ?: '–'; ?></td>
+                </tr>
+              <?php } ?>
+            </tbody>
+          </table>
+        </div>
+        <p class="a-muted px-4 py-3 mb-0">Base price <?php echo format_price_per_day($preview->PricePerDay); ?>.</p>
+      <?php } else { ?><p class="a-empty">No active cars.</p><?php } ?>
+    </div>
+  </section>
+</div>
 <form method="post">
   <?php echo csrf_field(); ?>
   <?php foreach ($groups as $groupLabel => $keys) { ?>
@@ -124,4 +205,15 @@ admin_page_start('Smart Pricing', 'pricing.php', [], [
     <button class="btn btn-primary" name="savesettings" value="1" type="submit"><i class="fa fa-check" aria-hidden="true"></i>Save and recompute</button>
   </div>
 </form>
-<?php admin_page_end(); ?>
+<?php admin_page_end(<<<'JS'
+(function () {
+  // While a recompute runs, check its status every 2 seconds and reload when it ends.
+  var card = document.getElementById('forecast-status');
+  if (!card || card.dataset.busy !== '1') return;
+  var timer = setInterval(function () {
+    fetch('pricing.php?status=json', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (s) {
+      if (!s.busy) { clearInterval(timer); location.reload(); }
+    }).catch(function () { clearInterval(timer); });
+  }, 2000);
+})();
+JS); ?>

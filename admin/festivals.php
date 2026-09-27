@@ -60,6 +60,7 @@ if (isset($_POST['addfestival']) || isset($_POST['updatefestival'])) {
     $query->execute($v);
     flash_set('success', $v['FestivalName'] . ' added.');
   }
+  forecast_request_recompute($dbh, 'festival saved: ' . $v['FestivalName']);
   redirect_to('festivals.php');
 }
 
@@ -67,6 +68,7 @@ if (isset($_POST['delfestival'])) {
   $query = $dbh->prepare("DELETE FROM tblfestivals WHERE id = :id");
   $query->execute([':id' => intval($_POST['delfestival'])]);
   flash_set($query->rowCount() ? 'success' : 'error', $query->rowCount() ? 'Festival deleted.' : 'That festival no longer exists.');
+  if ($query->rowCount()) forecast_request_recompute($dbh, 'festival deleted');
   redirect_to('festivals.php');
 }
 

@@ -30,6 +30,7 @@ if (isset($_POST['submit'])) {
     $query->execute();
     $newId = (int)$dbh->lastInsertId();
     if ($newId) {
+      forecast_request_recompute($dbh, 'vehicle added: ' . $v['VehiclesTitle']);
       flash_set('success', 'Vehicle posted: ' . $v['VehiclesTitle'] . ' is now listed on the website.');
       redirect_to('edit-vehicle.php?id=' . $newId);
     }

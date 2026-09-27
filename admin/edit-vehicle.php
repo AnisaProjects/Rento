@@ -53,6 +53,8 @@ if (isset($_POST['submit'])) {
     $notes = [];
     if ($replace) $notes[] = count($replace) === 1 ? 'image ' . $replace[0] . ' replaced' : count($replace) . ' images replaced';
     if (!empty($_POST['removeimg5']) && !in_array(5, $replace, true)) $notes[] = 'image 5 removed';
+    // Base price, type or visibility may have changed: refresh the smart prices.
+    forecast_request_recompute($dbh, 'vehicle saved: ' . $v['VehiclesTitle']);
     flash_set('success', 'Vehicle saved' . ($notes ? ' (' . implode(', ', $notes) . ')' : '') . '.');
     redirect_to(current_url());
   }

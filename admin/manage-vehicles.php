@@ -12,6 +12,7 @@ if (isset($_POST['toggleactive'])) {
   $state = $dbh->prepare("SELECT IsActive, VehiclesTitle FROM tblvehicles WHERE id = :id");
   $state->execute([':id' => $id]);
   $row = $state->fetch(PDO::FETCH_OBJ);
+  if ($row) forecast_request_recompute($dbh, 'vehicle ' . ($row->IsActive ? 'activated' : 'deactivated') . ': ' . $row->VehiclesTitle);
   flash_set($row ? 'success' : 'error', $row ? $row->VehiclesTitle . ($row->IsActive ? ' is now active and shown on the website.' : ' is now inactive and hidden from the website.') : 'That vehicle no longer exists.');
   redirect_to(current_url());
 }
@@ -35,6 +36,7 @@ if (isset($_POST['del'])) {
     $query->execute();
     if ($query->rowCount()) {
       delete_unused_vehicle_images($dbh, $images);
+      forecast_request_recompute($dbh, 'vehicle deleted');
     }
     flash_set($query->rowCount() ? 'success' : 'error', $query->rowCount() ? 'Vehicle deleted.' : 'That vehicle no longer exists.');
   }

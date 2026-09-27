@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Nightly smart-pricing recompute for Rento (02:30 local time). Install:
+       cp tools/com.rento.price-forecast.plist ~/Library/LaunchAgents/
+       launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.rento.price-forecast.plist
+     No credentials here: tools/run-forecast.php reads them from includes/config.php. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.rento.price-forecast</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Applications/MAMP/bin/php/php8.3.14/bin/php</string>
+    <string>/Applications/MAMP/htdocs/Rento/tools/run-forecast.php</string>
+    <string>nightly</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Applications/MAMP/htdocs/Rento</string>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>2</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/Applications/MAMP/htdocs/Rento/logs/forecast-launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Applications/MAMP/htdocs/Rento/logs/forecast-launchd.log</string>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

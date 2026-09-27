@@ -101,6 +101,7 @@ if (isset($_POST['submit'])) {
   $query->bindParam(':status', $status, PDO::PARAM_STR);
   $query->execute();
   if ($dbh->lastInsertId()) {
+    forecast_request_recompute($dbh, 'new booking #' . $bookingno);
     flash_set('success', 'Booking request sent (#' . $bookingno . '). We will confirm it shortly.');
     redirect_to('my-booking');
   }

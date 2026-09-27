@@ -55,6 +55,8 @@ function admin_booking_set_status(PDO $dbh, int $id, int $status): array
     $update->bindParam(':status', $status, PDO::PARAM_INT);
     $update->bindParam(':id', $id, PDO::PARAM_INT);
     $update->execute();
+    // Availability and occupancy changed.
+    forecast_request_recompute($dbh, 'booking ' . $number . ($status === 1 ? ' confirmed' : ' cancelled'));
     return ['success', $status === 1 ? "Booking $number confirmed." : "Booking $number cancelled."];
 }
 
