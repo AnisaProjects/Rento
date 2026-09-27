@@ -2312,3 +2312,190 @@ a.r-chip:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- 16. Panels, contact, content pages ---------- */
+.r-panel {
+  padding: var(--rento-space-6);
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-lg);
+  background: #fff;
+}
+
+.r-panel--dark {
+  border-color: transparent;
+  background: var(--rento-ink-900);
+  color: var(--rento-gray-300);
+}
+
+.r-panel__title {
+  margin-bottom: var(--rento-space-5) !important;
+  font-size: var(--rento-text-xl) !important;
+}
+
+.r-panel__big {
+  margin: 0;
+  color: var(--rento-ink-900);
+  font-family: var(--rento-font-heading);
+  font-size: var(--rento-text-xl);
+  font-weight: var(--rento-weight-bold);
+  line-height: 1.4;
+}
+
+.r-panel--dark .r-panel__big {
+  color: #fff;
+}
+
+.r-contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--rento-space-8);
+  align-items: start;
+}
+
+.r-contact__list {
+  display: grid;
+  gap: var(--rento-space-4);
+  margin: 0 0 var(--rento-space-6);
+  padding: 0;
+  list-style: none;
+}
+
+.r-contact__list li {
+  display: flex;
+  gap: var(--rento-space-4);
+  margin: 0;
+  padding: var(--rento-space-5);
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-lg);
+  background: #fff;
+}
+
+.r-contact__list h3 {
+  margin: 0 0 2px !important;
+  font-size: var(--rento-text-base) !important;
+}
+
+.r-contact__list p {
+  margin: 0;
+}
+
+.r-contact__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--rento-primary-soft);
+  color: var(--rento-primary);
+}
+
+.r-map {
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-lg);
+  background: var(--rento-gray-100);
+  overflow: hidden;
+}
+
+.r-map iframe {
+  display: block;
+  width: 100%;
+  height: 300px;
+  border: 0;
+}
+
+.r-article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--rento-space-10);
+  align-items: start;
+}
+
+.r-article__aside {
+  position: sticky;
+  top: 96px;
+}
+
+.r-article__aside p {
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-sm);
+}
+
+.r-about {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: var(--rento-space-10);
+}
+
+@media (max-width: 991px) {
+  .r-contact,
+  .r-article,
+  .r-about {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .r-article__aside {
+    position: static;
+  }
+}
+
+/* Admin-edited HTML (Manage Pages). Old editors left inline fonts, sizes and colours
+   in the content; the site's typography wins so every page reads the same. */
+.r-prose {
+  max-width: 72ch;
+  color: var(--rento-gray-600);
+  font-size: var(--rento-text-base);
+  line-height: 1.75;
+}
+
+.r-prose * {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  color: inherit;
+  background: transparent !important;
+}
+
+.r-prose [align] {
+  text-align: left !important;
+}
+
+.r-prose p,
+.r-prose ul,
+.r-prose ol {
+  margin: 0 0 var(--rento-space-4);
+}
+
+.r-prose h2,
+.r-prose h3,
+.r-prose h4 {
+  margin: var(--rento-space-8) 0 var(--rento-space-3);
+  color: var(--rento-ink-900) !important;
+  font-family: var(--rento-font-heading) !important;
+  line-height: 1.3 !important;
+}
+
+.r-prose h2 {
+  font-size: var(--rento-text-2xl) !important;
+}
+
+.r-prose h3,
+.r-prose h4 {
+  font-size: var(--rento-text-xl) !important;
+}
+
+.r-prose strong,
+.r-prose b {
+  color: var(--rento-ink-900) !important;
+  font-weight: var(--rento-weight-semibold);
+}
+
+.r-prose a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.r-prose li {
+  margin: 0 0 var(--rento-space-2);
+}
