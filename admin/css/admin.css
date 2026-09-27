@@ -929,6 +929,18 @@ a.a-activity__title:hover {
 }
 
 /* DataTables 2 */
+table.a-table th.dt-type-numeric,
+table.a-table td.dt-type-numeric,
+table.a-table th.dt-type-date,
+table.a-table td.dt-type-date {
+  text-align: left;
+}
+
+table.a-table th.dt-type-numeric div.dt-column-header,
+table.a-table th.dt-type-date div.dt-column-header {
+  flex-direction: row;
+}
+
 div.dt-container {
   font-size: var(--rento-text-sm);
 }

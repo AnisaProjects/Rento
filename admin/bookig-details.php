@@ -1,247 +1,127 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
-error_reporting(0);
-include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
-}
-else{
-if(isset($_POST['eid']))
-	{
-$eid=intval($_POST['eid']);
-$status="2";
-$sql = "UPDATE tblbooking SET Status=:status WHERE  id=:eid";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':status',$status, PDO::PARAM_STR);
-$query-> bindParam(':eid',$eid, PDO::PARAM_STR);
-$query -> execute();
-  echo "<script>alert('Booking Successfully Cancelled');</script>";
-echo "<script type='text/javascript'> document.location = 'canceled-bookings.php'; </script>";
+require_once __DIR__ . '/includes/layout.php';
+require_once __DIR__ . '/includes/bookings.php';
+admin_require_login();
+
+$bid = intval($_GET['bid'] ?? 0);
+if (admin_booking_actions($dbh)) {
+  redirect_to(current_url());
 }
 
-
-if(isset($_POST['aeid']))
-	{
-$aeid=intval($_POST['aeid']);
-$status=1;
-
-$sql = "UPDATE tblbooking SET Status=:status WHERE  id=:aeid";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':status',$status, PDO::PARAM_STR);
-$query-> bindParam(':aeid',$aeid, PDO::PARAM_STR);
-$query -> execute();
-echo "<script>alert('Booking Successfully Confirmed');</script>";
-echo "<script type='text/javascript'> document.location = 'confirmed-bookings.php'; </script>";
-}
-
-
- ?>
-
-<!doctype html>
-<html lang="en" class="no-js">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<meta name="theme-color" content="#3e454c">
-	
-	<title>Car Rental Portal | New Bookings   </title>
-
-	<!-- Font awesome -->
-	<link rel="stylesheet" href="css/font-awesome.min.css">
-	<!-- Sandstone Bootstrap CSS -->
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<!-- Bootstrap Datatables -->
-	<link rel="stylesheet" href="css/dataTables.bootstrap.min.css">
-	<!-- Bootstrap social button library -->
-	<link rel="stylesheet" href="css/bootstrap-social.css">
-	<!-- Bootstrap select -->
-	<link rel="stylesheet" href="css/bootstrap-select.css">
-	<!-- Bootstrap file input -->
-	<link rel="stylesheet" href="css/fileinput.min.css">
-	<!-- Awesome Bootstrap checkbox -->
-	<link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
-	<!-- Admin Stye -->
-	<link rel="stylesheet" href="css/style.css">
-  <style>
-		.errorWrap {
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #dd3d36;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-.succWrap{
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #5cb85c;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-		</style>
-
-</head>
-
-<body>
-	<?php include('includes/header.php');?>
-
-	<div class="ts-main-content">
-		<?php include('includes/leftbar.php');?>
-		<div class="content-wrapper">
-			<div class="container-fluid">
-
-				<div class="row">
-					<div class="col-md-12">
-
-						<h2 class="page-title">Booking Details</h2>
-
-						<!-- Zero Configuration Table -->
-						<div class="panel panel-default">
-							<div class="panel-heading">Bookings Info</div>
-							<div class="panel-body">
-
-
-<div id="print">
-								<table border="1"  class="display table table-striped table-bordered table-hover" cellspacing="0" width="100%"  >
-				
-									<tbody>
-
-									<?php 
-$bid=intval($_GET['bid']);
-									$sql = "SELECT tblusers.*,tblbrands.BrandName,tblvehicles.VehiclesTitle,tblbooking.FromDate,tblbooking.ToDate,tblbooking.message,tblbooking.VehicleId as vid,tblbooking.Status,tblbooking.PostingDate,tblbooking.id,tblbooking.BookingNumber,
-DATEDIFF(tblbooking.ToDate,tblbooking.FromDate) as totalnodays,tblvehicles.PricePerDay
-									  from tblbooking join tblvehicles on tblvehicles.id=tblbooking.VehicleId join tblusers on tblusers.EmailId=tblbooking.userEmail join tblbrands on tblvehicles.VehiclesBrand=tblbrands.id where tblbooking.id=:bid";
-$query = $dbh -> prepare($sql);
-$query -> bindParam(':bid',$bid, PDO::PARAM_STR);
+$query = $dbh->prepare(BOOKING_SELECT . " WHERE b.id = :bid");
+$query->bindParam(':bid', $bid, PDO::PARAM_INT);
 $query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{				?>	
-	<h3 style="text-align:center; color:red">#<?php echo htmlentities($result->BookingNumber);?> Booking Details </h3>
-
-		<tr>
-											<th colspan="4" style="text-align:center;color:blue">User Details</th>
-										</tr>
-										<tr>
-											<th>Booking No.</th>
-											<td>#<?php echo htmlentities($result->BookingNumber);?></td>
-											<th>Name</th>
-											<td><?php echo htmlentities($result->FullName);?></td>
-										</tr>
-										<tr>											
-											<th>Email Id</th>
-											<td><?php echo htmlentities($result->EmailId);?></td>
-											<th>Contact No</th>
-											<td><?php echo htmlentities($result->ContactNo);?></td>
-										</tr>
-											<tr>											
-											<th>Address</th>
-											<td><?php echo htmlentities($result->Address);?></td>
-											<th>City</th>
-											<td><?php echo htmlentities($result->City);?></td>
-										</tr>
-											<tr>											
-											<th>Country</th>
-											<td colspan="3"><?php echo htmlentities($result->Country);?></td>
-										</tr>
-
-										<tr>
-											<th colspan="4" style="text-align:center;color:blue">Booking Details</th>
-										</tr>
-											<tr>											
-											<th>Vehicle Name</th>
-											<td><a href="edit-vehicle.php?id=<?php echo htmlentities($result->vid);?>"><?php echo htmlentities($result->BrandName);?> , <?php echo htmlentities($result->VehiclesTitle);?></td>
-											<th>Booking Date</th>
-											<td><?php echo htmlentities($result->PostingDate);?></td>
-										</tr>
-										<tr>
-											<th>From Date</th>
-											<td><?php echo htmlentities($result->FromDate);?></td>
-											<th>To Date</th>
-											<td><?php echo htmlentities($result->ToDate);?></td>
-										</tr>
-<tr>
-	<th>Total Days</th>
-	<td><?php echo htmlentities($tdays=$result->totalnodays);?></td>
-	<th>Rent Per Days</th>
-	<td><?php echo htmlentities($ppdays=$result->PricePerDay);?></td>
-</tr>
-<tr>
-	<th colspan="3" style="text-align:center">Grand Total</th>
-	<td><?php echo htmlentities($tdays*$ppdays);?></td>
-</tr>
-<tr>
-<th>Booking Status</th>
-<td><?php 
-if($result->Status==0)
-{
-echo htmlentities('Not Confirmed yet');
-} else if ($result->Status==1) {
-echo htmlentities('Confirmed');
+$b = $query->fetch(PDO::FETCH_OBJ);
+if (!$b) {
+  flash_set('error', 'That booking no longer exists.');
+  redirect_to('manage-bookings.php');
 }
- else{
- 	echo htmlentities('Cancelled');
- }
-										?></td>
-										<th>Last pdation Date</th>
-										<td><?php echo htmlentities($result->LastUpdationDate);?></td>
-									</tr>
 
-									<?php if($result->Status==0){ ?>
-										<tr>	
-										<td style="text-align:center" colspan="4">
-				<form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Confirm this booking');"><?php echo csrf_field(); ?><input type="hidden" name="aeid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="btn btn-primary"> Confirm Booking</button></form> 
+$status = (int)$b->Status;
+$days = admin_rental_days($b->FromDate, $b->ToDate);
+$rate = (int)$b->PricePerDay;
+$today = date('Y-m-d');
+$vehicleName = $b->VehiclesTitle !== null ? vehicle_display_name($b->BrandName, $b->VehiclesTitle) : 'Removed vehicle';
+$customerBookings = $dbh->prepare("SELECT COUNT(*) FROM tblbooking WHERE userEmail = :email");
+$customerBookings->execute([':email' => $b->userEmail]);
+$customerBookings = (int)$customerBookings->fetchColumn();
 
-<form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Cancel this Booking');"><?php echo csrf_field(); ?><input type="hidden" name="eid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="btn btn-danger"> Cancel Booking</button></form>
-</td>
-</tr>
-<?php } ?>
-										<?php $cnt=$cnt+1; }} ?>
-										
-									</tbody>
-								</table>
-								<form method="post">
-<?php echo csrf_field(); ?>
-	   <input name="Submit2" type="submit" class="txtbox4" value="Print" onClick="return f3();" style="cursor: pointer;"  />
-	</form>
-
-							</div>
-						</div>
-
-					
-
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-	<!-- Loading Scripts -->
-	<script src="js/jquery.min.js"></script>
-	<script src="js/bootstrap-select.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/jquery.dataTables.min.js"></script>
-	<script src="js/dataTables.bootstrap.min.js"></script>
-	<script src="js/Chart.min.js"></script>
-	<script src="js/fileinput.js"></script>
-	<script src="js/chartData.js"></script>
-	<script src="js/main.js"></script>
-	<script language="javascript" type="text/javascript">
-function f3()
-{
-window.print(); 
+// Timeline: requested -> confirmed / cancelled -> pick-up -> return.
+$steps = [['Booking requested', admin_date($b->PostingDate, true), 'is-done', 'fa-paper-plane']];
+if ($status === 2) {
+  $steps[] = ['Cancelled', $b->LastUpdationDate ? admin_date($b->LastUpdationDate, true) : '', 'is-cancelled', 'fa-xmark'];
+} else {
+  $steps[] = $status === 1
+    ? ['Confirmed', $b->LastUpdationDate ? admin_date($b->LastUpdationDate, true) : '', 'is-done', 'fa-check']
+    : ['Waiting for confirmation', 'Use Confirm or Cancel at the top of the page', 'is-current', 'fa-hourglass-half'];
+  $started = $status === 1 && $today >= $b->FromDate;
+  $ended = $status === 1 && $today >= $b->ToDate;
+  // A booking still pending after its dates can't happen as booked any more.
+  $note = fn(string $date, bool $done) => $done ? '' : ($today > $date ? ' (date has passed)' : ' (upcoming)');
+  $steps[] = ['Pick-up', admin_date($b->FromDate) . $note((string)$b->FromDate, $started), $started ? 'is-done' : '', 'fa-key'];
+  $steps[] = ['Return', admin_date($b->ToDate) . $note((string)$b->ToDate, $ended), $ended ? 'is-done' : '', 'fa-flag-checkered'];
 }
-</script>
-</body>
-</html>
-<?php } ?>
+
+admin_page_start('Booking #' . $b->BookingNumber, 'bookig-details.php', [['Bookings', 'manage-bookings.php']], [
+  'lead' => 'Booked on ' . admin_date($b->PostingDate, true),
+  'actions' => admin_booking_buttons($b, true)
+    . '<button type="button" class="btn btn-light" onclick="window.print()"><i class="fa fa-print" aria-hidden="true"></i>Print</button>',
+]);
+?>
+<div class="a-detail-grid">
+  <div>
+    <section class="a-card">
+      <div class="a-card__head">
+        <h2 class="a-card__title"><i class="fa fa-route" aria-hidden="true"></i>Status</h2>
+        <?php echo admin_booking_badge($status); ?>
+      </div>
+      <div class="a-card__body">
+        <ol class="a-timeline">
+          <?php foreach ($steps as [$title, $meta, $class, $icon]) { ?>
+            <li class="<?php echo $class; ?>">
+              <span class="a-timeline__dot"><i class="fa <?php echo $class === 'is-done' ? 'fa-check' : $icon; ?>" aria-hidden="true"></i></span>
+              <span class="a-timeline__title"><?php echo h($title); ?></span>
+              <span class="a-timeline__meta"><?php echo h($meta); ?></span>
+            </li>
+          <?php } ?>
+        </ol>
+      </div>
+    </section>
+
+    <section class="a-card">
+      <div class="a-card__head"><h2 class="a-card__title"><i class="fa fa-car" aria-hidden="true"></i>Trip</h2></div>
+      <div class="a-card__body">
+        <div class="a-booking-vehicle mb-3">
+          <?php echo admin_vehicle_thumb($b->Vimage1, $vehicleName); ?>
+          <div>
+            <?php if ($b->VehiclesTitle !== null) { ?>
+              <a class="a-strong text-decoration-none" href="edit-vehicle.php?id=<?php echo (int)$b->vid; ?>"><?php echo h($vehicleName); ?></a>
+            <?php } else { ?><span class="a-strong"><?php echo h($vehicleName); ?></span><?php } ?>
+            <div class="a-muted"><?php echo format_price_per_day($rate); ?></div>
+          </div>
+        </div>
+        <dl class="a-dl">
+          <dt>Pick-up</dt><dd><?php echo admin_date($b->FromDate); ?></dd>
+          <dt>Return</dt><dd><?php echo admin_date($b->ToDate); ?></dd>
+          <dt>Length</dt><dd><?php echo $days; ?> day<?php echo $days === 1 ? '' : 's'; ?></dd>
+          <dt>Message</dt><dd><?php echo trim((string)$b->message) !== '' ? nl2br(h($b->message)) : '<span class="a-muted">No message</span>'; ?></dd>
+          <dt>Last change</dt><dd><?php echo admin_date($b->LastUpdationDate, true) ?: '<span class="a-muted">Not changed since booking</span>'; ?></dd>
+        </dl>
+      </div>
+    </section>
+  </div>
+
+  <div>
+    <section class="a-card">
+      <div class="a-card__head"><h2 class="a-card__title"><i class="fa fa-user" aria-hidden="true"></i>Customer</h2></div>
+      <div class="a-card__body">
+        <div class="a-customer">
+          <span class="a-customer__avatar" aria-hidden="true"><?php echo h(initials($b->FullName ?? $b->userEmail)); ?></span>
+          <div>
+            <span class="a-strong d-block"><?php echo $b->FullName !== null ? h($b->FullName) : 'Deleted account'; ?></span>
+            <span class="a-muted"><?php echo $customerBookings; ?> booking<?php echo $customerBookings === 1 ? '' : 's'; ?><?php echo $b->RegDate ? ' · customer since ' . admin_date($b->RegDate) : ''; ?></span>
+          </div>
+        </div>
+        <dl class="a-dl">
+          <dt>Email</dt><dd><a href="mailto:<?php echo h($b->userEmail); ?>"><?php echo h($b->userEmail); ?></a></dd>
+          <dt>Phone</dt><dd><?php echo $b->ContactNo ? '<a href="tel:' . h($b->ContactNo) . '">' . h($b->ContactNo) . '</a>' : '<span class="a-muted">Not given</span>'; ?></dd>
+          <dt>Address</dt><dd><?php echo h(implode(', ', array_filter([$b->Address, $b->City, $b->Country]))) ?: '<span class="a-muted">Not given</span>'; ?></dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="a-card">
+      <div class="a-card__head"><h2 class="a-card__title"><i class="fa fa-receipt" aria-hidden="true"></i>Price</h2></div>
+      <div class="a-card__body">
+        <ul class="a-price">
+          <li><span>Daily price</span><span class="a-money"><?php echo format_price($rate); ?></span></li>
+          <li><span>Days</span><span>× <?php echo $days; ?></span></li>
+          <li><span class="a-strong">Total</span><span class="a-price__total"><?php echo format_price($days * $rate); ?></span></li>
+        </ul>
+        <p class="a-muted mb-0 mt-2">Worked out from the car's current daily price.</p>
+      </div>
+    </section>
+  </div>
+</div>
+<?php admin_page_end(); ?>
