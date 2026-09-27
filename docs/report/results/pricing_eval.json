@@ -1,0 +1,270 @@
+{
+  "generated": "2026-09-27T21:29:05+05:45",
+  "confirmed_bookings": 2,
+  "demand_factors_on": false,
+  "settings": {
+    "pricing_max_discount": 15,
+    "pricing_max_surcharge": 25,
+    "pricing_weekend_pct": 8,
+    "pricing_weekend_days": "5,6",
+    "pricing_festival_high_pct": 12,
+    "pricing_festival_medium_pct": 5,
+    "pricing_travel_days_pct": 15,
+    "pricing_season_pct": 4,
+    "pricing_lastminute_days": 2,
+    "pricing_lastminute_pct": 5,
+    "pricing_early_days": 45,
+    "pricing_early_pct": -4,
+    "pricing_occupancy_window": 30,
+    "pricing_occupancy_high": 60,
+    "pricing_occupancy_high_pct": 6,
+    "pricing_occupancy_low": 10,
+    "pricing_occupancy_low_pct": -3,
+    "pricing_demand_days": 30,
+    "pricing_demand_high_count": 3,
+    "pricing_demand_high_pct": 5,
+    "pricing_demand_min_bookings": 50,
+    "pricing_round_to": 50,
+    "pricing_forecast_days": 60,
+    "pricing_ml_enabled": 0,
+    "pricing_ml_threshold": 200
+  },
+  "checks": {
+    "rows": 480,
+    "cars": 8,
+    "days_per_car": 60,
+    "limits": {
+      "min_multiplier": 0.85,
+      "max_multiplier": 1.25,
+      "round_to": 50
+    },
+    "multiplier_range_seen": [
+      1.0,
+      1.25
+    ],
+    "rows_outside_limits": 0,
+    "rows_not_rounded": 0,
+    "rows_formula_mismatch": 0,
+    "rows_where_factors_exceed_cap": 48,
+    "max_uncapped_sum_pct": 27,
+    "rows_marked_capped": 48
+  },
+  "sample_breakdowns_fortuner": {
+    "Normal day (no factor)": {
+      "date": "2026-09-30",
+      "weekday": "Wed",
+      "base": 10000,
+      "factors": [],
+      "sum_pct": 0,
+      "applied_pct": 0.0,
+      "price": 10000,
+      "capped": false
+    },
+    "Last minute (0-2 days ahead)": {
+      "date": "2026-09-27",
+      "weekday": "Sun",
+      "base": 10000,
+      "factors": [
+        {
+          "label": "Last-minute",
+          "pct": 5
+        }
+      ],
+      "sum_pct": 5,
+      "applied_pct": 5.0,
+      "price": 10500,
+      "capped": false
+    },
+    "Weekend (no festival)": {
+      "date": "2026-10-02",
+      "weekday": "Fri",
+      "base": 10000,
+      "factors": [
+        {
+          "label": "Weekend",
+          "pct": 8
+        },
+        {
+          "label": "Autumn peak trekking season 2026",
+          "pct": 4
+        }
+      ],
+      "sum_pct": 12,
+      "applied_pct": 12.0,
+      "price": 11200,
+      "capped": false
+    },
+    "Early booking (45+ days ahead)": {
+      "date": "2026-11-12",
+      "weekday": "Thu",
+      "base": 10000,
+      "factors": [
+        {
+          "label": "Autumn peak trekking season 2026",
+          "pct": 4
+        },
+        {
+          "label": "Early booking",
+          "pct": -4
+        }
+      ],
+      "sum_pct": 0,
+      "applied_pct": 0.0,
+      "price": 10000,
+      "capped": false
+    },
+    "Dashain travel days": {
+      "date": "2026-10-09",
+      "weekday": "Fri",
+      "base": 10000,
+      "factors": [
+        {
+          "label": "Weekend",
+          "pct": 8
+        },
+        {
+          "label": "Dashain 2026 (BS 2083): travel days",
+          "pct": 15
+        },
+        {
+          "label": "Autumn peak trekking season 2026",
+          "pct": 4
+        }
+      ],
+      "sum_pct": 27,
+      "applied_pct": 25.0,
+      "price": 12500,
+      "capped": true
+    },
+    "Dashain main days": {
+      "date": "2026-10-18",
+      "weekday": "Sun",
+      "base": 10000,
+      "factors": [
+        {
+          "label": "Dashain 2026 (BS 2083)",
+          "pct": 12
+        },
+        {
+          "label": "Autumn peak trekking season 2026",
+          "pct": 4
+        }
+      ],
+      "sum_pct": 16,
+      "applied_pct": 16.0,
+      "price": 11600,
+      "capped": false
+    },
+    "Tihar travel days": {
+      "date": "2026-11-05",
+      "weekday": "Thu",
+      "base": 10000,
+      "factors": [
+        {
+          "label": "Tihar 2026 (BS 2083): travel days",
+          "pct": 15
+        },
+        {
+          "label": "Autumn peak trekking season 2026",
+          "pct": 4
+        }
+      ],
+      "sum_pct": 19,
+      "applied_pct": 19.0,
+      "price": 11900,
+      "capped": false
+    },
+    "Tihar main days": {
+      "date": "2026-11-08",
+      "weekday": "Sun",
+      "base": 10000,
+      "factors": [
+        {
+          "label": "Tihar 2026 (BS 2083)",
+          "pct": 12
+        },
+        {
+          "label": "Autumn peak trekking season 2026",
+          "pct": 4
+        }
+      ],
+      "sum_pct": 16,
+      "applied_pct": 16.0,
+      "price": 11600,
+      "capped": false
+    },
+    "Factors exceed the cap": {
+      "date": "2026-10-09",
+      "weekday": "Fri",
+      "base": 10000,
+      "factors": [
+        {
+          "label": "Weekend",
+          "pct": 8
+        },
+        {
+          "label": "Dashain 2026 (BS 2083): travel days",
+          "pct": 15
+        },
+        {
+          "label": "Autumn peak trekking season 2026",
+          "pct": 4
+        }
+      ],
+      "sum_pct": 27,
+      "applied_pct": 25.0,
+      "price": 12500,
+      "capped": true
+    }
+  },
+  "quote_consistency": [
+    {
+      "car": "Toyota Fortuner",
+      "from": "2026-09-27",
+      "to": "2026-09-29",
+      "api_total": 31500,
+      "sum_of_forecast_days": 31500,
+      "match": true
+    },
+    {
+      "car": "Toyota Fortuner",
+      "from": "2026-10-09",
+      "to": "2026-10-11",
+      "api_total": 36900,
+      "sum_of_forecast_days": 36900,
+      "match": true
+    },
+    {
+      "car": "Toyota Fortuner",
+      "from": "2026-11-06",
+      "to": "2026-11-07",
+      "api_total": 25000,
+      "sum_of_forecast_days": 25000,
+      "match": true
+    },
+    {
+      "car": "Nissan Sunny 2020",
+      "from": "2026-09-27",
+      "to": "2026-09-29",
+      "api_total": 15750,
+      "sum_of_forecast_days": 15750,
+      "match": true
+    },
+    {
+      "car": "Nissan Sunny 2020",
+      "from": "2026-10-09",
+      "to": "2026-10-11",
+      "api_total": 18450,
+      "sum_of_forecast_days": 18450,
+      "match": true
+    },
+    {
+      "car": "Nissan Sunny 2020",
+      "from": "2026-11-06",
+      "to": "2026-11-07",
+      "api_total": 12500,
+      "sum_of_forecast_days": 12500,
+      "match": true
+    }
+  ]
+}

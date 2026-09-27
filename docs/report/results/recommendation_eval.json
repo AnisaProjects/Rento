@@ -1,0 +1,309 @@
+{
+  "generated": "2026-09-27T21:29:17+05:45",
+  "base_url": "http://localhost:8888/Rento",
+  "summary": {
+    "scenarios": 12,
+    "scored": 11,
+    "mean_precision_at_3": 0.606060606060606,
+    "mean_norm_precision_at_3": 0.9393939393939394,
+    "hit_at_1": 0.9090909090909091,
+    "rule_checks_passed": "12/12",
+    "median_ms": 4.0
+  },
+  "scenarios": [
+    {
+      "id": "R01",
+      "trip": "Family trip to Pokhara under Rs 8,000",
+      "understood": {
+        "type": "Sedan",
+        "budget": 8000,
+        "context": [
+          "family"
+        ],
+        "trip_type": "highway"
+      },
+      "returned": 4,
+      "top3": [
+        "Nissan Sunny 2020 (97%)",
+        "Nissan Kicks (82%)",
+        "Maruti Suzuki Vitara Brezza (81%)"
+      ],
+      "relevant": [
+        4,
+        6,
+        8
+      ],
+      "precision_at_3": 1.0,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 22.0,
+      "rule_problems": []
+    },
+    {
+      "id": "R02",
+      "trip": "Mountain roads to Mustang, 5 people",
+      "understood": {
+        "type": "SUV",
+        "seats": 5,
+        "trip_type": "mountain"
+      },
+      "returned": 6,
+      "top3": [
+        "Toyota Fortuner (96%)",
+        "Nissan Kicks (79%)",
+        "Maruti Suzuki Vitara Brezza (78%)"
+      ],
+      "relevant": [
+        3,
+        4,
+        7,
+        8
+      ],
+      "precision_at_3": 1.0,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 4.0,
+      "rule_problems": []
+    },
+    {
+      "id": "R03",
+      "trip": "Daily city commute in Kathmandu, cheap",
+      "understood": {
+        "type": "Hatchback",
+        "budget": 5500,
+        "trip_type": "city"
+      },
+      "returned": 2,
+      "top3": [
+        "Maruti Suzuki Wagon R (93%)",
+        "Nissan Sunny 2020 (70%)"
+      ],
+      "relevant": [
+        1,
+        6
+      ],
+      "precision_at_3": 0.6666666666666666,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 4.7,
+      "rule_problems": []
+    },
+    {
+      "id": "R04",
+      "trip": "Comfortable sedan for a business meeting",
+      "understood": {
+        "type": "Sedan",
+        "type_named": true,
+        "context": [
+          "business",
+          "comfort"
+        ],
+        "trip_type": "highway"
+      },
+      "returned": 7,
+      "top3": [
+        "Nissan Sunny 2020 (96%)",
+        "BMW 5 Series (94%)",
+        "Nissan Kicks (60%)"
+      ],
+      "relevant": [
+        2,
+        6
+      ],
+      "precision_at_3": 0.6666666666666666,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 3.5,
+      "rule_problems": []
+    },
+    {
+      "id": "R05",
+      "trip": "Trip to Chitwan for 7 people",
+      "understood": {
+        "type": "SUV",
+        "seats": 7,
+        "trip_type": "mountain"
+      },
+      "returned": 1,
+      "top3": [
+        "Toyota Fortuner (96%)"
+      ],
+      "relevant": [
+        7
+      ],
+      "precision_at_3": 0.3333333333333333,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 2.8,
+      "rule_problems": []
+    },
+    {
+      "id": "R06",
+      "trip": "Luxury car for a wedding",
+      "understood": {
+        "type": "Sedan",
+        "budget": 15000,
+        "context": [
+          "business",
+          "comfort"
+        ],
+        "trip_type": "highway"
+      },
+      "returned": 8,
+      "top3": [
+        "Nissan Sunny 2020 (96%)",
+        "BMW 5 Series (95%)",
+        "Nissan Kicks (79%)"
+      ],
+      "relevant": [
+        2,
+        3,
+        5
+      ],
+      "precision_at_3": 0.3333333333333333,
+      "norm_precision_at_3": 0.3333333333333333,
+      "hit_at_1": false,
+      "ms": 4.5,
+      "rule_problems": []
+    },
+    {
+      "id": "R07",
+      "trip": "SUV under Rs 7,500",
+      "understood": {
+        "type": "SUV",
+        "budget": 7500,
+        "type_named": true,
+        "trip_type": "mountain"
+      },
+      "returned": 2,
+      "top3": [
+        "Nissan Kicks (83%)",
+        "Maruti Suzuki Vitara Brezza (82%)"
+      ],
+      "relevant": [
+        4,
+        8
+      ],
+      "precision_at_3": 0.6666666666666666,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 2.7,
+      "rule_problems": []
+    },
+    {
+      "id": "R08",
+      "trip": "Road trip with lots of luggage",
+      "understood": {
+        "type": "SUV",
+        "context": [
+          "luggage"
+        ],
+        "trip_type": "mountain"
+      },
+      "returned": 4,
+      "top3": [
+        "Toyota Fortuner (95%)",
+        "Nissan Kicks (77%)",
+        "Maruti Suzuki Vitara Brezza (76%)"
+      ],
+      "relevant": [
+        3,
+        4,
+        7,
+        8
+      ],
+      "precision_at_3": 1.0,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 2.7,
+      "rule_problems": []
+    },
+    {
+      "id": "R09",
+      "trip": "Sports car for a weekend drive",
+      "understood": {
+        "type": "Coupe",
+        "type_named": true
+      },
+      "returned": 1,
+      "top3": [
+        "Nissan GT-R (92%)"
+      ],
+      "relevant": [
+        5
+      ],
+      "precision_at_3": 0.3333333333333333,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 2.4,
+      "rule_problems": []
+    },
+    {
+      "id": "R10",
+      "trip": "Off-road trip to a village in the hills for 2",
+      "understood": {
+        "type": "SUV",
+        "trip_type": "mountain"
+      },
+      "returned": 4,
+      "top3": [
+        "Toyota Fortuner (94%)",
+        "Nissan Kicks (72%)",
+        "Maruti Suzuki Vitara Brezza (70%)"
+      ],
+      "relevant": [
+        7
+      ],
+      "precision_at_3": 0.3333333333333333,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 5.2,
+      "rule_problems": []
+    },
+    {
+      "id": "R11",
+      "trip": "Cheap hatchback for two in the city",
+      "understood": {
+        "type": "Hatchback",
+        "budget": 5500,
+        "type_named": true,
+        "trip_type": "city"
+      },
+      "returned": 2,
+      "top3": [
+        "Maruti Suzuki Wagon R (94%)",
+        "Nissan Sunny 2020 (64%)"
+      ],
+      "relevant": [
+        1
+      ],
+      "precision_at_3": 0.3333333333333333,
+      "norm_precision_at_3": 1.0,
+      "hit_at_1": true,
+      "ms": 4.6,
+      "rule_problems": []
+    },
+    {
+      "id": "R12",
+      "trip": "Electric car for the city",
+      "understood": {
+        "type": "Hatchback",
+        "fuel": "Electric",
+        "trip_type": "city"
+      },
+      "returned": 3,
+      "top3": [
+        "Maruti Suzuki Wagon R (71%)",
+        "Nissan Sunny 2020 (44%)",
+        "BMW 5 Series (42%)"
+      ],
+      "relevant": [],
+      "precision_at_3": null,
+      "norm_precision_at_3": null,
+      "hit_at_1": null,
+      "ms": 3.6,
+      "electric_cars_in_fleet": 0,
+      "rule_problems": []
+    }
+  ]
+}
