@@ -1194,6 +1194,7 @@ a.r-chip:hover {
   font-size: 24px;
 }
 
+.r-empty h2,
 .r-empty h3 {
   font-size: var(--rento-text-xl);
 }

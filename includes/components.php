@@ -112,13 +112,13 @@ function page_hero(string $title, string $lead = '', array $crumbs = [], string 
 }
 
 // Friendly "nothing here yet" block with an optional button.
-function empty_state(string $icon, string $title, string $text, string $buttonLabel = '', string $buttonUrl = ''): string
+function empty_state(string $icon, string $title, string $text, string $buttonLabel = '', string $buttonUrl = '', string $heading = 'h3'): string
 {
     $button = $buttonLabel !== ''
         ? '<a class="r-btn" href="' . htmlentities($buttonUrl) . '">' . htmlentities($buttonLabel) . '</a>'
         : '';
     return '<div class="r-empty"><span class="r-empty__icon"><i class="fa ' . htmlentities($icon) . '" aria-hidden="true"></i></span>'
-        . '<h3>' . htmlentities($title) . '</h3><p>' . htmlentities($text) . '</p>' . $button . '</div>';
+        . "<$heading>" . htmlentities($title) . "</$heading><p>" . htmlentities($text) . '</p>' . $button . '</div>';
 }
 
 // Account area: hero, profile card and account navigation around the page content.

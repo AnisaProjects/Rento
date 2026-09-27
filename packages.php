@@ -60,7 +60,7 @@ $total = array_sum(array_map(fn($c) => (int)$c->packages, $categories));
           </div>
           <p class="r-hint r-package-note"><i class="fa fa-circle-info" aria-hidden="true"></i> Prices are starting prices per vehicle. Send a request and we confirm the final price, car and pickup time with you. No payment is taken online.</p>
         <?php } else {
-          echo empty_state('fa-route', 'Packages are coming soon', 'We are preparing tours, airport transfers and cars with a driver. In the meantime, browse our self-drive cars or ask us about your trip.', 'Contact us', 'contact-us');
+          echo empty_state('fa-route', 'Packages are coming soon', 'We are preparing tours, airport transfers and cars with a driver. In the meantime, browse our self-drive cars or ask us about your trip.', 'Contact us', 'contact-us', 'h2');
         } ?>
       </div>
     </section>
