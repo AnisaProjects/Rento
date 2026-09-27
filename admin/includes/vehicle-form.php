@@ -38,6 +38,8 @@ function vehicle_form_input(PDO $dbh): array
         'IsActive' => empty($_POST['isactive']) ? 0 : 1,
         // New field driveronly: rented only with a driver (enquiry instead of self-drive booking).
         'DriverOnly' => empty($_POST['driveronly']) ? 0 : 1,
+        // New field rugged: off-road capable (ranked higher for mountain and rough-road trips).
+        'Rugged' => empty($_POST['rugged']) ? 0 : 1,
     ];
     foreach (VEHICLE_FEATURES as $field => [$column]) {
         $v[$column] = empty($_POST[$field]) ? null : 1;
@@ -114,6 +116,7 @@ function vehicle_form_sections(PDO $dbh, ?object $vehicle): void
     $selectedBrand = (int)$val('brandname', 'VehiclesBrand');
     $isActive = $posted ? !empty($_POST['isactive']) : ($vehicle === null || (int)$vehicle->IsActive === 1);
     $driverOnly = $posted ? !empty($_POST['driveronly']) : ((int)($vehicle->DriverOnly ?? 0) === 1);
+    $rugged = $posted ? !empty($_POST['rugged']) : ((int)($vehicle->Rugged ?? 0) === 1);
     ?>
     <section class="a-card a-form-section">
       <div class="a-card__body d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -131,6 +134,11 @@ function vehicle_form_sections(PDO $dbh, ?object $vehicle): void
             <label class="form-check-label fs-6 fw-semibold" for="driveronly">Driver only</label>
           </div>
           <div class="form-text" id="driveronly-hint">Shown as "With driver": customers send a request instead of booking self-drive.</div>
+          <div class="form-check form-switch fs-5 mb-0 mt-2">
+            <input class="form-check-input" type="checkbox" role="switch" id="rugged" name="rugged" value="1"<?php echo $rugged ? ' checked' : ''; ?> aria-describedby="rugged-hint">
+            <label class="form-check-label fs-6 fw-semibold" for="rugged">Rugged / off-road capable</label>
+          </div>
+          <div class="form-text" id="rugged-hint">Only for cars built for mountain tracks (high clearance, strong chassis, 4x4 available), e.g. Fortuner, Scorpio, Hilux. Find My Car ranks them first for mountain and rough-road trips.</div>
         </div>
       </div>
     </section>

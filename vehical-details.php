@@ -202,6 +202,7 @@ $today = date('Y-m-d');
             <?php if ($car->SeatingCapacity) { ?><li><span class="r-chip"><i class="fa fa-user-group" aria-hidden="true"></i><?php echo (int)$car->SeatingCapacity; ?> seats</span></li><?php } ?>
             <?php if ($car->ModelYear) { ?><li><span class="r-chip"><i class="fa fa-calendar" aria-hidden="true"></i><?php echo (int)$car->ModelYear; ?> model</span></li><?php } ?>
             <?php if ($driverOnly) { ?><li><span class="r-chip"><i class="fa fa-id-card" aria-hidden="true"></i>With driver</span></li><?php } ?>
+            <?php if (!empty($car->Rugged)) { ?><li><span class="r-chip"><i class="fa fa-mountain" aria-hidden="true"></i>Off-road capable</span></li><?php } ?>
           </ul>
         </div>
         <div class="r-car__price">

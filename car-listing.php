@@ -65,7 +65,7 @@ $where[] = 'tblvehicles.IsActive = 1';
 $from = "FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE " . implode(' AND ', $where);
 
 $columns = "SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
-    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblvehicles.DriverOnly, tblbrands.BrandName";
+    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblvehicles.DriverOnly, tblvehicles.Rugged, tblbrands.BrandName";
 // The fleet is small, so the list is filtered by price and paged here, with the card's "from" price.
 $all = $dbh->prepare("$columns $from ORDER BY " . LISTING_SORTS[$sort][1]);
 $all->execute($bind);

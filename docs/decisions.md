@@ -62,6 +62,24 @@ A temporary customer booked the Nissan Kicks for 20–22 Oct 2026 (3 days, Dasha
 
 The customer and booking were then deleted. Revenue is back at Rs 57,000, and prices were recomputed.
 
+### P5. Rugged / off-road flag
+
+**What.**
+- Migration 019 adds `tblvehicles.Rugged` (default 0) and a "Rugged / off-road capable" switch in
+  admin → Vehicles (form field `rugged`). It is set on the Toyota Fortuner, and on the inactive Mahindra
+  Scorpio and Toyota Hilux: ladder-frame cars with high ground clearance and 4x4 versions.
+- It is *not* set on the Audi Q8. Its quattro all-wheel drive is for grip on the road, and its low tyres
+  and body aren't meant for mountain tracks. The Kicks, Brezza and Creta are road-going compact SUVs.
+- On mountain, Mustang, off-road and rough-road trips, road suitability now weighs 25 instead of 15:
+  - Rugged cars score full marks for it.
+  - Every other car is capped at 0.6 and gets the caution "Not a rugged 4x4: fine on rough patches,
+    less suited to mountain tracks".
+- Car pages show an "Off-road capable" chip, and the API returns `rugged`.
+
+**Result** ("Mountain roads to Mustang, 5 people, SUV"): Fortuner 97%, Kicks 83%, Brezza 82%, Q8 82%
+(before: Kicks 96%, Fortuner 96%, Brezza 95%, Q8 95%).
+**Undo.** Switch the flag off per car in admin. The column itself stays (additive rule).
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`

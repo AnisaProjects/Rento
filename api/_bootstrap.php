@@ -79,7 +79,7 @@ function api_car(): object
     if (!ctype_digit($id) || (int)$id < 1) {
         api_error(400, 'invalid_car', 'car must be a vehicle id.');
     }
-    $query = $dbh->prepare("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.CarType, v.SeatingCapacity, v.FuelType, v.DriverOnly, br.BrandName
+    $query = $dbh->prepare("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.CarType, v.SeatingCapacity, v.FuelType, v.DriverOnly, v.Rugged, br.BrandName
         FROM tblvehicles v LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand WHERE v.id = :id AND v.IsActive = 1");
     $query->execute([':id' => (int)$id]);
     $car = $query->fetch(PDO::FETCH_OBJ);
@@ -99,6 +99,7 @@ function api_car_summary(object $car): array
         'fuel' => $car->FuelType,
         'base_price' => (int)$car->PricePerDay,
         'driver_only' => (bool)$car->DriverOnly,
+        'rugged' => (bool)($car->Rugged ?? false),
         'url' => vehicle_url($car->id, $car->BrandName, $car->VehiclesTitle),
     ];
 }

@@ -8,7 +8,9 @@
  *   type      30 when the visitor named it ("SUV"), 15 when it was only inferred from the trip
  *   seats     15 (when travellers are known, or the trip is a family / group trip)
  *   budget    20 (graded: comfortably within > just within > up to 10% over)
- *   road      15 (city / highway / mountain, from the trip)
+ *   road      15 (city / highway / mountain, from the trip); 25 on mountain and rough-road trips, where
+ *             only cars flagged Rugged / off-road capable (tblvehicles.Rugged) score full marks and other
+ *             SUVs are capped at ROAD_NOT_RUGGED with a caution
  *   comfort   10 (family, business, luggage or comfort trips)
  *   fuel      10 (when asked)
  *   history   10 (logged-in users with confirmed rentals)
@@ -29,8 +31,10 @@
  */
 class CarRecommendationEngine
 {
-    const WEIGHTS = ['typeNamed' => 30, 'typeInferred' => 15, 'seats' => 15, 'budget' => 20, 'road' => 15,
+    const WEIGHTS = ['typeNamed' => 30, 'typeInferred' => 15, 'seats' => 15, 'budget' => 20, 'road' => 15, 'roadMountain' => 25,
         'comfort' => 10, 'fuel' => 10, 'history' => 10, 'age' => 5];
+    // Mountain / rough-road suitability of a car that is not flagged Rugged (at most).
+    const ROAD_NOT_RUGGED = 0.6;
     const OVER_BUDGET_TOLERANCE = 0.10;
     // How well a car type stands in for a requested type (1 = the same type).
     const TYPE_SIMILARITY = [
@@ -65,7 +69,7 @@ class CarRecommendationEngine
     private function cars(): array
     {
         return $this->dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.FuelType, v.ModelYear, v.SeatingCapacity, v.Vimage1,
-            v.CarType, v.DriverOnly, br.BrandName FROM tblvehicles v LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand
+            v.CarType, v.DriverOnly, v.Rugged, br.BrandName FROM tblvehicles v LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand
             WHERE v.IsActive = 1 ORDER BY v.id")->fetchAll(PDO::FETCH_OBJ);
     }
 
@@ -174,9 +178,16 @@ class CarRecommendationEngine
             }
             if ($road) {
                 $suit = self::ROAD_SUITABILITY[$road][$kind] ?? 0.5;
-                $add('road', $suit);
-                if ($suit >= 0.8) $reasons[] = 'Good for ' . self::ROAD_LABELS[$road];
+                $rugged = !empty($car->Rugged) && !$sports;
+                if ($road === 'mountain') {
+                    // Rough and mountain roads: being built for them matters more than the body type.
+                    $suit = $rugged ? 1.0 : min($suit, self::ROAD_NOT_RUGGED);
+                }
+                $add($road === 'mountain' ? 'roadMountain' : 'road', $suit);
+                if ($road === 'mountain' && $rugged) $reasons[] = 'Rugged, off-road capable: built for mountain and rough roads';
+                elseif ($suit >= 0.8) $reasons[] = 'Good for ' . self::ROAD_LABELS[$road];
                 elseif ($suit <= 0.3) $cautions[] = ($sports ? 'Sports car: ' : "$carType: ") . 'not ideal for ' . self::ROAD_LABELS[$road];
+                elseif ($road === 'mountain') $cautions[] = 'Not a rugged 4x4: fine on rough patches, less suited to mountain tracks';
             }
             if ($wantsComfort || $wantsLuggage) {
                 $parts = [];
