@@ -1,0 +1,37 @@
+---
+title: "Rento system architecture (local deployment on MAMP)"
+---
+flowchart TB
+    subgraph Client["Client (browser, desktop and mobile)"]
+        UI["HTML + Bootstrap 5.3 + design tokens<br/>vanilla JS: interface.js, theme.js,<br/>price-calendar.js, rento-ai.js"]
+    end
+    subgraph Web["Apache 2.4 + PHP 8.3 (MAMP)"]
+        HT[".htaccess: clean URLs, blocked<br/>internal folders, no script uploads"]
+        PUB["Public pages<br/>index, car-listing, car page,<br/>Find My Car, packages, invoice"]
+        ADM["Admin area (own session)<br/>dashboard, fleet, packages, festivals,<br/>Smart Pricing, AI Insights, Email"]
+        API["JSON API (GET, rate-limited)<br/>price-quote, price-calendar, recommend"]
+        CORE["Shared PHP modules<br/>security, pricing, price-insights,<br/>recommendation engine, mailer, seo"]
+    end
+    subgraph Data["MySQL 8.0 (database rento, least-privilege user)"]
+        T1[("tblvehicles, tblbooking, tblusers,<br/>packages, content")]
+        T2[("tbl_price_forecast, tbl_forecast_runs,<br/>tbl_price_overrides, tblfestivals, tblsettings")]
+    end
+    subgraph ML["Python 3.12 venv (ml/)"]
+        BF["batch_forecast.py +<br/>pricing_rules.py (live pricer)"]
+        EXP["train_evaluate.py (offline)<br/>Linear Regression, Random Forest,<br/>Gradient Boosting, PyTorch MLP"]
+    end
+    SCHED["launchd (macOS) nightly 02:30<br/>tools/run-forecast.php"]
+    SMTP["SMTP server (optional)"]
+    UI -- "HTTPS / HTTP" --> HT --> PUB & ADM & API
+    PUB & ADM & API --> CORE
+    CORE -- "PDO prepared statements" --> T1 & T2
+    CORE -- "proc_open, settings via env" --> BF
+    SCHED --> BF
+    BF -- "PyMySQL" --> T2
+    BF -. reads .-> T1
+    CORE -- "PHPMailer" --> SMTP
+    EXP -. "external datasets,<br/>not live" .- BF
+    classDef box fill:#fff0eb,stroke:#d23f1c,color:#101114
+    classDef store fill:#f1f2f4,stroke:#4f5362
+    class UI,HT,PUB,ADM,API,CORE,BF,EXP,SCHED,SMTP box
+    class T1,T2 store

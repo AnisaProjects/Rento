@@ -1,0 +1,105 @@
+---
+title: "Class / module diagram (PHP modules shown as «module»; only CarRecommendationEngine is a PHP class)"
+---
+classDiagram
+    direction LR
+    class CarRecommendationEngine {
+        +WEIGHTS : array
+        +ROAD_SUITABILITY : array
+        +ROAD_NOT_RUGGED = 0.6
+        -dbh : PDO
+        +recommend(trip, userEmail, limit) array
+        +scoreCars(cars, trip, userEmail) array
+        +isSportsCar(car)$ bool
+        +getUserPreferences(email) array
+        -cars() array
+        -dailyPrice(car, from, to) array
+    }
+    class TripParser {
+        <<module includes/trip-parser.php>>
+        +trip_understand(text) array
+        +trip_amount(raw) int
+    }
+    class Pricing {
+        <<module includes/pricing.php>>
+        +pricing_quote(dbh, car, from, to) array
+        +public_quote(dbh, car, from, to) array
+        +vehicle_is_free(dbh, id, from, to) bool
+        +booking_price_record(quote) array
+        +booking_total(booking) array
+        +booking_total_sql() string
+        +forecast_request_recompute(dbh, reason) int
+        +forecast_start(dbh) bool
+        +pricing_health(dbh) array
+    }
+    class PriceInsights {
+        <<module includes/price-insights.php>>
+        +car_price_infos(dbh) array
+        +market_category(car) string
+        +vehicle_price_suggestion(dbh, id, base) array
+    }
+    class Security {
+        <<module includes/security.php>>
+        +csrf_token() string
+        +csrf_is_valid() bool
+        +password_hash_for_storage(plain) string
+        +password_check_and_upgrade(plain, stored, upgrade) bool
+        +session_login_regenerate()
+        +clean_cms_html(html) string
+    }
+    class RateLimit {
+        <<module includes/rate_limit.php>>
+        +rate_limit_exceeded(dbh, action, email, max) bool
+        +rate_limit_record(dbh, action, email)
+    }
+    class Mailer {
+        <<module includes/mailer.php>>
+        +mail_configured(dbh) bool
+        +mail_send(dbh, to, subject, html, text) bool
+        +mail_encrypt(plain) string
+        +mail_booking_received(dbh, id) bool
+    }
+    class Api {
+        <<module api/_bootstrap.php>>
+        +api_require_get()
+        +api_rate_limit(action, max)
+        +api_car() object
+        +api_json(data)
+        +api_error(status, code, message)
+    }
+    class PricingRules {
+        <<Python ml/pricing_rules.py>>
+        +price_for_day(day, today, car, festivals, s) dict
+    }
+    class Festival {
+        <<dataclass>>
+        +name, start, end, demand
+        +is_season, travel_from, travel_to, travel_pct
+    }
+    class CarContext {
+        <<dataclass>>
+        +base_price : int
+        +occupancy : float
+        +recent_requests : int
+        +booked_days : set
+    }
+    class BatchForecast {
+        <<Python ml/batch_forecast.py>>
+        +main() int
+        +compute(cur, settings, today) tuple
+        +claim_runs(cur) list
+        +finish_runs(cur, ids, status, ...)
+    }
+    CarRecommendationEngine ..> TripParser : trip criteria
+    CarRecommendationEngine ..> Pricing : public_quote()
+    CarRecommendationEngine ..> PriceInsights : 'from' price
+    Api ..> Pricing
+    Api ..> CarRecommendationEngine
+    Api ..> RateLimit
+    PriceInsights ..> Pricing
+    Pricing ..> BatchForecast : starts (proc_open, env vars)
+    BatchForecast ..> PricingRules
+    PricingRules ..> Festival
+    PricingRules ..> CarContext
+    Mailer ..> Pricing : booking_total()
+    Security ..> RateLimit : login, reset

@@ -1,0 +1,43 @@
+---
+title: "DFD level 1 (part B): administration and background processes 6.0 - 9.0"
+---
+flowchart LR
+    C["Customer / guest"]
+    A["Administrator"]
+    S["Scheduler (launchd / cron)"]
+    M["SMTP server"]
+    P5(["5.0 Book and invoice (part A)"])
+    P6(["6.0 Handle packages and enquiries"])
+    P7(["7.0 Administer fleet, content, festivals, pricing"])
+    P8(["8.0 Forecast prices"])
+    P9(["9.0 Send email"])
+    D2[("D2 tblvehicles, tblbrands")]
+    D3[("D3 tblbooking")]
+    D4[("D4 tbl_price_forecast, tbl_forecast_runs, tbl_price_overrides")]
+    D5[("D5 tblfestivals, tblsettings")]
+    D6[("D6 tblpackages, tblpackageenquiries")]
+    D8[("D8 tblpages, tblsitecontent, tblmailsettings")]
+    C -- "enquiry" --> P6
+    A -- "status, notes" --> P6
+    P6 <--> D6
+    P6 -- "enquiry email" --> P9
+    A -- "fleet, packages, content,<br/>festivals, settings, overrides" --> P7
+    P7 --> D2 & D5 & D6 & D8
+    P7 -- "overrides" --> D4
+    P7 -- "recompute request" --> P8
+    S -- "nightly trigger" --> P8
+    P5 -- "recompute request" --> P8
+    D2 & D3 & D5 --> P8
+    P8 -- "60-day prices + reasons" --> D4
+    P5 -- "booking emails" --> P9
+    D8 -- "SMTP settings" --> P9
+    P9 --> M
+    D4 -- "AI Insights, model health" --> A
+    classDef ext fill:#ffffff,stroke:#101114
+    classDef proc fill:#fff0eb,stroke:#d23f1c
+    classDef other fill:#ffffff,stroke:#d23f1c,stroke-dasharray:4 3
+    classDef store fill:#f1f2f4,stroke:#4f5362
+    class C,A,S,M ext
+    class P6,P7,P8,P9 proc
+    class P5 other
+    class D2,D3,D4,D5,D6,D8 store

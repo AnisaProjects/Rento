@@ -1,0 +1,19 @@
+---
+title: "DFD level 0 (context diagram)"
+---
+flowchart LR
+    C["Customer / guest"]
+    A["Administrator"]
+    S["Scheduler<br/>(launchd, 02:30 nightly)"]
+    M["SMTP mail server"]
+    P(["0 Rento<br/>car rental system"])
+    C -- "search criteria, trip description,<br/>booking request, enquiry, account details" --> P
+    P -- "car lists, day prices and reasons,<br/>recommendations, booking status, invoice" --> C
+    A -- "fleet, packages, festivals, settings,<br/>booking decisions, price overrides" --> P
+    P -- "dashboard KPIs, AI Insights,<br/>model health, reports" --> A
+    S -- "nightly recompute trigger" --> P
+    P -- "reset links, booking and<br/>enquiry emails" --> M
+    classDef ext fill:#ffffff,stroke:#101114
+    classDef proc fill:#fff0eb,stroke:#d23f1c
+    class C,A,S,M ext
+    class P proc

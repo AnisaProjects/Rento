@@ -1,0 +1,27 @@
+---
+title: "Activity: from search to confirmed booking"
+---
+flowchart TD
+    S([Start]) --> A1[Customer searches or describes the trip]
+    A1 --> A2[Open a car page]
+    A2 --> A3[Pick dates on the price calendar]
+    A3 --> A4{Logged in?}
+    A4 -- no --> A5[Log in or register] --> A3
+    A4 -- yes --> A6[Send booking request]
+    A6 --> D1{CSRF token valid?}
+    D1 -- no --> X1([Request rejected])
+    D1 -- yes --> D2{Dates valid and car free?}
+    D2 -- no --> A7[Show error, keep the form] --> A3
+    D2 -- yes --> A8[Server computes the quote from the forecast]
+    A8 --> A9[Store booking with quoted_price and per-day details]
+    A9 --> A10[Request price recompute]
+    A9 --> A11{SMTP set up?}
+    A11 -- yes --> A12[Email: request received]
+    A11 -- no --> A13[No email]
+    A12 & A13 --> A14[Admin reviews the new booking]
+    A14 --> D3{Clashes with a confirmed booking?}
+    D3 -- yes --> A15[Admin must cancel one first]
+    D3 -- no --> D4{Confirm or cancel?}
+    D4 -- cancel --> A16[Status = cancelled] --> E([End])
+    D4 -- confirm --> A17[Status = confirmed, email, recompute]
+    A17 --> A18[Customer prints the invoice at the stored price] --> E
