@@ -1,0 +1,85 @@
+{
+  "method": "tests/evaluation/page_weight.mjs: headless Chrome, cache disabled, page scrolled to load lazy images; transferred bytes (encodedDataLength). Desktop 1366x900, mobile 390x844.",
+  "before_source": "Phase 2 report, measured with the same script on the original template pages before the redesign (desktop).",
+  "note": "The car-detail before value was measured on a car page of the original template.",
+  "pages": [
+    {
+      "page": "Home",
+      "path": "/",
+      "before_requests": 40,
+      "before_kb": 4090,
+      "now_requests": 23,
+      "now_kb": 831,
+      "now_mobile_requests": 21,
+      "now_mobile_kb": 606,
+      "change_kb_pct": -79.7,
+      "js_errors": [],
+      "failed": []
+    },
+    {
+      "page": "Car listing",
+      "path": "/car-listing",
+      "before_requests": 38,
+      "before_kb": 2386,
+      "now_requests": 22,
+      "now_kb": 540,
+      "now_mobile_requests": 22,
+      "now_mobile_kb": 540,
+      "change_kb_pct": -77.4,
+      "js_errors": [],
+      "failed": []
+    },
+    {
+      "page": "Car detail",
+      "path": "/car/toyota-fortuner-7",
+      "before_requests": 35,
+      "before_kb": 1171,
+      "now_requests": 29,
+      "now_kb": 781,
+      "now_mobile_requests": 26,
+      "now_mobile_kb": 552,
+      "change_kb_pct": -33.3,
+      "js_errors": [],
+      "failed": []
+    },
+    {
+      "page": "Find My Car",
+      "path": "/car-recommendation",
+      "before_requests": 28,
+      "before_kb": 898,
+      "now_requests": 14,
+      "now_kb": 387,
+      "now_mobile_requests": 14,
+      "now_mobile_kb": 387,
+      "change_kb_pct": -56.9,
+      "js_errors": [],
+      "failed": []
+    },
+    {
+      "page": "FAQs",
+      "path": "/faqs",
+      "before_requests": 29,
+      "before_kb": 885,
+      "now_requests": 13,
+      "now_kb": 389,
+      "now_mobile_requests": 13,
+      "now_mobile_kb": 389,
+      "change_kb_pct": -56.0,
+      "js_errors": [],
+      "failed": []
+    },
+    {
+      "page": "Contact",
+      "path": "/contact-us",
+      "before_requests": 30,
+      "before_kb": 919,
+      "now_requests": 14,
+      "now_kb": 380,
+      "now_mobile_requests": 14,
+      "now_mobile_kb": 380,
+      "change_kb_pct": -58.7,
+      "js_errors": [],
+      "failed": []
+    }
+  ]
+}

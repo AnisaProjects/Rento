@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/Applications/MAMP/htdocs/Rento/phpunit.xml" tests="54" assertions="268" errors="0" failures="0" skipped="0" time="2.433683">
+    <testsuite name="Unit" tests="30" assertions="84" errors="0" failures="0" skipped="0" time="0.948198">
+      <testsuite name="HelpersTest" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" tests="11" assertions="20" errors="0" failures="0" skipped="0" time="0.004809">
+        <testsuite name="HelpersTest::testRentalDaysIsInclusive" tests="8" assertions="8" errors="0" failures="0" skipped="0" time="0.003243">
+          <testcase name="testRentalDaysIsInclusive with data set &quot;same day counts as one&quot;" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="23" class="HelpersTest" classname="HelpersTest" assertions="1" time="0.001488"/>
+          <testcase name="testRentalDaysIsInclusive with data set &quot;inclusive range&quot;" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="23" class="HelpersTest" classname="HelpersTest" assertions="1" time="0.000279"/>
+          <testcase name="testRentalDaysIsInclusive with data set &quot;across a month&quot;" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="23" class="HelpersTest" classname="HelpersTest" assertions="1" time="0.000229"/>
+          <testcase name="testRentalDaysIsInclusive with data set &quot;leap day&quot;" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="23" class="HelpersTest" classname="HelpersTest" assertions="1" time="0.000233"/>
+          <testcase name="testRentalDaysIsInclusive with data set &quot;return before pickup&quot;" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="23" class="HelpersTest" classname="HelpersTest" assertions="1" time="0.000264"/>
+          <testcase name="testRentalDaysIsInclusive with data set &quot;invalid date&quot;" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="23" class="HelpersTest" classname="HelpersTest" assertions="1" time="0.000248"/>
+          <testcase name="testRentalDaysIsInclusive with data set &quot;empty&quot;" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="23" class="HelpersTest" classname="HelpersTest" assertions="1" time="0.000255"/>
+          <testcase name="testRentalDaysIsInclusive with data set &quot;datetime values&quot;" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="23" class="HelpersTest" classname="HelpersTest" assertions="1" time="0.000247"/>
+        </testsuite>
+        <testcase name="testRentalDaysSqlMatchesThePhpRule" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="28" class="HelpersTest" classname="HelpersTest" assertions="3" time="0.000770"/>
+        <testcase name="testPricesAreRupeesWithThousandsSeparators" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="39" class="HelpersTest" classname="HelpersTest" assertions="4" time="0.000447"/>
+        <testcase name="testCleanUrls" file="/Applications/MAMP/htdocs/Rento/tests/Unit/HelpersTest.php" line="47" class="HelpersTest" classname="HelpersTest" assertions="5" time="0.000349"/>
+      </testsuite>
+      <testsuite name="PricingTest" file="/Applications/MAMP/htdocs/Rento/tests/Unit/PricingTest.php" tests="5" assertions="21" errors="0" failures="0" skipped="0" time="0.001525">
+        <testcase name="testBookingTotalUsesTheStoredQuotedPrice" file="/Applications/MAMP/htdocs/Rento/tests/Unit/PricingTest.php" line="7" class="PricingTest" classname="PricingTest" assertions="4" time="0.000290"/>
+        <testcase name="testOldBookingsWithoutAQuoteUseDaysTimesBasePrice" file="/Applications/MAMP/htdocs/Rento/tests/Unit/PricingTest.php" line="18" class="PricingTest" classname="PricingTest" assertions="2" time="0.000243"/>
+        <testcase name="testPackageSurchargeIsRoundedToFiftyRupees" file="/Applications/MAMP/htdocs/Rento/tests/Unit/PricingTest.php" line="26" class="PricingTest" classname="PricingTest" assertions="4" time="0.000503"/>
+        <testcase name="testMarketCategoryNeverComparesLuxuryCarsWithOrdinaryOnes" file="/Applications/MAMP/htdocs/Rento/tests/Unit/PricingTest.php" line="34" class="PricingTest" classname="PricingTest" assertions="9" time="0.000259"/>
+        <testcase name="testQuoteReasonsAreReadableLines" file="/Applications/MAMP/htdocs/Rento/tests/Unit/PricingTest.php" line="48" class="PricingTest" classname="PricingTest" assertions="2" time="0.000231"/>
+      </testsuite>
+      <testsuite name="SecurityTest" file="/Applications/MAMP/htdocs/Rento/tests/Unit/SecurityTest.php" tests="5" assertions="27" errors="0" failures="0" skipped="0" time="0.938532">
+        <testcase name="testBcryptHashesVerifyAndAreNotRehashed" file="/Applications/MAMP/htdocs/Rento/tests/Unit/SecurityTest.php" line="7" class="SecurityTest" classname="SecurityTest" assertions="4" time="0.541058"/>
+        <testcase name="testOldMd5HashesAreAcceptedOnceAndUpgraded" file="/Applications/MAMP/htdocs/Rento/tests/Unit/SecurityTest.php" line="17" class="SecurityTest" classname="SecurityTest" assertions="6" time="0.395961"/>
+        <testcase name="testCsrfTokenMustMatch" file="/Applications/MAMP/htdocs/Rento/tests/Unit/SecurityTest.php" line="28" class="SecurityTest" classname="SecurityTest" assertions="4" time="0.000451"/>
+        <testcase name="testCmsHtmlLosesScriptsButKeepsFormatting" file="/Applications/MAMP/htdocs/Rento/tests/Unit/SecurityTest.php" line="40" class="SecurityTest" classname="SecurityTest" assertions="6" time="0.000476"/>
+        <testcase name="testSecretsAreEncryptedAndDecryptOnlyWithTheKey" file="/Applications/MAMP/htdocs/Rento/tests/Unit/SecurityTest.php" line="52" class="SecurityTest" classname="SecurityTest" assertions="7" time="0.000586"/>
+      </testsuite>
+      <testsuite name="TripParserTest" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" tests="9" assertions="16" errors="0" failures="0" skipped="0" time="0.003332">
+        <testsuite name="TripParserTest::testBudget" tests="5" assertions="5" errors="0" failures="0" skipped="0" time="0.001964">
+          <testcase name="testBudget with data set #0" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" line="14" class="TripParserTest" classname="TripParserTest" assertions="1" time="0.000601"/>
+          <testcase name="testBudget with data set #1" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" line="14" class="TripParserTest" classname="TripParserTest" assertions="1" time="0.000351"/>
+          <testcase name="testBudget with data set #2" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" line="14" class="TripParserTest" classname="TripParserTest" assertions="1" time="0.000354"/>
+          <testcase name="testBudget with data set #3" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" line="14" class="TripParserTest" classname="TripParserTest" assertions="1" time="0.000326"/>
+          <testcase name="testBudget with data set #4" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" line="14" class="TripParserTest" classname="TripParserTest" assertions="1" time="0.000332"/>
+        </testsuite>
+        <testcase name="testNamedTypeIsMarkedAsNamed" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" line="19" class="TripParserTest" classname="TripParserTest" assertions="3" time="0.000317"/>
+        <testcase name="testInferredTypeIsNotMarkedAsNamed" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" line="27" class="TripParserTest" classname="TripParserTest" assertions="3" time="0.000330"/>
+        <testcase name="testFamilyContextAndCheapDefaultBudget" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" line="35" class="TripParserTest" classname="TripParserTest" assertions="2" time="0.000407"/>
+        <testcase name="testEmptyInputGivesNothing" file="/Applications/MAMP/htdocs/Rento/tests/Unit/TripParserTest.php" line="41" class="TripParserTest" classname="TripParserTest" assertions="3" time="0.000313"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Integration" tests="24" assertions="184" errors="0" failures="0" skipped="0" time="1.485486">
+      <testsuite name="ApiTest" file="/Applications/MAMP/htdocs/Rento/tests/Integration/ApiTest.php" tests="6" assertions="147" errors="0" failures="0" skipped="0" time="0.081859">
+        <testcase name="testQuoteTotalEqualsTheForecastDays" file="/Applications/MAMP/htdocs/Rento/tests/Integration/ApiTest.php" line="28" class="ApiTest" classname="ApiTest" assertions="7" time="0.014349"/>
+        <testcase name="testQuoteRejectsBadInput" file="/Applications/MAMP/htdocs/Rento/tests/Integration/ApiTest.php" line="41" class="ApiTest" classname="ApiTest" assertions="5" time="0.013278"/>
+        <testcase name="testOnlyGetIsAllowed" file="/Applications/MAMP/htdocs/Rento/tests/Integration/ApiTest.php" line="54" class="ApiTest" classname="ApiTest" assertions="2" time="0.004863"/>
+        <testcase name="testCalendarListsTheRestOfTheMonth" file="/Applications/MAMP/htdocs/Rento/tests/Integration/ApiTest.php" line="61" class="ApiTest" classname="ApiTest" assertions="95" time="0.005515"/>
+        <testcase name="testRecommendReturnsRankedMatchesWithReasons" file="/Applications/MAMP/htdocs/Rento/tests/Integration/ApiTest.php" line="74" class="ApiTest" classname="ApiTest" assertions="36" time="0.009211"/>
+        <testcase name="testRateLimitAnswers429" file="/Applications/MAMP/htdocs/Rento/tests/Integration/ApiTest.php" line="95" class="ApiTest" classname="ApiTest" assertions="2" time="0.034643"/>
+      </testsuite>
+      <testsuite name="BookingFlowTest" file="/Applications/MAMP/htdocs/Rento/tests/Integration/BookingFlowTest.php" tests="3" assertions="22" errors="0" failures="0" skipped="0" time="1.354595">
+        <testcase name="testBookingStoredPriceInvoiceAndRevenueAgree" file="/Applications/MAMP/htdocs/Rento/tests/Integration/BookingFlowTest.php" line="83" class="BookingFlowTest" classname="BookingFlowTest" assertions="14" time="0.534215"/>
+        <testcase name="testBookingWithoutCsrfTokenIsRejected" file="/Applications/MAMP/htdocs/Rento/tests/Integration/BookingFlowTest.php" line="116" class="BookingFlowTest" classname="BookingFlowTest" assertions="4" time="0.427218"/>
+        <testcase name="testInvoiceIsOnlyForTheOwner" file="/Applications/MAMP/htdocs/Rento/tests/Integration/BookingFlowTest.php" line="125" class="BookingFlowTest" classname="BookingFlowTest" assertions="4" time="0.393162"/>
+      </testsuite>
+      <testsuite name="SecurityHttpTest" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" tests="15" assertions="15" errors="0" failures="0" skipped="0" time="0.049031">
+        <testsuite name="SecurityHttpTest::testInternalFileIsNotServed" tests="14" assertions="14" errors="0" failures="0" skipped="0" time="0.044960">
+          <testcase name="testInternalFileIsNotServed with data set #0" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.003475"/>
+          <testcase name="testInternalFileIsNotServed with data set #1" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.003601"/>
+          <testcase name="testInternalFileIsNotServed with data set #2" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.003323"/>
+          <testcase name="testInternalFileIsNotServed with data set #3" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.003019"/>
+          <testcase name="testInternalFileIsNotServed with data set #4" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.002787"/>
+          <testcase name="testInternalFileIsNotServed with data set #5" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.002325"/>
+          <testcase name="testInternalFileIsNotServed with data set #6" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.003554"/>
+          <testcase name="testInternalFileIsNotServed with data set #7" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.002638"/>
+          <testcase name="testInternalFileIsNotServed with data set #8" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.002318"/>
+          <testcase name="testInternalFileIsNotServed with data set #9" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.002378"/>
+          <testcase name="testInternalFileIsNotServed with data set #10" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.002972"/>
+          <testcase name="testInternalFileIsNotServed with data set #11" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.002602"/>
+          <testcase name="testInternalFileIsNotServed with data set #12" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.002893"/>
+          <testcase name="testInternalFileIsNotServed with data set #13" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="16" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.007075"/>
+        </testsuite>
+        <testcase name="testLoginWithoutCsrfTokenDoesNotLogIn" file="/Applications/MAMP/htdocs/Rento/tests/Integration/SecurityHttpTest.php" line="22" class="SecurityHttpTest" classname="SecurityHttpTest" assertions="1" time="0.004071"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

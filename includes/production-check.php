@@ -127,7 +127,7 @@ function production_checks(PDO $dbh, array $opts = []): array
         $base = rtrim($base, '/') . '/';
         $exposed = 0; $reached = true;
         foreach (['includes/config.local.php', 'includes/config.php', 'vendor/autoload.php', 'composer.json', 'logs/forecast.log',
-            'database/migrations/001_password_resets.sql', 'ml/pricing_rules.py', 'docs/decisions.md', 'tools/run-forecast.php', '.git/HEAD', '.gitignore'] as $path) {
+            'database/migrations/001_password_resets.sql', 'ml/pricing_rules.py', 'docs/decisions.md', 'tools/run-forecast.php', 'phpunit.xml', 'tests/bootstrap.php', '.git/HEAD', '.gitignore'] as $path) {
             $code = production_http_status($base . $path);
             if ($code === null) { $add('warn', "Could not reach $base to test protected files"); $reached = false; break; }
             if (!in_array($code, [403, 404], true)) $exposed++;

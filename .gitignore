@@ -14,3 +14,6 @@ __pycache__/
 
 # Composer libraries (composer install --no-dev)
 /vendor/
+
+# PHPUnit cache
+/.phpunit.cache/

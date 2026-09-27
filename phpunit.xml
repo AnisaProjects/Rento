@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PHPUnit (dev only). Run all tests with vendor/bin/phpunit, or one suite with the testsuite option
+     (Unit or Integration). Integration tests need MAMP running (Apache + MySQL) and use RENTO_TEST_URL. -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap.php" colors="true" cacheDirectory=".phpunit.cache"
+         failOnWarning="true" failOnRisky="true">
+  <testsuites>
+    <testsuite name="Unit"><directory>tests/Unit</directory></testsuite>
+    <testsuite name="Integration"><directory>tests/Integration</directory></testsuite>
+  </testsuites>
+  <php>
+    <env name="RENTO_TEST_URL" value="http://localhost:8888/Rento"/>
+  </php>
+</phpunit>
