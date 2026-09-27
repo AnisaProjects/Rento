@@ -61,10 +61,17 @@ function car_card(object $car, array $opts = []): string
 
 // Dark title band at the top of inner pages.
 //   $crumbs: [[label, url], ...] between Home and the current page (optional)
-function page_hero(string $title, string $lead = '', array $crumbs = []): string
+//   $image:  name of a photo in assets/images (WebP + JPG) shown behind the title (optional)
+function page_hero(string $title, string $lead = '', array $crumbs = [], string $image = ''): string
 {
     ob_start(); ?>
-    <section class="r-page-hero">
+    <section class="r-page-hero<?php echo $image !== '' ? ' r-page-hero--image' : ''; ?>">
+      <?php if ($image !== '') { ?>
+        <picture class="r-page-hero__bg">
+          <source type="image/webp" srcset="assets/images/<?php echo htmlentities($image); ?>.webp">
+          <img src="assets/images/<?php echo htmlentities($image); ?>.jpg" alt="">
+        </picture>
+      <?php } ?>
       <div class="container">
         <nav aria-label="Breadcrumb">
           <ol class="r-breadcrumb">
@@ -150,5 +157,48 @@ function booking_status_badge($status): string
         default => ['r-badge--warning', 'Awaiting confirmation'],
     };
     return '<span class="r-badge ' . $class . '">' . $label . '</span>';
+}
+
+// Splits FAQ HTML (from Manage Pages) into questions and answers: every heading, or a
+// paragraph that is only bold text, starts a question; what follows is its answer.
+// Returns [] when the content has no such structure (it is then shown as plain text).
+function faq_items(string $html): array
+{
+    if (trim(strip_tags($html)) === '') {
+        return [];
+    }
+    $doc = new DOMDocument();
+    $previous = libxml_use_internal_errors(true);
+    $doc->loadHTML('<?xml encoding="utf-8"?><div id="faq-root">' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+    libxml_use_internal_errors($previous);
+    $root = $doc->getElementById('faq-root');
+
+    $isQuestion = function (DOMNode $node): bool {
+        if (!$node instanceof DOMElement) {
+            return false;
+        }
+        if (in_array(strtolower($node->tagName), ['h2', 'h3', 'h4', 'h5'], true)) {
+            return true;
+        }
+        if (in_array(strtolower($node->tagName), ['p', 'div'], true)) {
+            $text = trim($node->textContent);
+            $bold = '';
+            foreach ($node->getElementsByTagName('strong') as $b) { $bold .= $b->textContent; }
+            foreach ($node->getElementsByTagName('b') as $b) { $bold .= $b->textContent; }
+            return $text !== '' && trim($bold) === $text;
+        }
+        return false;
+    };
+
+    $items = [];
+    foreach ($root->childNodes as $node) {
+        if ($isQuestion($node)) {
+            $items[] = ['question' => trim($node->textContent), 'answer' => ''];
+        } elseif ($items) {
+            $items[count($items) - 1]['answer'] .= $doc->saveHTML($node);
+        }
+    }
+    return array_values(array_filter($items, fn($item) => $item['question'] !== ''));
 }
 ?>
