@@ -9,6 +9,9 @@
 //   admin_page_end();
 require_once __DIR__ . '/config.php';
 
+// Minimum length for a new admin password (change and reset).
+const ADMIN_PASSWORD_MIN = 8;
+
 // Optional libraries a page can ask for with ['libs' => [...]].
 const ADMIN_LIBS = [
     'datatables' => [
@@ -249,4 +252,65 @@ function admin_rental_days(?string $from, ?string $to): int
     $start = strtotime((string)$from);
     $end = strtotime((string)$to);
     return ($start && $end && $end > $start) ? (int)round(($end - $start) / 86400) : 0;
+}
+
+// Login, forgot-password and reset pages: a split screen without the sidebar.
+function admin_auth_start(string $title): void
+{
+    ?>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#101114">
+<title><?php echo h($title); ?> | Rento Admin</title>
+<link rel="icon" type="image/png" href="../assets/images/favicon-icon/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="../assets/vendor/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="a-body">
+<div class="a-auth">
+  <aside class="a-auth__art" aria-hidden="true">
+    <span class="a-logo">Rent<span>o</span><small>Admin</small></span>
+    <div>
+      <h2>Bookings, cars and customers in one place.</h2>
+      <p class="mb-0">Confirm new bookings, keep the fleet up to date and answer customer questions.</p>
+    </div>
+    <p class="small mb-0">&copy; <?php echo date('Y'); ?> Rento</p>
+  </aside>
+  <main class="a-auth__panel" id="a-main">
+    <div class="a-auth__form">
+<?php
+}
+
+function admin_auth_end(string $inlineScript = ''): void
+{
+    ?>
+    </div>
+  </main>
+</div>
+<?php echo flash_render_toasts(); ?>
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="js/admin.js"></script>
+<?php if ($inlineScript !== '') { ?><script><?php echo $inlineScript; ?></script><?php } ?>
+</body>
+</html>
+<?php
+}
+
+// Password input with a show/hide button.
+function admin_password_input(string $name, string $label, string $autocomplete, int $minLength = 0, string $hint = ''): string
+{
+    return '<div class="mb-3"><label class="form-label" for="' . h($name) . '">' . h($label) . '</label><div class="a-pass">'
+        . '<input type="password" class="form-control" name="' . h($name) . '" id="' . h($name) . '" autocomplete="' . h($autocomplete) . '" required'
+        . ($minLength ? ' minlength="' . $minLength . '"' : '') . '>'
+        . '<button type="button" data-a-pass="' . h($name) . '" aria-label="Show password"><i class="fa fa-eye" aria-hidden="true"></i></button></div>'
+        . ($hint !== '' ? '<div class="form-text">' . h($hint) . '</div>' : '') . '</div>';
 }

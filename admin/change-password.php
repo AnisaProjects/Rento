@@ -1,193 +1,73 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
-error_reporting(0);
-include('includes/config.php');
-if (strlen($_SESSION['alogin']) == 0) {
-	header('location:index.php');
-} else {
-	// Code for change password	
-	if (isset($_POST['submit'])) {
-		$username = $_SESSION['alogin'];
-		$sql = "SELECT id, Password FROM admin WHERE UserName=:username";
-		$query = $dbh->prepare($sql);
-		$query->bindParam(':username', $username, PDO::PARAM_STR);
-		$query->execute();
-		$admin = $query->fetch(PDO::FETCH_OBJ);
-		if ((string)($_POST['newpassword'] ?? '') !== (string)($_POST['confirmpassword'] ?? '')) {
-			$error = "New Password and Confirm Password do not match.";
-		} elseif ($admin && password_check_and_upgrade((string)($_POST['password'] ?? ''), $admin->Password, function () {})) {
-			$newpassword = password_hash_for_storage((string)$_POST['newpassword']);
-			$con = "update admin set Password=:newpassword where id=:id";
-			$chngpwd1 = $dbh->prepare($con);
-			$chngpwd1->bindParam(':id', $admin->id, PDO::PARAM_INT);
-			$chngpwd1->bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
-			$chngpwd1->execute();
-			$msg = "Your Password succesfully changed";
-		} else {
-			$error = "Your current password is not valid.";
-		}
-	}
-	?>
+require_once __DIR__ . '/includes/layout.php';
+admin_require_login();
 
-	<!doctype html>
-	<html lang="en" class="no-js">
+if (isset($_POST['submit'])) {
+  $username = $_SESSION['alogin'];
+  $query = $dbh->prepare("SELECT id, Password FROM admin WHERE UserName = :username");
+  $query->bindParam(':username', $username, PDO::PARAM_STR);
+  $query->execute();
+  $admin = $query->fetch(PDO::FETCH_OBJ);
+  $new = (string)($_POST['newpassword'] ?? '');
+  if ($new !== (string)($_POST['confirmpassword'] ?? '')) {
+    flash_set('error', 'New password and confirm password do not match.');
+  } elseif (strlen($new) < ADMIN_PASSWORD_MIN) {
+    flash_set('error', 'The new password must be at least ' . ADMIN_PASSWORD_MIN . ' characters.');
+  } elseif ($admin && password_check_and_upgrade((string)($_POST['password'] ?? ''), $admin->Password, function () {})) {
+    $newpassword = password_hash_for_storage($new);
+    $query = $dbh->prepare("UPDATE admin SET Password = :newpassword WHERE id = :id");
+    $query->bindParam(':id', $admin->id, PDO::PARAM_INT);
+    $query->bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
+    $query->execute();
+    // Any reset links still open for this admin stop working.
+    $dbh->prepare("UPDATE tblpasswordresets SET UsedAt = NOW() WHERE AccountType = 'admin' AND UserId = :id AND UsedAt IS NULL")->execute([':id' => $admin->id]);
+    flash_set('success', 'Your password has been changed.');
+  } else {
+    flash_set('error', 'Your current password is not correct.');
+  }
+  redirect_to(current_url());
+}
 
-	<head>
-		<meta charset="UTF-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-		<meta name="description" content="">
-		<meta name="author" content="">
-		<meta name="theme-color" content="#3e454c">
+$passwordField = function (string $name, string $label, string $autocomplete, string $hint = '') {
+  ?>
+  <div class="mb-3">
+    <label class="form-label" for="<?php echo $name; ?>"><?php echo h($label); ?></label>
+    <div class="a-pass">
+      <input type="password" class="form-control" name="<?php echo $name; ?>" id="<?php echo $name; ?>" autocomplete="<?php echo $autocomplete; ?>" required<?php echo $name !== 'password' ? ' minlength="' . ADMIN_PASSWORD_MIN . '"' : ''; ?>>
+      <button type="button" data-a-pass="<?php echo $name; ?>" aria-label="Show password"><i class="fa fa-eye" aria-hidden="true"></i></button>
+    </div>
+    <?php if ($hint) { ?><div class="form-text"><?php echo h($hint); ?></div><?php } ?>
+  </div>
+  <?php
+};
 
-		<title>Car Rental Portal | Admin Change Password</title>
-
-		<!-- Font awesome -->
-		<link rel="stylesheet" href="css/font-awesome.min.css">
-		<!-- Sandstone Bootstrap CSS -->
-		<link rel="stylesheet" href="css/bootstrap.min.css">
-		<!-- Bootstrap Datatables -->
-		<link rel="stylesheet" href="css/dataTables.bootstrap.min.css">
-		<!-- Bootstrap social button library -->
-		<link rel="stylesheet" href="css/bootstrap-social.css">
-		<!-- Bootstrap select -->
-		<link rel="stylesheet" href="css/bootstrap-select.css">
-		<!-- Bootstrap file input -->
-		<link rel="stylesheet" href="css/fileinput.min.css">
-		<!-- Awesome Bootstrap checkbox -->
-		<link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
-		<!-- Admin Stye -->
-		<link rel="stylesheet" href="css/style.css">
-		<script type="text/javascript">
-			function changepassword_valid() {
-				if (document.chngpwd.newpassword.value != document.chngpwd.confirmpassword.value) {
-					alert("New Password and Confirm Password Field do not match  !!");
-					document.chngpwd.confirmpassword.focus();
-					return false;
-				}
-				return true;
-			}
-		</script>
-		<style>
-			.errorWrap {
-				padding: 10px;
-				margin: 0 0 20px 0;
-				background: #fff;
-				border-left: 4px solid #dd3d36;
-				-webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-				box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-			}
-
-			.succWrap {
-				padding: 10px;
-				margin: 0 0 20px 0;
-				background: #fff;
-				border-left: 4px solid #5cb85c;
-				-webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-				box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-			}
-		</style>
-
-
-	</head>
-
-	<body>
-		<?php include('includes/header.php'); ?>
-		<div class="ts-main-content">
-			<?php include('includes/leftbar.php'); ?>
-			<div class="content-wrapper">
-				<div class="container-fluid">
-
-					<div class="row">
-						<div class="col-md-12">
-
-							<h2 class="page-title">Change Password</h2>
-
-							<div class="row">
-								<div class="col-md-10">
-									<div class="panel panel-default">
-										<div class="panel-heading">Form fields</div>
-										<div class="panel-body">
-											<form method="post" name="chngpwd" class="form-horizontal"
-												onSubmit="return changepassword_valid();">
-<?php echo csrf_field(); ?>
-
-
-												<?php if ($error) { ?>
-													<div class="errorWrap">
-														<strong>ERROR</strong>:<?php echo htmlentities($error); ?>
-													</div><?php } else if ($msg) { ?>
-														<div class="succWrap">
-															<strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?>
-														</div>
-												<?php } ?>
-												<div class="form-group">
-													<label class="col-sm-4 control-label">Current Password</label>
-													<div class="col-sm-8">
-														<input type="password" class="form-control" name="password"
-															id="password" required>
-													</div>
-												</div>
-												<div class="hr-dashed"></div>
-
-												<div class="form-group">
-													<label class="col-sm-4 control-label">New Password</label>
-													<div class="col-sm-8">
-														<input type="password" class="form-control" name="newpassword"
-															id="newpassword" required>
-													</div>
-												</div>
-												<div class="hr-dashed"></div>
-
-												<div class="form-group">
-													<label class="col-sm-4 control-label">Confirm Password</label>
-													<div class="col-sm-8">
-														<input type="password" class="form-control" name="confirmpassword"
-															id="confirmpassword" required>
-													</div>
-												</div>
-												<div class="hr-dashed"></div>
-
-
-
-												<div class="form-group">
-													<div class="col-sm-8 col-sm-offset-4">
-
-														<button class="btn btn-primary" name="submit" type="submit">Save
-															changes</button>
-													</div>
-												</div>
-
-											</form>
-
-										</div>
-									</div>
-								</div>
-
-							</div>
-
-
-
-						</div>
-					</div>
-
-
-				</div>
-			</div>
-		</div>
-
-		<!-- Loading Scripts -->
-		<script src="js/jquery.min.js"></script>
-		<script src="js/bootstrap-select.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
-		<script src="js/jquery.dataTables.min.js"></script>
-		<script src="js/dataTables.bootstrap.min.js"></script>
-		<script src="js/Chart.min.js"></script>
-		<script src="js/fileinput.js"></script>
-		<script src="js/chartData.js"></script>
-		<script src="js/main.js"></script>
-
-	</body>
-
-	</html>
-<?php } ?>
+admin_page_start('Change Password', 'change-password.php', [], ['lead' => 'Signed in as ' . $_SESSION['alogin'] . '.']);
+?>
+<section class="a-card a-form-narrow">
+  <form method="post" name="chngpwd" class="a-card__body" id="chngpwd">
+    <?php echo csrf_field(); ?>
+    <?php $passwordField('password', 'Current password', 'current-password'); ?>
+    <?php $passwordField('newpassword', 'New password', 'new-password', 'At least ' . ADMIN_PASSWORD_MIN . ' characters.'); ?>
+    <?php $passwordField('confirmpassword', 'Confirm new password', 'new-password'); ?>
+    <div class="form-text mb-3" id="pw-match" aria-live="polite"></div>
+    <div class="d-flex justify-content-end gap-2">
+      <a class="btn btn-light" href="dashboard.php">Cancel</a>
+      <button class="btn btn-primary" name="submit" type="submit"><i class="fa fa-key" aria-hidden="true"></i>Change password</button>
+    </div>
+  </form>
+</section>
+<?php admin_page_end(<<<'JS'
+(function () {
+  var form = document.getElementById('chngpwd');
+  var next = form.newpassword, confirm = form.confirmpassword, hint = document.getElementById('pw-match');
+  function check() {
+    var ok = !confirm.value || next.value === confirm.value;
+    confirm.setCustomValidity(ok ? '' : 'The passwords do not match.');
+    hint.textContent = confirm.value ? (ok ? 'Passwords match.' : 'Passwords do not match.') : '';
+    hint.className = 'form-text mb-3 ' + (ok ? 'text-success' : 'text-danger');
+  }
+  next.addEventListener('input', check);
+  confirm.addEventListener('input', check);
+})();
+JS); ?>

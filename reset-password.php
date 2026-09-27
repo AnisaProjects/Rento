@@ -19,7 +19,7 @@ function find_reset_request(PDO $dbh, string $token)
     return false;
   }
   $tokenHash = hash('sha256', $token);
-  $query = $dbh->prepare("SELECT id, UserId FROM tblpasswordresets WHERE TokenHash=:hash AND UsedAt IS NULL AND ExpiresAt > NOW()");
+  $query = $dbh->prepare("SELECT id, UserId FROM tblpasswordresets WHERE TokenHash=:hash AND AccountType='user' AND UsedAt IS NULL AND ExpiresAt > NOW()");
   $query->bindParam(':hash', $tokenHash, PDO::PARAM_STR);
   $query->execute();
   return $query->fetch(PDO::FETCH_OBJ);
@@ -42,13 +42,13 @@ if (isset($_POST['update'])) {
 
   if ($user) {
     // Only the newest link for a user works.
-    $expire = $dbh->prepare("UPDATE tblpasswordresets SET UsedAt=NOW() WHERE UserId=:uid AND UsedAt IS NULL");
+    $expire = $dbh->prepare("UPDATE tblpasswordresets SET UsedAt=NOW() WHERE UserId=:uid AND AccountType='user' AND UsedAt IS NULL");
     $expire->bindParam(':uid', $user->id, PDO::PARAM_INT);
     $expire->execute();
 
     $newToken = bin2hex(random_bytes(32));
     $tokenHash = hash('sha256', $newToken);
-    $insert = $dbh->prepare("INSERT INTO tblpasswordresets(UserId, TokenHash, ExpiresAt) VALUES(:uid, :hash, NOW() + INTERVAL " . RESET_TOKEN_TTL_MINUTES . " MINUTE)");
+    $insert = $dbh->prepare("INSERT INTO tblpasswordresets(UserId, AccountType, TokenHash, ExpiresAt) VALUES(:uid, 'user', :hash, NOW() + INTERVAL " . RESET_TOKEN_TTL_MINUTES . " MINUTE)");
     $insert->bindParam(':uid', $user->id, PDO::PARAM_INT);
     $insert->bindParam(':hash', $tokenHash, PDO::PARAM_STR);
     $insert->execute();
@@ -77,7 +77,7 @@ if (isset($_POST['update'])) {
     $update->bindParam(':password', $passwordHash, PDO::PARAM_STR);
     $update->bindParam(':uid', $reset->UserId, PDO::PARAM_INT);
     $update->execute();
-    $used = $dbh->prepare("UPDATE tblpasswordresets SET UsedAt=NOW() WHERE UserId=:uid AND UsedAt IS NULL");
+    $used = $dbh->prepare("UPDATE tblpasswordresets SET UsedAt=NOW() WHERE UserId=:uid AND AccountType='user' AND UsedAt IS NULL");
     $used->bindParam(':uid', $reset->UserId, PDO::PARAM_INT);
     $used->execute();
     $dbh->commit();
