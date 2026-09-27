@@ -40,6 +40,7 @@ const ADMIN_MENU = [
         ['Manage Brands', 'manage-brands.php', ['edit-brand.php']],
         ['Create Brand', 'create-brand.php', []],
     ]],
+    ['Festivals', 'fa-calendar-days', 'festivals.php'],
     ['Registered Users', 'fa-users', 'reg-users.php'],
     ['Testimonials', 'fa-comment-dots', 'testimonials.php'],
     ['Contact Us Queries', 'fa-envelope-open-text', 'manage-conactusquery.php'],
