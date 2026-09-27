@@ -945,7 +945,7 @@ a.a-activity__title:hover {
 
 .a-filter.is-active .a-filter__count {
   background: color-mix(in srgb, var(--rento-on-inverse) 18%, transparent);
-  color: #fff;
+  color: var(--rento-on-inverse);
 }
 
 /* DataTables 2 */
@@ -1772,3 +1772,21 @@ div.dt-container .dt-length select {
 :root[data-theme="dark"] .text-success { color: var(--rento-success-text) !important; }
 :root[data-theme="dark"] .text-warning { color: var(--rento-warning-text) !important; }
 :root[data-theme="dark"] .text-info { color: var(--rento-info-text) !important; }
+
+/* Manage Pages: read-only preview of a draft (same look as the page text). */
+.a-draft-preview {
+  max-height: 480px;
+  overflow: auto;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius);
+  background: var(--rento-surface-2);
+}
+
+.a-draft-preview h2 { font-size: 1.15rem; margin-top: 1.25rem; }
+.a-draft-preview h3 { font-size: 1rem; }
+
+/* Rich-text editor (Quill): links readable in both themes. */
+.ql-editor a {
+  color: var(--rento-primary-text);
+}

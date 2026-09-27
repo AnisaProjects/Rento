@@ -267,6 +267,40 @@ you enter your provider's details**.
 **Undo.** Clear the SMTP server in admin → Email (email off). Revert the commit to remove the code;
 migration 021 stays (additive).
 
+### P11. Terms & Conditions and Privacy Policy (drafts)
+
+**What.**
+- **Drafts.** Nepal-specific drafts in `docs/legal/terms-draft.html` and `docs/legal/privacy-draft.html` are
+  loaded as **drafts** (migration 022 adds `DraftDetail`, `DraftNote` and `DraftUpdatedAt` to `tblpages`).
+  **Nothing is published.** The live Terms and Privacy pages are unchanged.
+- **Admin → Manage Pages:**
+  - A page with a draft shows "Draft waiting for review", with the review note, a preview, and Edit draft,
+    Publish draft (with confirmation) and Discard draft.
+  - The live editor also has "Save as draft".
+  - **Publishing is blocked while the draft contains `[TO CONFIRM: …]`.** Terms has 27 of these, Privacy 14.
+- **The Terms draft covers:** self-drive, with-driver rental, packages, booking requests and confirmation,
+  smart pricing (daily prices, and the saved quote as the price), payment and the deposit, who may drive,
+  documents, use of the vehicle (off-road flag, restricted areas), fuel and km, damage, accidents,
+  insurance, breakdown and theft, changes and cancellations, liability (with a Consumer Protection Act
+  2075 reference), the account and website, complaints, Nepal law and courts.
+- **The Privacy draft covers:** what is collected (account, bookings, enquiries, contact form, newsletter,
+  testimonials, documents at pickup, technical data and cookies), why, smart pricing and recommendations,
+  sharing (email and hosting providers, insurers, police, Google Fonts and Maps), retention, security,
+  rights under the Individual Privacy Act 2075, children and changes. It matches what the code actually
+  does (for example, rate-limit records deleted after about a day, and the theme stored only in the
+  browser).
+- **Keyboard fix.** Tab in the page editor (Quill) no longer traps the keyboard: it leaves the editor
+  instead of inserting a tab (WCAG 2.1.2).
+
+**You must review:** every `[TO CONFIRM]` item (company, PAN/VAT, deposit, payment timing, minimum age and
+licence years, insurance and excess, fuel and km rules, cancellation fees, retention periods, providers), and
+have both texts checked, ideally by a lawyer in Nepal. The drafts were written by the developer, not a
+lawyer.
+
+**Important:** the **live** Terms page is copied *Yahoo! India* terms and the live Privacy page is *lorem
+ipsum*. Both should be replaced soon, which is what publishing the reviewed drafts will do.
+**Undo.** Admin → Manage Pages → Discard draft.
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`
