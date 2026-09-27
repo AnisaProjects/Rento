@@ -2,166 +2,76 @@
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 if (empty($_SESSION['login'])) {
-  header('Location: ./');
-} else {
-  ?><!DOCTYPE HTML>
-  <html lang="en">
+  flash_set('info', 'Please log in to see your account.');
+  flash_open_modal('loginform');
+  redirect_to('./');
+}
 
-  <head>
-    <?php
-    $pageTitle = 'My Bookings';
-    include('includes/head.php');
-    ?>
-  </head>
+$sql = "SELECT tblvehicles.Vimage1 AS Vimage1, tblvehicles.VehiclesTitle, tblvehicles.id AS vid, tblbrands.BrandName, tblbooking.FromDate,
+    tblbooking.ToDate, tblbooking.message, tblbooking.Status, tblbooking.PostingDate, tblvehicles.PricePerDay,
+    DATEDIFF(tblbooking.ToDate, tblbooking.FromDate) AS totaldays, tblbooking.BookingNumber
+  FROM tblbooking JOIN tblvehicles ON tblbooking.VehicleId = tblvehicles.id JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand
+  WHERE tblbooking.userEmail = :useremail ORDER BY tblbooking.id DESC";
+$query = $dbh->prepare($sql);
+$query->bindParam(':useremail', $_SESSION['login'], PDO::PARAM_STR);
+$query->execute();
+$bookings = $query->fetchAll(PDO::FETCH_OBJ);
+?>
+<!DOCTYPE HTML>
+<html lang="en">
 
-  <body>
+<head>
+  <?php
+  $pageTitle = 'My Bookings';
+  $pageModern = true;
+  include('includes/head.php');
+  ?>
+</head>
 
+<body class="r-page">
 
-    <!--Header-->
-    <?php include('includes/header.php'); ?>
-    <!--Page Header-->
-    <!-- /Header -->
+  <?php include('includes/header.php'); ?>
 
-    <!--Page Header-->
-    <section class="page-header profile_page">
-      <div class="container">
-        <div class="page-header_wrap">
-          <div class="page-heading">
-            <h1>My Booking</h1>
-          </div>
-          <ul class="coustom-breadcrumb">
-            <li><a href="#">Home</a></li>
-            <li>My Booking</li>
-          </ul>
-        </div>
-      </div>
-      <!-- Dark Overlay-->
-      <div class="dark-overlay"></div>
-    </section>
-    <!-- /Page Header-->
-
-    <?php
-    $useremail = $_SESSION['login'];
-    $sql = "SELECT * from tblusers where EmailId=:useremail ";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':useremail', $useremail, PDO::PARAM_STR);
-    $query->execute();
-    $results = $query->fetchAll(PDO::FETCH_OBJ);
-    $cnt = 1;
-    if ($query->rowCount() > 0) {
-      foreach ($results as $result) { ?>
-        <section class="user_profile inner_pages">
-          <div class="container">
-            <div class="user_profile_info gray-bg padding_4x4_40">
-              <div class="upload_user_logo"> <img src="assets/images/dealer-logo.jpg" alt="image">
+  <main id="main">
+    <?php echo account_start($dbh, 'my-booking', 'My bookings', 'Your booking requests and their status.'); ?>
+    <?php if ($bookings) {
+      foreach ($bookings as $booking) {
+        // A same-day rental counts as one day (same rule as the booking form).
+        $days = max(1, (int)$booking->totaldays);
+        $carName = vehicle_display_name($booking->BrandName, $booking->VehiclesTitle);
+        $url = vehicle_url($booking->vid, $booking->BrandName, $booking->VehiclesTitle); ?>
+        <article class="r-booking">
+          <a class="r-booking__media" href="<?php echo htmlentities($url); ?>" tabindex="-1" aria-hidden="true">
+            <?php echo vehicle_image($booking->Vimage1, '', ['sizes' => '160px']); ?>
+          </a>
+          <div>
+            <div class="r-booking__head">
+              <div>
+                <h2 class="r-booking__title"><a href="<?php echo htmlentities($url); ?>"><?php echo htmlentities($carName); ?></a></h2>
+                <span class="r-booking__number">Booking #<?php echo htmlentities($booking->BookingNumber); ?> &middot; requested <?php echo htmlentities(date('j M Y', strtotime($booking->PostingDate))); ?></span>
               </div>
-              <div class="dealer_info">
-                <h5><?php echo htmlentities($result->FullName); ?></h5>
-                <p><?php echo htmlentities($result->Address); ?><br>
-                  <?php echo htmlentities($result->City); ?>&nbsp;<?php echo htmlentities($result->Country);
-      }
-    }
-    ?></p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3 col-sm-3">
-            <?php include('includes/sidebar.php'); ?>
-          </div>
-          <div class="col-md-8 col-sm-8">
-            <div class="profile_wrap">
-              <h5 class="uppercase underline">My Booikngs </h5>
-              <div class="my_vehicles_list">
-                <ul class="vehicle_listing">
-                  <?php
-                  $useremail = $_SESSION['login'];
-                  $sql = "SELECT tblvehicles.Vimage1 as Vimage1,tblvehicles.VehiclesTitle,tblvehicles.id as vid,tblbrands.BrandName,tblbooking.FromDate,tblbooking.ToDate,tblbooking.message,tblbooking.Status,tblvehicles.PricePerDay,DATEDIFF(tblbooking.ToDate,tblbooking.FromDate) as totaldays,tblbooking.BookingNumber  from tblbooking join tblvehicles on tblbooking.VehicleId=tblvehicles.id join tblbrands on tblbrands.id=tblvehicles.VehiclesBrand where tblbooking.userEmail=:useremail order by tblbooking.id desc";
-                  $query = $dbh->prepare($sql);
-                  $query->bindParam(':useremail', $useremail, PDO::PARAM_STR);
-                  $query->execute();
-                  $results = $query->fetchAll(PDO::FETCH_OBJ);
-                  $cnt = 1;
-                  if ($query->rowCount() > 0) {
-                    foreach ($results as $result) { ?>
-
-                      <li>
-                        <h4 style="color:red">Booking No #<?php echo htmlentities($result->BookingNumber); ?></h4>
-                        <div class="vehicle_img"> <a
-                            href="<?php echo htmlentities(vehicle_url($result->vid, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>"><?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '160px']); ?></a>
-                        </div>
-                        <div class="vehicle_title">
-
-                          <h6><a href="<?php echo htmlentities(vehicle_url($result->vid, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>">
-                              <?php echo htmlentities($result->BrandName); ?> ,
-                              <?php echo htmlentities($result->VehiclesTitle); ?></a></h6>
-                          <p><b>From </b> <?php echo htmlentities($result->FromDate); ?> <b>To </b>
-                            <?php echo htmlentities($result->ToDate); ?></p>
-                          <div style="float: left">
-                            <p><b>Message:</b> <?php echo htmlentities($result->message); ?> </p>
-                          </div>
-                        </div>
-                        <?php if ($result->Status == 1) { ?>
-                          <div class="vehicle_status"> <a href="#" class="btn outline btn-xs active-btn">Confirmed</a>
-                            <div class="clearfix"></div>
-                          </div>
-
-                        <?php } else if ($result->Status == 2) { ?>
-                            <div class="vehicle_status"> <a href="#" class="btn outline btn-xs">Cancelled</a>
-                              <div class="clearfix"></div>
-                            </div>
-
-
-
-                        <?php } else { ?>
-                            <div class="vehicle_status"> <a href="#" class="btn outline btn-xs">Not Confirm yet</a>
-                              <div class="clearfix"></div>
-                            </div>
-                        <?php } ?>
-
-                      </li>
-
-                      <h5 style="color:blue">Invoice</h5>
-                      <table>
-                        <tr>
-                          <th>Car Name</th>
-                          <th>From Date</th>
-                          <th>To Date</th>
-                          <th>Total Days</th>
-                          <th>Rent / Day</th>
-                        </tr>
-                        <tr>
-                          <td><?php echo htmlentities($result->VehiclesTitle); ?>,
-                            <?php echo htmlentities($result->BrandName); ?>
-                          </td>
-                          <td><?php echo htmlentities($result->FromDate); ?></td>
-                          <td> <?php echo htmlentities($result->ToDate); ?></td>
-                          <td><?php echo htmlentities($tds = $result->totaldays); ?></td>
-                          <td> <?php $ppd = $result->PricePerDay; echo format_price($ppd); ?></td>
-                        </tr>
-                        <tr>
-                          <th colspan="4" style="text-align:center;"> Grand Total</th>
-                          <th><?php echo format_price($tds * $ppd); ?></th>
-                        </tr>
-                      </table>
-                      <hr />
-                    <?php }
-                  } else { ?>
-                    <h5 align="center" style="color:red">No booking yet</h5>
-                  <?php } ?>
-
-
-                </ul>
-              </div>
+              <?php echo booking_status_badge($booking->Status); ?>
             </div>
+            <dl class="r-booking__facts">
+              <div><dt>Pickup</dt><dd><?php echo htmlentities(date('D, j M Y', strtotime($booking->FromDate))); ?></dd></div>
+              <div><dt>Return</dt><dd><?php echo htmlentities(date('D, j M Y', strtotime($booking->ToDate))); ?></dd></div>
+              <div><dt><?php echo $days; ?> <?php echo $days === 1 ? 'day' : 'days'; ?> &times; <?php echo format_price($booking->PricePerDay); ?></dt><dd><?php echo format_price($days * $booking->PricePerDay); ?></dd></div>
+            </dl>
+            <?php if (trim((string)$booking->message) !== '') { ?>
+              <p class="r-booking__message"><strong>Your message:</strong> <?php echo htmlentities($booking->message); ?></p>
+            <?php } ?>
           </div>
-        </div>
-      </div>
-    </section>
-    <!--/my-vehicles-->
-    <?php include('includes/footer.php'); ?>
+        </article>
+      <?php }
+    } else {
+      echo empty_state('fa-calendar-check', 'No bookings yet', 'When you request a car, it shows up here with its status.', 'Browse cars', 'car-listing');
+    } ?>
+    <?php echo account_end(); ?>
+  </main>
 
-    <?php include('includes/scripts.php'); ?>
-  </body>
+  <?php include('includes/footer.php'); ?>
+  <?php include('includes/scripts.php'); ?>
 
-  </html>
-<?php } ?>
+</body>
+
+</html>

@@ -2499,3 +2499,232 @@ a.r-chip:hover {
 .r-prose li {
   margin: 0 0 var(--rento-space-2);
 }
+
+/* ---------- 17. Account area ---------- */
+.r-account__layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--rento-space-8);
+  align-items: start;
+}
+
+.r-account__aside {
+  position: sticky;
+  top: 96px;
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-lg);
+  background: #fff;
+  overflow: hidden;
+}
+
+.r-account__user {
+  display: flex;
+  align-items: center;
+  gap: var(--rento-space-4);
+  padding: var(--rento-space-5);
+  border-bottom: 1px solid var(--rento-gray-100);
+}
+
+.r-account__user p {
+  margin: 0;
+}
+
+.r-account__name {
+  color: var(--rento-ink-900);
+  font-family: var(--rento-font-heading);
+  font-weight: var(--rento-weight-bold);
+}
+
+.r-account__email,
+.r-account__since {
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-xs);
+  overflow-wrap: anywhere;
+}
+
+.r-account__nav {
+  margin: 0;
+  padding: var(--rento-space-2);
+  list-style: none;
+}
+
+.r-account__nav li {
+  margin: 0;
+}
+
+.r-account__nav a {
+  display: flex;
+  align-items: center;
+  gap: var(--rento-space-3);
+  padding: var(--rento-space-3);
+  border-radius: var(--rento-radius-sm);
+  color: var(--rento-ink-800) !important;
+  font-size: var(--rento-text-sm);
+  font-weight: var(--rento-weight-medium);
+}
+
+.r-account__nav a i {
+  width: 18px;
+  color: var(--rento-gray-400);
+  text-align: center;
+}
+
+.r-account__nav a:hover {
+  background: var(--rento-gray-50);
+}
+
+.r-account__nav a.is-active {
+  background: var(--rento-primary-soft);
+  color: var(--rento-primary-active) !important;
+  font-weight: var(--rento-weight-semibold);
+}
+
+.r-account__nav a.is-active i {
+  color: var(--rento-primary);
+}
+
+.r-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rento-space-2) var(--rento-space-6);
+  margin: calc(-1 * var(--rento-space-3)) 0 var(--rento-space-6);
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-sm);
+}
+
+.r-booking {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: var(--rento-space-5);
+  padding: var(--rento-space-5);
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-lg);
+  background: #fff;
+}
+
+.r-booking + .r-booking {
+  margin-top: var(--rento-space-4);
+}
+
+.r-booking__media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  height: auto;
+  border-radius: var(--rento-radius);
+  object-fit: cover;
+}
+
+.r-booking__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rento-space-2);
+  margin-bottom: var(--rento-space-3);
+}
+
+.r-booking__title {
+  margin: 0 !important;
+  font-size: var(--rento-text-lg) !important;
+}
+
+.r-booking__title a {
+  color: var(--rento-ink-900) !important;
+}
+
+.r-booking__number {
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-xs);
+}
+
+.r-booking__facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--rento-space-3);
+  margin: 0 0 var(--rento-space-3);
+}
+
+.r-booking__facts div {
+  padding: var(--rento-space-3);
+  border-radius: var(--rento-radius);
+  background: var(--rento-gray-50);
+}
+
+.r-booking__facts dt {
+  margin-bottom: 2px;
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-xs);
+  font-weight: var(--rento-weight-medium);
+}
+
+.r-booking__facts dd {
+  margin: 0;
+  color: var(--rento-ink-900);
+  font-size: var(--rento-text-sm);
+  font-weight: var(--rento-weight-semibold);
+}
+
+.r-booking__message {
+  margin: 0;
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-sm);
+}
+
+.r-testimonial {
+  padding: var(--rento-space-5);
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-lg);
+  background: #fff;
+}
+
+.r-testimonial + .r-testimonial {
+  margin-top: var(--rento-space-4);
+}
+
+.r-testimonial__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rento-space-2);
+  margin-bottom: var(--rento-space-3);
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-sm);
+}
+
+.r-testimonial p {
+  margin: 0;
+  color: var(--rento-ink-800);
+}
+
+@media (max-width: 991px) {
+  .r-account__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .r-account__aside {
+    position: static;
+  }
+
+  .r-account__nav {
+    display: flex;
+    gap: var(--rento-space-1);
+    overflow-x: auto;
+  }
+
+  .r-account__nav a {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 575px) {
+  .r-booking {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .r-booking__facts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.r-panel--narrow { max-width: 560px; }

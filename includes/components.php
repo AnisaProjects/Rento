@@ -92,4 +92,63 @@ function empty_state(string $icon, string $title, string $text, string $buttonLa
     return '<div class="r-empty"><span class="r-empty__icon"><i class="fa ' . htmlentities($icon) . '" aria-hidden="true"></i></span>'
         . '<h3>' . htmlentities($title) . '</h3><p>' . htmlentities($text) . '</p>' . $button . '</div>';
 }
+
+// Account area: hero, profile card and account navigation around the page content.
+//   echo account_start($dbh, 'my-booking', 'My bookings'); ...content... echo account_end();
+function account_start(PDO $dbh, string $active, string $title, string $lead = ''): string
+{
+    $userQuery = $dbh->prepare("SELECT FullName, EmailId, RegDate FROM tblusers WHERE EmailId = :email");
+    $userQuery->bindParam(':email', $_SESSION['login'], PDO::PARAM_STR);
+    $userQuery->execute();
+    $user = $userQuery->fetch(PDO::FETCH_OBJ) ?: (object)['FullName' => '', 'EmailId' => $_SESSION['login'], 'RegDate' => null];
+    $links = [
+        'profile' => ['fa-user', 'Profile'],
+        'my-booking' => ['fa-calendar-check', 'My bookings'],
+        'my-testimonials' => ['fa-comment-dots', 'My testimonials'],
+        'post-testimonial' => ['fa-pen-to-square', 'Write a testimonial'],
+        'update-password' => ['fa-key', 'Change password'],
+    ];
+    ob_start();
+    echo page_hero($title, $lead, [['My account', 'profile']]); ?>
+    <section class="r-section r-section--muted r-account">
+      <div class="container">
+        <div class="r-account__layout">
+          <aside class="r-account__aside">
+            <div class="r-account__user">
+              <span class="r-avatar r-avatar--lg" aria-hidden="true"><?php echo htmlentities(initials($user->FullName ?: $user->EmailId)); ?></span>
+              <div>
+                <p class="r-account__name"><?php echo htmlentities($user->FullName ?: 'Your account'); ?></p>
+                <p class="r-account__email"><?php echo htmlentities($user->EmailId); ?></p>
+                <?php if (!empty($user->RegDate)) { ?><p class="r-account__since">Member since <?php echo date('F Y', strtotime($user->RegDate)); ?></p><?php } ?>
+              </div>
+            </div>
+            <nav aria-label="My account">
+              <ul class="r-account__nav">
+                <?php foreach ($links as $url => [$icon, $label]) { ?>
+                  <li><a href="<?php echo $url; ?>" class="<?php echo $url === $active ? 'is-active' : ''; ?>" <?php echo $url === $active ? 'aria-current="page"' : ''; ?>><i class="fa <?php echo $icon; ?>" aria-hidden="true"></i><?php echo $label; ?></a></li>
+                <?php } ?>
+                <li><a href="logout"><i class="fa fa-arrow-right-from-bracket" aria-hidden="true"></i>Sign out</a></li>
+              </ul>
+            </nav>
+          </aside>
+          <div class="r-account__content">
+    <?php
+    return ob_get_clean();
+}
+
+function account_end(): string
+{
+    return '</div></div></div></section>';
+}
+
+// Status badge for a booking (tblbooking.Status: 0/NULL pending, 1 confirmed, 2 cancelled).
+function booking_status_badge($status): string
+{
+    [$class, $label] = match ((int)$status) {
+        1 => ['r-badge--success', 'Confirmed'],
+        2 => ['r-badge--danger', 'Cancelled'],
+        default => ['r-badge--warning', 'Awaiting confirmation'],
+    };
+    return '<span class="r-badge ' . $class . '">' . $label . '</span>';
+}
 ?>

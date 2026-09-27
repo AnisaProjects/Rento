@@ -2,124 +2,55 @@
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 if (empty($_SESSION['login'])) {
-  header('Location: ./');
-} else {
+  flash_set('info', 'Please log in to see your account.');
+  flash_open_modal('loginform');
+  redirect_to('./');
+}
+
+$query = $dbh->prepare("SELECT * FROM tbltestimonial WHERE UserEmail=:useremail ORDER BY id DESC");
+$query->bindParam(':useremail', $_SESSION['login'], PDO::PARAM_STR);
+$query->execute();
+$testimonials = $query->fetchAll(PDO::FETCH_OBJ);
+?>
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <?php
+  $pageTitle = 'My Testimonials';
+  $pageModern = true;
+  include('includes/head.php');
   ?>
-  <!DOCTYPE HTML>
-  <html lang="en">
+</head>
 
-  <head>
-    <?php
-    $pageTitle = 'My Testimonials';
-    include('includes/head.php');
-    ?>
-  </head>
+<body class="r-page">
 
-  <body>
+  <?php include('includes/header.php'); ?>
 
-    <!--Header-->
-    <?php include('includes/header.php'); ?>
-    <!--Page Header-->
-    <section class="page-header profile_page">
-      <div class="container">
-        <div class="page-header_wrap">
-          <div class="page-heading">
-            <h1>My Testimonials</h1>
+  <main id="main">
+    <?php echo account_start($dbh, 'my-testimonials', 'My testimonials', 'Testimonials appear on the home page once we approve them.'); ?>
+    <?php if ($testimonials) { ?>
+      <p class="mb-4"><a class="r-btn r-btn--outline r-btn--sm" href="post-testimonial"><i class="fa fa-plus" aria-hidden="true"></i>Write another</a></p>
+      <?php foreach ($testimonials as $testimonial) { ?>
+        <article class="r-testimonial">
+          <div class="r-testimonial__head">
+            <span>Posted <?php echo htmlentities(date('j M Y', strtotime($testimonial->PostingDate))); ?></span>
+            <?php echo $testimonial->status == 1
+              ? '<span class="r-badge r-badge--success">Published</span>'
+              : '<span class="r-badge r-badge--warning">Awaiting approval</span>'; ?>
           </div>
-          <ul class="coustom-breadcrumb">
-            <li><a href="#">Home</a></li>
-            <li>My Testimonials</li>
-          </ul>
-        </div>
-      </div>
-      <!-- Dark Overlay-->
-      <div class="dark-overlay"></div>
-    </section>
-    <!-- /Page Header-->
+          <p><?php echo nl2br(htmlentities($testimonial->Testimonial)); ?></p>
+        </article>
+      <?php }
+    } else {
+      echo empty_state('fa-comment-dots', 'No testimonials yet', 'Rented a car with us? Tell other renters how it went.', 'Write a testimonial', 'post-testimonial');
+    } ?>
+    <?php echo account_end(); ?>
+  </main>
 
-    <?php
-    $useremail = $_SESSION['login'];
-    $sql = "SELECT * from tblusers where EmailId=:useremail";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':useremail', $useremail, PDO::PARAM_STR);
-    $query->execute();
-    $results = $query->fetchAll(PDO::FETCH_OBJ);
-    $cnt = 1;
-    if ($query->rowCount() > 0) {
-      foreach ($results as $result) { ?>
-        <section class="user_profile inner_pages">
-          <div class="container">
-            <div class="user_profile_info gray-bg padding_4x4_40">
-              <div class="upload_user_logo"> <img src="assets/images/dealer-logo.jpg" alt="image">
-              </div>
+  <?php include('includes/footer.php'); ?>
+  <?php include('includes/scripts.php'); ?>
 
-              <div class="dealer_info">
-                <h5><?php echo htmlentities($result->FullName); ?></h5>
-                <p><?php echo htmlentities($result->Address); ?><br>
-                  <?php echo htmlentities($result->City); ?>&nbsp;<?php echo htmlentities($result->Country);
-      }
-    } ?></p>
-          </div>
-        </div>
+</body>
 
-        <div class="row">
-          <div class="col-md-3 col-sm-3">
-            <?php include('includes/sidebar.php'); ?>
-          </div>
-          <div class="col-md-8 col-sm-8">
-            <div class="profile_wrap">
-              <h5 class="uppercase underline">My Testimonials </h5>
-              <div class="my_vehicles_list">
-                <ul class="vehicle_listing">
-                  <?php
-                  $useremail = $_SESSION['login'];
-                  $sql = "SELECT * from tbltestimonial where UserEmail=:useremail";
-                  $query = $dbh->prepare($sql);
-                  $query->bindParam(':useremail', $useremail, PDO::PARAM_STR);
-                  $query->execute();
-                  $results = $query->fetchAll(PDO::FETCH_OBJ);
-
-                  if ($cnt = $query->rowCount() > 0) {
-                    foreach ($results as $result) { ?>
-
-                      <li>
-
-                        <div>
-                          <p><?php echo htmlentities($result->Testimonial); ?> </p>
-                          <p><b>Posting Date:</b><?php echo htmlentities($result->PostingDate); ?> </p>
-                        </div>
-                        <?php if ($result->status == 1) { ?>
-                          <div class="vehicle_status"> <a class="btn outline btn-xs active-btn">Active</a>
-
-                            <div class="clearfix"></div>
-                          </div>
-                        <?php } else { ?>
-                          <div class="vehicle_status"> <a href="#" class="btn outline btn-xs">Waiting for approval</a>
-                            <div class="clearfix"></div>
-                          </div>
-                        <?php } ?>
-                      </li>
-                    <?php }
-                  } ?>
-
-                </ul>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      </div>
-    </section>
-    <!--/my-vehicles-->
-
-    <<!--Footer -->
-      <?php include('includes/footer.php'); ?>
-      <!-- /Footer-->
-
-<?php include('includes/scripts.php'); ?>
-
-  </body>
-
-  </html>
-<?php } ?>
+</html>
