@@ -1790,3 +1790,9 @@ div.dt-container .dt-length select {
 .ql-editor a {
   color: var(--rento-primary-text);
 }
+
+/* Dark mode: pasted text with fixed colours (e.g. black) follows the theme in the editor too. */
+:root[data-theme="dark"] .ql-editor [style*="color"] {
+  color: inherit !important;
+  background-color: transparent !important;
+}

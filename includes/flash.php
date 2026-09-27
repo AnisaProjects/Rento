@@ -15,7 +15,7 @@ function flash_message(string $type, ?string $message, bool $allowHtml = false):
     $type = isset(FLASH_LABELS[$type]) ? $type : 'info';
     $role = $type === 'error' ? 'alert' : 'status';
     $body = $allowHtml ? $message : htmlentities($message);
-    return '<div class="rento-flash rento-flash--' . $type . '" role="' . $role . '"><strong>'
+    return '<div class="rento-flash rento-flash--' . $type . '" role="' . $role . '" data-r-announce="' . $role . '"><strong>'
         . FLASH_LABELS[$type] . '</strong>: ' . $body . '</div>';
 }
 
@@ -53,7 +53,7 @@ function flash_render_toasts(): string
     unset($_SESSION['flash_modal']);
     $out = '<div class="visually-hidden" id="r-live-status" role="status" aria-live="polite" aria-atomic="true"></div>'
         . '<div class="visually-hidden" id="r-live-alert" role="alert" aria-atomic="true"></div>';
-    $out .= $html === '' ? '' : '<div class="r-toasts">' . $html . '</div>';
+    $out .= $html === '' ? '' : '<div class="r-toasts" role="region" aria-label="Notifications">' . $html . '</div>';
     if (preg_match('/^[a-z-]+$/', $modal)) {
         $out .= '<div id="r-open-modal" data-modal="' . $modal . '" hidden></div>';
     }

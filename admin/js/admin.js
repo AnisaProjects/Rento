@@ -65,8 +65,8 @@
   window.setTimeout(function () {
     document.querySelectorAll('[data-r-announce]').forEach(function (toast) {
       var region = document.getElementById(toast.dataset.rAnnounce === 'alert' ? 'r-live-alert' : 'r-live-status');
-      var body = toast.querySelector('.r-toast__body');
-      if (region && body) region.textContent = (region.textContent ? region.textContent + ' ' : '') + body.textContent;
+      var body = toast.querySelector('.r-toast__body') || toast; // toast, or an inline message
+      if (region && body) region.textContent = (region.textContent ? region.textContent + ' ' : '') + body.textContent.trim();
     });
   }, 250);
 

@@ -113,7 +113,7 @@ admin_page_start($page ? ($editDraft ? 'Edit draft: ' : 'Edit ') . $page[0] : 'M
       <?php if ($pagetype === 'faqs') { ?>
         <div class="a-notice mb-3"><i class="fa fa-circle-info mt-1" aria-hidden="true"></i><div>Each question needs its own heading (Heading 3); the text under it is the answer. The FAQs page turns them into an accordion.</div></div>
       <?php } ?>
-      <label class="form-label" for="pgedetails"><?php echo $editDraft ? 'Draft content' : 'Page content'; ?></label>
+      <h2 class="fs-6 fw-semibold mb-2"><label class="form-label mb-0" for="pgedetails"><?php echo $editDraft ? 'Draft content' : 'Page content'; ?></label></h2>
       <div class="a-editor">
         <div id="page-editor" hidden></div>
         <textarea class="form-control" rows="16" name="pgedetails" id="pgedetails" required><?php echo h($detail); ?></textarea>
@@ -177,6 +177,10 @@ admin_page_start($page ? ($editDraft ? 'Edit draft: ' : 'Edit ') . $page[0] : 'M
     }
   });
   quill.setContents(quill.clipboard.convert({ html: textarea.value }), 'silent');
+  // The editing area is a multi-line text box for assistive technology, so the page's own headings
+  // (e.g. the FAQ questions) are read as content, not as headings of the admin page.
+  quill.root.setAttribute('role', 'textbox');
+  quill.root.setAttribute('aria-multiline', 'true');
   quill.root.setAttribute('aria-label', 'Page content');
   document.querySelectorAll('.ql-header .ql-picker-label').forEach(function (el) { el.setAttribute('aria-label', 'Text style'); });
   document.getElementById('page-form').addEventListener('submit', function () {

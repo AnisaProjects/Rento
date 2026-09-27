@@ -343,6 +343,35 @@ template contact address), 10 passed. All of these are expected on MAMP; each ha
 
 **Undo.** `git mv docs/archive/dynamic_pricing docs/dynamic_pricing`.
 
+### P14. Final full test (2026-09-27)
+
+**Results.**
+- **Links:** 25 public pages and 228 admin pages crawled (admin logged in, GET links only). No broken
+  links; `/search` → car-listing is an intended redirect. The sitemap has 25 URLs, all 200.
+- **JS errors, failed requests, horizontal overflow:** 0, on 23 public and 41 admin pages at 1366 and 390,
+  light and dark.
+- **PHP error log:** no errors, only the usual notice that dates beyond the 60-day forecast use the base
+  price.
+- **axe:** no violations on every page (24 public incl. 404, 42 admin, 8 customer pages) in light and dark
+  at 1366 and 390.
+- **Keyboard:** every page at both widths passes (no unnamed or invisible stops, visible focus, no traps),
+  and the 29 widget scenarios pass.
+- **End to end, in a real browser:**
+  - A customer logs in, picks dates on the price calendar and books (quote Rs 25,450 = the sum of the day
+    prices).
+  - The confirmation and invoice show the same total.
+  - The admin confirms through the dialog; revenue rises by exactly Rs 25,450; the customer sees
+    "confirmed".
+  - A visitor sends a package enquiry and sees the thank-you (also read out). The admin sees it and marks it
+    contacted.
+  - All test data was then deleted and prices recomputed (revenue back to Rs 57,000).
+
+**Fixed during the test.**
+- FAQ editor: an h2 around "Page content", so the page's headings are in order.
+- Editor: pasted fixed colours follow the theme in dark mode.
+- Inline form messages (next to a form, e.g. the enquiry thank-you) are read out like toasts.
+- Toasts sit in a labelled "Notifications" region.
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`
