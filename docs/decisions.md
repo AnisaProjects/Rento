@@ -3,6 +3,65 @@
 Decisions made on the owner's behalf, with the reason and how to undo each one.
 Newest section first. Prices are in Nepalese rupees per day.
 
+## 2026-09-27: Phase 6 (polish)
+
+**Backup taken before any change:** `~/Rento-backups/rento-20260927-180218-before-phase6.sql`.
+
+### P1. `rento` MySQL user
+
+**What.**
+- Created `rento`@`localhost` and `rento`@`127.0.0.1`, with SELECT, INSERT, UPDATE and DELETE on the
+  `rento` database only. The auth plugin is `mysql_native_password`, the same as root; PyMySQL would
+  need an extra package for MySQL 8's default.
+- The password is random (28 characters). It is stored only in `includes/config.local.php`, which is
+  owner-readable (600), git-ignored and in `includes/`, which Apache already blocks.
+- `includes/config.php` now reads settings from `RENTO_*` environment variables first, then
+  `config.local.php`, then (in dev mode only) the MAMP defaults.
+- Tested: the web site, the PHP CLI (launchd job) and the Python pricer connect as `rento`.
+- Migrations (schema changes) still need an admin user such as root, because the app user can't
+  ALTER tables. Root's password was not changed.
+
+**Why.** The app shouldn't run as root.
+**Undo.** Delete `includes/config.local.php` (PHP falls back to the MAMP root defaults in dev mode).
+To remove the user: `DROP USER 'rento'@'localhost', 'rento'@'127.0.0.1';`.
+**To see or change the password:** open `includes/config.local.php`. To change it:
+`ALTER USER 'rento'@'localhost' IDENTIFIED BY '…'`, the same for `127.0.0.1`, then update the file.
+
+### P2. Nightly price recompute (launchd)
+
+**What.** Installed `tools/com.rento.price-forecast.plist` in `~/Library/LaunchAgents` and loaded it.
+It runs every night at 02:30. A test run (`launchctl kickstart`) exited with code 0 and wrote this to
+`logs/forecast-launchd.log`:
+`2026-09-27 18:03:57 forecast (nightly): done - 8 cars x 60 days from 2026-09-27. …`
+**Undo.** `launchctl bootout gui/$(id -u)/com.rento.price-forecast`, then delete the plist from
+`~/Library/LaunchAgents`.
+
+### P3. BS 2084 festival dates are "provisional"
+
+**What.**
+- A festival counts as provisional until its "Checked" value is "Official (government list)". Seasonal
+  guidance rows never do.
+- Admin → Festivals shows a "Provisional" badge on upcoming provisional rows, and a note about the BS 2084
+  dates (20 festivals from 14 Apr 2027).
+- From **1 Feb 2027**, while any BS 2084 date is still provisional, the dashboard shows a reminder
+  (`FESTIVAL_BS2084_REVIEW_FROM` in `includes/festivals.php`).
+- Package pages with festival pricing mark those windows "(dates to be confirmed)".
+
+**Why.** The official BS 2084 holiday list isn't out yet, and prices must not rely on unchecked dates
+without saying so.
+**Undo.** Revert the commit "Items 4-5: rento DB user, nightly job, BS 2084 reminder".
+
+### P4. End-to-end booking check (then deleted)
+
+A temporary customer booked the Nissan Kicks for 20–22 Oct 2026 (3 days, Dashain). The figures agreed:
+- **Price shown before booking:** Rs 24,300 (3 × Rs 8,100).
+- **Stored `quoted_price`:** Rs 24,300.
+- **Invoice:** base Rs 21,000 + Rs 3,300 = Rs 24,300.
+- **Admin booking details:** Rs 24,300.
+- **Admin "Total revenue" after confirming:** rose from Rs 57,000 to Rs 81,300 (+Rs 24,300).
+
+The customer and booking were then deleted. Revenue is back at Rs 57,000, and prices were recomputed.
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`

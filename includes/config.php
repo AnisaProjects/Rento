@@ -2,17 +2,30 @@
 // Rento configuration: the only place that holds DB credentials and app flags.
 // Both the site and admin/ load this file (admin/includes/config.php requires it).
 
-// DB credentials (MAMP: MySQL 8 on port 8889; PHP connects through the socket).
-define('DB_HOST', 'localhost');
-define('DB_PORT', 8889);
-define('DB_USER', 'root');
-define('DB_PASS', 'root');
-define('DB_NAME', 'rento');
+// Secrets and per-server values come from, in order:
+//   1. environment variables RENTO_DB_HOST, RENTO_DB_PORT, RENTO_DB_USER, RENTO_DB_PASS, RENTO_DB_NAME,
+//      RENTO_DEV_MODE (set them in the web server / cron on real hosting, see docs/deployment.md)
+//   2. includes/config.local.php, not in git: return ['DB_USER' => ..., 'DB_PASS' => ..., ...];
+//   3. the MAMP defaults below (dev mode only; production refuses to start without 1 or 2).
+$rentoLocal = is_file(__DIR__ . '/config.local.php') ? (array)(include __DIR__ . '/config.local.php') : [];
+$rentoConf = function (string $key, $default) use ($rentoLocal) {
+    $env = getenv('RENTO_' . $key);
+    return $env !== false && $env !== '' ? $env : ($rentoLocal[$key] ?? $default);
+};
 
-// Development mode. MAMP has no mail server, so while this is true the
+// Development mode. While this is true (and no SMTP server is set in admin -> Email), the
 // password reset link is shown on screen instead of being emailed.
-// Set it to false on any server that real users can reach.
-define('APP_DEV_MODE', true);
+// Set it to false on any server that real users can reach (RENTO_DEV_MODE=0).
+define('APP_DEV_MODE', filter_var($rentoConf('DEV_MODE', true), FILTER_VALIDATE_BOOLEAN));
+
+// DB credentials (MAMP: MySQL 8 on port 8889; PHP connects through the socket).
+// On this Mac, config.local.php holds the 'rento' user (SELECT/INSERT/UPDATE/DELETE on rento only).
+define('DB_HOST', $rentoConf('DB_HOST', 'localhost'));
+define('DB_PORT', (int)$rentoConf('DB_PORT', 8889));
+define('DB_USER', $rentoConf('DB_USER', APP_DEV_MODE ? 'root' : ''));
+define('DB_PASS', $rentoConf('DB_PASS', APP_DEV_MODE ? 'root' : ''));
+define('DB_NAME', $rentoConf('DB_NAME', 'rento'));
+unset($rentoLocal, $rentoConf);
 
 // Rate limiting (includes/rate_limit.php): failed logins and reset requests allowed
 // per IP and per email within the window; the registration email check is per IP.
@@ -67,6 +80,7 @@ require_once __DIR__ . '/flash.php';
 require_once __DIR__ . '/components.php';
 require_once __DIR__ . '/site-content.php';
 require_once __DIR__ . '/packages.php';
+require_once __DIR__ . '/festivals.php';
 require_once __DIR__ . '/settings.php';
 require_once __DIR__ . '/pricing.php';
 require_once __DIR__ . '/price-insights.php';

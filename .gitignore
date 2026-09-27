@@ -8,3 +8,6 @@ __pycache__/
 
 # Python virtual environment (recreate with ml/requirements.txt)
 /ml/.venv/
+
+# Local secrets (DB user, dev mode) for this machine; see includes/config.php
+/includes/config.local.php

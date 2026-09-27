@@ -107,6 +107,14 @@ admin_page_start('Festivals & Travel Peaks', 'festivals.php', [], [
   'actions' => '<a class="btn btn-primary" href="festivals.php#festival-form"><i class="fa fa-plus" aria-hidden="true"></i>Add festival</a>',
 ]);
 ?>
+<?php $bs2084 = festival_bs2084_status($dbh);
+if ($bs2084['count']) { ?>
+  <div class="a-notice<?php echo $bs2084['due'] ? ' a-notice--warning' : ''; ?> mb-3" role="note"><i class="fa fa-calendar-check mt-1" aria-hidden="true"></i><div>
+    <strong><?php echo $bs2084['count']; ?> BS 2084 festival<?php echo $bs2084['count'] === 1 ? ' is' : 's are'; ?> provisional</strong> (from <?php echo admin_date(FESTIVAL_BS2084_START); ?>).
+    Their dates come from published calendars, not the government's official BS 2084 holiday list. When that list is out (usually early in 2027), check each date, correct it if needed and set "Checked" to "Official (government list)".
+    <?php echo $bs2084['due'] ? 'The review is due now.' : 'The dashboard will remind you from ' . admin_date(FESTIVAL_BS2084_REVIEW_FROM) . '.'; ?>
+  </div></div>
+<?php } ?>
 <section class="a-card">
   <div class="a-table-wrap">
     <table class="table a-table" data-a-table data-search-placeholder="Search festivals" data-empty="No festivals yet" data-order='[[1,"asc"]]' data-page-length="25">
@@ -129,7 +137,7 @@ admin_page_start('Festivals & Travel Peaks', 'festivals.php', [], [
           $now = !$past && $f->StartDate <= $today;
           $variant = ['official' => 'success', 'two sources' => 'info', 'disagreement' => 'danger', 'unverified' => 'warning', 'guidance' => 'neutral'][$f->Verification] ?? 'neutral'; ?>
           <tr<?php echo $past ? ' class="opacity-50"' : ''; ?>>
-            <td><span class="a-strong"><?php echo h($f->FestivalName); ?></span><?php echo $now ? ' ' . admin_badge('Now', 'primary') : ''; ?></td>
+            <td><span class="a-strong"><?php echo h($f->FestivalName); ?></span><?php echo $now ? ' ' . admin_badge('Now', 'primary') : ''; ?><?php echo !$past && festival_is_provisional($f) ? ' ' . admin_badge('Provisional', 'warning') : ''; ?></td>
             <td data-order="<?php echo h($f->StartDate); ?>" class="text-nowrap"><?php echo admin_date($f->StartDate); ?><?php echo $f->EndDate !== $f->StartDate ? ' – ' . admin_date($f->EndDate) : ''; ?>
               <?php if ($f->TravelFrom) { ?><span class="a-muted d-block"><i class="fa fa-suitcase-rolling" aria-hidden="true"></i> Travel <?php echo date('j M', strtotime($f->TravelFrom)) . ($f->TravelTo !== $f->TravelFrom ? '–' . date('j M', strtotime($f->TravelTo)) : ''); ?> · <?php echo $f->TravelPct !== null ? rtrim(rtrim((string)$f->TravelPct, '0'), '.') . '%' : 'default ' . setting('pricing_travel_days_pct') . '%'; ?></span><?php } ?>
             </td>

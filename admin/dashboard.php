@@ -74,6 +74,12 @@ admin_page_start('Dashboard', 'dashboard.php', [], [
 ]);
 ?>
 
+<?php $bs2084 = festival_bs2084_status($dbh);
+if ($bs2084['due']) { ?>
+  <div class="a-notice a-notice--warning mb-3" role="note"><i class="fa fa-calendar-check mt-1" aria-hidden="true"></i><div>
+    <strong>Check the BS 2084 festival dates.</strong> <?php echo $bs2084['count']; ?> festival<?php echo $bs2084['count'] === 1 ? ' is' : 's are'; ?> still provisional. Compare them with the government's official BS 2084 holiday list and mark them official in <a href="festivals.php">Festivals</a>, so smart pricing uses the right days.
+  </div></div>
+<?php } ?>
 <section class="a-kpis" aria-label="Key figures">
   <a class="a-kpi a-kpi--success" href="confirmed-bookings.php">
     <span class="a-kpi__icon"><i class="fa fa-sack-dollar" aria-hidden="true"></i></span>

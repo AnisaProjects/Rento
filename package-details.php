@@ -116,7 +116,7 @@ if ($prices) {
                     <?php foreach (array_slice($surcharges, 0, 10) as $w) { ?>
                       <tr>
                         <td class="text-nowrap"><?php echo date('j M', strtotime($w['from'])) . ($w['to'] !== $w['from'] ? ' – ' . date('j M Y', strtotime($w['to'])) : date(' Y', strtotime($w['from']))); ?></td>
-                        <td><?php echo htmlentities($w['label']); ?> <span class="r-hint">+<?php echo rtrim(rtrim(number_format($w['pct'], 1), '0'), '.'); ?>%</span></td>
+                        <td><?php echo htmlentities($w['label']); ?><?php echo $w['provisional'] ? ' <span class="r-hint">(dates to be confirmed)</span>' : ''; ?> <span class="r-hint">+<?php echo rtrim(rtrim(number_format($w['pct'], 1), '0'), '.'); ?>%</span></td>
                         <?php foreach ($prices as $type => $price) { ?><td class="r-num"><?php echo format_price(package_price_with($price, $w['pct'])); ?></td><?php } ?>
                       </tr>
                     <?php } ?>

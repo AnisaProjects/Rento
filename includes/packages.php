@@ -101,22 +101,23 @@ function package_surcharge_windows(PDO $dbh, int $days = 365): array
 {
     $cap = (float)setting('pricing_max_surcharge');
     $end = date('Y-m-d', strtotime("+$days days"));
-    $query = $dbh->prepare("SELECT FestivalName, StartDate, EndDate, DemandLevel, TravelFrom, TravelTo, TravelPct FROM tblfestivals
+    $query = $dbh->prepare("SELECT FestivalName, StartDate, EndDate, DemandLevel, Verification, TravelFrom, TravelTo, TravelPct FROM tblfestivals
         WHERE Verification <> 'guidance' AND ((EndDate >= CURDATE() AND StartDate <= :end1) OR (TravelTo >= CURDATE() AND TravelFrom <= :end2))
         ORDER BY COALESCE(TravelFrom, StartDate)");
     $query->execute([':end1' => $end, ':end2' => $end]);
     $windows = [];
     foreach ($query->fetchAll(PDO::FETCH_OBJ) as $f) {
+        $provisional = festival_is_provisional($f); // not yet on the official holiday list
         $festivalPct = (float)setting($f->DemandLevel === 'high' ? 'pricing_festival_high_pct' : 'pricing_festival_medium_pct');
         if ($f->TravelFrom && $f->TravelTo && $f->TravelTo >= date('Y-m-d')) {
             $travelPct = $f->TravelPct !== null ? (float)$f->TravelPct : (float)setting('pricing_travel_days_pct');
-            $windows[] = ['label' => $f->FestivalName . ': travel days', 'from' => max($f->TravelFrom, date('Y-m-d')), 'to' => $f->TravelTo, 'pct' => min($cap, $travelPct)];
+            $windows[] = ['label' => $f->FestivalName . ': travel days', 'from' => max($f->TravelFrom, date('Y-m-d')), 'to' => $f->TravelTo, 'pct' => min($cap, $travelPct), 'provisional' => $provisional];
         }
         // Main festival days after the travel window (a travel day never gets both).
         $mainFrom = $f->TravelTo && $f->TravelTo >= $f->StartDate ? date('Y-m-d', strtotime($f->TravelTo . ' +1 day')) : $f->StartDate;
         $mainFrom = max($mainFrom, date('Y-m-d'));
         if ($f->EndDate >= $mainFrom && $festivalPct > 0) {
-            $windows[] = ['label' => $f->FestivalName, 'from' => $mainFrom, 'to' => $f->EndDate, 'pct' => min($cap, $festivalPct)];
+            $windows[] = ['label' => $f->FestivalName, 'from' => $mainFrom, 'to' => $f->EndDate, 'pct' => min($cap, $festivalPct), 'provisional' => $provisional];
         }
     }
     usort($windows, fn($a, $b) => [$a['from'], -$a['pct']] <=> [$b['from'], -$b['pct']]);
