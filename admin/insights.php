@@ -20,14 +20,11 @@ function insight_rows(PDO $dbh): array
     return $rows;
 }
 
-function insight_suggestion(array $rows, int $base): ?int
+// Suggested base price: the shared helper (includes/price-insights.php), 60 days.
+function insight_suggestion(int $carId, int $base): ?int
 {
-    // Only rule-priced days (not manual overrides) count towards the suggestion.
-    $ruled = array_filter($rows, fn($r) => empty($r->meta['override']) && (int)$r->BasePrice === $base);
-    if (!$ruled) return null;
-    $avg = array_sum(array_map(fn($r) => (int)$r->Price, $ruled)) / count($ruled);
-    $step = max(1, (int)setting('pricing_round_to'));
-    return (int)(round($avg / $step) * $step);
+    global $dbh;
+    return vehicle_price_suggestion($dbh, $carId, $base, INSIGHT_HORIZON)['suggestion'] ?? null;
 }
 
 $cars = $dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.CarType, v.DriverOnly, v.Vimage1, br.BrandName FROM tblvehicles v
@@ -38,7 +35,7 @@ foreach ($cars as $c) $carById[(int)$c->id] = $c;
 if (isset($_POST['applybase'])) {
   $car = $carById[intval($_POST['applybase'])] ?? null;
   $rows = $car ? (insight_rows($dbh)[(int)$car->id] ?? []) : [];
-  $suggestion = $car ? insight_suggestion($rows, (int)$car->PricePerDay) : null;
+  $suggestion = $car ? insight_suggestion((int)$car->id, (int)$car->PricePerDay) : null;
   if (!$car || !$suggestion) {
     flash_set('error', 'There is no suggestion for that car yet. Recompute prices first.');
   } else {
@@ -115,7 +112,7 @@ foreach ($cars as $car) {
   $low = $rows ? array_reduce($rows, fn($c, $r) => !$c || (int)$r->Price < (int)$c->Price ? $r : $c) : null;
   $high = $rows ? array_reduce($rows, fn($c, $r) => !$c || (int)$r->Price > (int)$c->Price ? $r : $c) : null;
   $insights[] = ['car' => $car, 'rows' => $rows, 'avg30' => $avg($first30), 'avg60' => $avg($rows), 'low' => $low, 'high' => $high,
-    'reasons' => array_slice($reasonDays, 0, 3, true), 'suggestion' => insight_suggestion($rows, $base), 'stale' => $rows && (int)$rows[0]->BasePrice !== $base];
+    'reasons' => array_slice($reasonDays, 0, 3, true), 'suggestion' => insight_suggestion((int)$car->id, $base), 'stale' => $rows && (int)$rows[0]->BasePrice !== $base];
 }
 $chartCarId = intval($_GET['car'] ?? ($cars[0]->id ?? 0));
 $chartRows = $rowsByCar[$chartCarId] ?? [];

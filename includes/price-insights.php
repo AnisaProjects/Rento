@@ -125,3 +125,36 @@ function car_price_info(PDO $dbh, int $carId): ?array
 {
     return car_price_infos($dbh)[$carId] ?? null;
 }
+
+// Suggested base price for a car: the average rule-based price (no manual overrides) over the
+// next $days of the forecast, rounded like prices. Also used by admin -> AI Insights.
+// Returns null without a current forecast, else ['suggestion', 'average', 'days', 'reasons' => [label => days]].
+function vehicle_price_suggestion(PDO $dbh, int $carId, int $base, int $days = 60): ?array
+{
+    $query = $dbh->prepare("SELECT Price, Reasons FROM tbl_price_forecast WHERE VehicleId = :id AND BasePrice = :base
+        AND ForecastDate BETWEEN CURDATE() AND CURDATE() + INTERVAL " . max(1, $days - 1) . " DAY");
+    $query->execute([':id' => $carId, ':base' => $base]);
+    $prices = [];
+    $impact = [];
+    $count = [];
+    foreach ($query->fetchAll(PDO::FETCH_OBJ) as $row) {
+        $meta = json_decode((string)$row->Reasons, true) ?: [];
+        if (!empty($meta['override'])) continue;
+        $prices[] = (int)$row->Price;
+        foreach ($meta['reasons'] ?? [] as $r) {
+            $impact[$r['label']] = ($impact[$r['label']] ?? 0) + abs((float)$r['pct']);
+            $count[$r['label']] = ($count[$r['label']] ?? 0) + 1;
+        }
+    }
+    if (!$prices) {
+        return null;
+    }
+    arsort($impact);
+    $step = max(1, (int)setting('pricing_round_to'));
+    $average = array_sum($prices) / count($prices);
+    $reasons = [];
+    foreach (array_slice(array_keys($impact), 0, 3) as $label) {
+        $reasons[$label] = $count[$label];
+    }
+    return ['suggestion' => (int)(round($average / $step) * $step), 'average' => $average, 'days' => count($prices), 'reasons' => $reasons];
+}

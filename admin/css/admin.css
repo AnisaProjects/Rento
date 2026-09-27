@@ -1180,6 +1180,18 @@ div.dt-container .dt-length select {
   margin-bottom: 1rem;
 }
 
+/* Smart price suggestion on the vehicle form */
+.a-price-suggestion {
+  padding: .6rem .75rem;
+  border-radius: var(--rento-radius-sm);
+  background: var(--rento-primary-soft);
+  color: var(--rento-ink-800);
+}
+
+.a-price-suggestion i {
+  color: var(--rento-primary-text);
+}
+
 /* Model health warnings (pricing.php) */
 .a-health-list {
   margin: 0;

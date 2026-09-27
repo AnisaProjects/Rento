@@ -165,7 +165,25 @@ function vehicle_form_sections(PDO $dbh, ?object $vehicle): void
           <label class="form-label" for="priceperday">Price per day <span class="a-req">*</span></label>
           <div class="input-group">
             <span class="input-group-text">Rs</span>
-            <input type="number" id="priceperday" name="priceperday" class="form-control" min="1" max="1000000" step="1" inputmode="numeric" value="<?php echo h($val('priceperday', 'PricePerDay')); ?>" required>
+            <input type="number" id="priceperday" name="priceperday" class="form-control" min="1" max="1000000" step="1" inputmode="numeric" value="<?php echo h($val('priceperday', 'PricePerDay')); ?>" required aria-describedby="price-suggestion">
+          </div>
+          <?php
+          // Smart price suggestion (edit only): the average rule-based price for the next 60 days.
+          $suggestion = $vehicle ? vehicle_price_suggestion($dbh, (int)$vehicle->id, (int)$vehicle->PricePerDay) : null; ?>
+          <div class="form-text a-price-suggestion" id="price-suggestion">
+            <?php if ($suggestion) {
+              $diff = $suggestion['suggestion'] - (int)$vehicle->PricePerDay; ?>
+              <strong><i class="fa fa-wand-magic-sparkles" aria-hidden="true"></i> Smart price suggestion: <?php echo format_price($suggestion['suggestion']); ?>/day</strong>
+              <?php echo $diff ? '(' . ($diff > 0 ? '+' : '−') . format_price(abs($diff)) . ')' : '(the same as now)'; ?>.
+              The pricing rules would charge <?php echo format_price(round($suggestion['average'])); ?>/day on average over the next <?php echo $suggestion['days']; ?> days<?php
+              echo $suggestion['reasons'] ? ', mainly for ' . h(implode(', ', array_map(fn($l, $n) => $l . ' (' . $n . ' days)', array_keys($suggestion['reasons']), $suggestion['reasons']))) : ''; ?>.
+              <?php if ($diff) { ?><button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-use-suggestion="<?php echo (int)$suggestion['suggestion']; ?>">Use it</button><?php } ?>
+              <span class="d-block">Rule-based, from your festival calendar and settings; the rules still apply on top of the base price you save.</span>
+            <?php } elseif ($vehicle) { ?>
+              No smart price suggestion yet: the forecast for this car is missing or out of date. Save, then check again after the recompute.
+            <?php } else { ?>
+              After you post the car, a smart price suggestion appears here.
+            <?php } ?>
           </div>
         </div>
         <div>

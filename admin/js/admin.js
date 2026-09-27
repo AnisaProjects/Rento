@@ -148,4 +148,13 @@
       btn.querySelector('i').className = 'fa ' + (show ? 'fa-eye-slash' : 'fa-eye');
     });
   });
+
+  /* ---------- Vehicle form: "Use it" for the smart price suggestion ---------- */
+  document.querySelectorAll('[data-use-suggestion]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var input = document.getElementById('priceperday');
+      input.value = btn.dataset.useSuggestion;
+      input.focus();
+    });
+  });
 })();
