@@ -1,8 +1,10 @@
 <?php
+// Sign-up modal. The form posts to the current page; afterwards the visitor is
+// redirected back to it and sees the result as a toast (and the right form re-opens).
 if (isset($_POST['signup'])) {
-  $fname = $_POST['fullname'];
-  $email = trim($_POST['emailid']);
-  $mobile = $_POST['mobileno'];
+  $fname = trim((string)($_POST['fullname'] ?? ''));
+  $email = trim((string)($_POST['emailid'] ?? ''));
+  $mobile = trim((string)($_POST['mobileno'] ?? ''));
   $plainPassword = (string)($_POST['password'] ?? '');
 
   $existing = $dbh->prepare("SELECT id FROM tblusers WHERE EmailId = :email");
@@ -10,11 +12,14 @@ if (isset($_POST['signup'])) {
   $existing->execute();
 
   if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo "<script>alert('Please enter a valid email address.');</script>";
+    flash_set('error', 'Please enter a valid email address.');
+    flash_open_modal('signupform');
   } elseif ($plainPassword !== (string)($_POST['confirmpassword'] ?? '')) {
-    echo "<script>alert('Password and Confirm Password do not match.');</script>";
+    flash_set('error', 'Password and Confirm Password do not match.');
+    flash_open_modal('signupform');
   } elseif ($existing->fetch()) {
-    echo "<script>alert('This email is already registered. Please login instead.');</script>";
+    flash_set('error', 'This email is already registered. Please log in instead.');
+    flash_open_modal('loginform');
   } else {
     $password = password_hash_for_storage($plainPassword);
     $sql = "INSERT INTO  tblusers(FullName,EmailId,ContactNo,Password) VALUES(:fname,:email,:mobile,:password)";
@@ -24,98 +29,113 @@ if (isset($_POST['signup'])) {
     $query->bindParam(':mobile', $mobile, PDO::PARAM_STR);
     $query->bindParam(':password', $password, PDO::PARAM_STR);
     $query->execute();
-    $lastInsertId = $dbh->lastInsertId();
-    if ($lastInsertId) {
-      echo "<script>alert('Registration successfull. Now you can login');</script>";
+    if ($dbh->lastInsertId()) {
+      flash_set('success', 'Your account is ready. Please log in.');
+      flash_open_modal('loginform');
     } else {
-      echo "<script>alert('Something went wrong. Please try again');</script>";
+      flash_set('error', 'Something went wrong. Please try again.');
+      flash_open_modal('signupform');
     }
   }
+  redirect_to(current_url());
 }
-
 ?>
 
-
 <script>
+  // Tells the visitor whether the email is free (check_availability.php) when they leave the field.
   function checkAvailability() {
-    $("#loaderIcon").show();
+    var email = document.getElementById('emailid').value;
+    if (!email) return;
     jQuery.ajax({
       url: "check_availability.php",
-      data: 'emailid=' + $("#emailid").val(),
+      data: { emailid: email },
       type: "POST",
       success: function (data) {
-        $("#user-availability-status").html(data);
-        $("#loaderIcon").hide();
-      },
-      error: function () { }
+        jQuery("#user-availability-status").html(data);
+      }
     });
   }
-</script>
-<script type="text/javascript">
+
+  // Live "passwords match" hint; also blocks submitting mismatched passwords.
   function registration_valid() {
-    var password = document.forms["signup"]["password"].value.trim();
-    var confirmpassword = document.forms["signup"]["confirmpassword"].value.trim();
-    if (password !== confirmpassword) {
-      alert("Password and Confirm Password do not match.");
-      document.forms["signup"]["confirmpassword"].focus();
+    var form = document.forms["signup"];
+    if (form["password"].value !== form["confirmpassword"].value) {
+      form["confirmpassword"].focus();
       return false;
     }
     return true;
   }
+
+  document.addEventListener('input', function (event) {
+    if (event.target.id !== 'signup-password' && event.target.id !== 'signup-confirmpassword') return;
+    var pass = document.getElementById('signup-password').value;
+    var confirm = document.getElementById('signup-confirmpassword');
+    var hint = document.getElementById('signup-match');
+    if (!confirm.value) {
+      hint.textContent = '';
+      confirm.classList.remove('is-invalid');
+      return;
+    }
+    var ok = pass === confirm.value;
+    hint.textContent = ok ? 'Passwords match.' : 'Passwords do not match.';
+    hint.className = 'r-hint ' + (ok ? 'r-hint--success' : 'r-hint--error');
+    confirm.classList.toggle('is-invalid', !ok);
+  });
 </script>
-<div class="modal fade" id="signupform" tabindex="-1" aria-labelledby="signupform-title" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+
+<div class="modal fade r-modal" id="signupform" tabindex="-1" aria-labelledby="signupform-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" id="signupform-title">Sign Up</h3>
+        <h2 class="modal-title" id="signupform-title">Create your account</h2>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div class="row">
-          <div class="signup_wrap">
-            <div class="col-md-12 col-sm-6">
-              <form method="post" name="signup" onSubmit="return registration_valid();">
-<?php echo csrf_field(); ?>
-                <div class="form-group">
-                  <label class="visually-hidden" for="signup-fullname">Full name</label>
-                  <input id="signup-fullname" type="text" class="form-control" name="fullname" placeholder="Full Name" required="required">
-                </div>
-                <div class="form-group">
-                  <label class="visually-hidden" for="signup-mobile">Mobile number</label>
-                  <input id="signup-mobile" type="text" class="form-control" name="mobileno" placeholder="Mobile Number" maxlength="10"
-                    required="required">
-                </div>
-                <div class="form-group">
-                  <label class="visually-hidden" for="emailid">Email address</label>
-                  <input type="email" class="form-control" name="emailid" id="emailid" onBlur="checkAvailability()"
-                    placeholder="Email Address" required="required">
-                  <span id="user-availability-status" style="font-size:12px;"></span>
-                </div>
-                <div class="form-group">
-                  <label class="visually-hidden" for="signup-password">Password</label>
-                  <input id="signup-password" type="password" class="form-control" name="password" placeholder="Password"
-                    required="required">
-                </div>
-                <div class="form-group">
-                  <label class="visually-hidden" for="signup-confirmpassword">Confirm password</label>
-                  <input id="signup-confirmpassword" type="password" class="form-control" name="confirmpassword" placeholder="Confirm Password"
-                    required="required">
-                </div>
-                <div class="form-group checkbox">
-                  <input type="checkbox" id="terms_agree" required="required" checked="">
-                  <label for="terms_agree">I Agree with <a href="terms" target="_blank" rel="noopener">Terms and Conditions</a></label>
-                </div>
-                <div class="form-group">
-                  <input type="submit" value="Sign Up" name="signup" id="submit" class="btn btn-block">
-                </div>
-              </form>
-            </div>
-
+        <p class="r-modal__lead">It takes a minute, and you can book straight away.</p>
+        <form method="post" name="signup" onSubmit="return registration_valid();">
+          <?php echo csrf_field(); ?>
+          <div class="r-field">
+            <label class="r-label" for="signup-fullname">Full name</label>
+            <input type="text" id="signup-fullname" name="fullname" class="r-input" autocomplete="name" required>
           </div>
-        </div>
+          <div class="r-form-row">
+            <div class="r-field">
+              <label class="r-label" for="emailid">Email address</label>
+              <input type="email" id="emailid" name="emailid" class="r-input" autocomplete="email" onBlur="checkAvailability()" required>
+              <div id="user-availability-status" class="r-hint" aria-live="polite"></div>
+            </div>
+            <div class="r-field">
+              <label class="r-label" for="signup-mobile">Mobile number</label>
+              <input type="tel" id="signup-mobile" name="mobileno" class="r-input" autocomplete="tel" maxlength="10" required>
+            </div>
+          </div>
+          <div class="r-form-row">
+            <div class="r-field">
+              <label class="r-label" for="signup-password">Password</label>
+              <div class="r-password">
+                <input type="password" id="signup-password" name="password" class="r-input" autocomplete="new-password" required>
+                <button type="button" class="r-password__toggle" aria-controls="signup-password" aria-label="Show password" aria-pressed="false">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <div class="r-field">
+              <label class="r-label" for="signup-confirmpassword">Confirm password</label>
+              <input type="password" id="signup-confirmpassword" name="confirmpassword" class="r-input" autocomplete="new-password" required>
+              <div id="signup-match" class="r-hint" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="r-field">
+            <label class="r-check" for="terms_agree">
+              <input type="checkbox" id="terms_agree" required>
+              <span>I agree to the <a href="terms" target="_blank" rel="noopener">Terms and Conditions</a></span>
+            </label>
+          </div>
+          <button type="submit" value="Sign Up" name="signup" id="submit" class="r-btn r-btn--block r-btn--lg">Create account</button>
+        </form>
       </div>
-      <div class="modal-footer text-center">
-        <p>Already got an account? <a href="#loginform" data-bs-toggle="modal">Login Here</a></p>
+      <div class="modal-footer">
+        <p>Already have an account? <a href="#loginform" data-bs-toggle="modal">Log in</a></p>
       </div>
     </div>
   </div>

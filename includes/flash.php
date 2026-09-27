@@ -25,6 +25,36 @@ function flash_set(string $type, string $message): void
     $_SESSION['flash'][] = [$type, $message];
 }
 
+// Re-open a modal (e.g. 'loginform') on the next page view, so a failed login or
+// sign-up lands the visitor back in the form.
+function flash_open_modal(string $modalId): void
+{
+    $_SESSION['flash_modal'] = $modalId;
+}
+
+// Queued messages as toasts (rendered once per page by includes/scripts.php).
+function flash_render_toasts(): string
+{
+    $icons = ['success' => 'fa-circle-check', 'error' => 'fa-circle-exclamation', 'warning' => 'fa-triangle-exclamation', 'info' => 'fa-circle-info'];
+    $html = '';
+    foreach ($_SESSION['flash'] ?? [] as [$type, $message]) {
+        $type = isset($icons[$type]) ? $type : 'info';
+        $html .= '<div class="r-toast r-toast--' . $type . ' toast" role="' . ($type === 'error' ? 'alert' : 'status')
+            . '" aria-live="' . ($type === 'error' ? 'assertive' : 'polite') . '" aria-atomic="true" data-bs-delay="6000">'
+            . '<i class="fa ' . $icons[$type] . ' r-toast__icon" aria-hidden="true"></i>'
+            . '<div class="r-toast__body">' . htmlentities($message) . '</div>'
+            . '<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button></div>';
+    }
+    unset($_SESSION['flash']);
+    $modal = $_SESSION['flash_modal'] ?? '';
+    unset($_SESSION['flash_modal']);
+    $out = $html === '' ? '' : '<div class="r-toasts">' . $html . '</div>';
+    if (preg_match('/^[a-z-]+$/', $modal)) {
+        $out .= '<div id="r-open-modal" data-modal="' . $modal . '" hidden></div>';
+    }
+    return $out;
+}
+
 function flash_render(): string
 {
     $html = '';

@@ -84,4 +84,41 @@ function vehicle_url($id, ?string $brand = null, ?string $title = null): string
     $slug = vehicle_slug($brand, $title);
     return 'car/' . ($slug === '' ? '' : $slug . '-') . (int)$id;
 }
+
+// Ends the request with a redirect, dropping any page output buffered so far.
+// Used after handling a form (post/redirect/get), so refreshing never re-submits it.
+function redirect_to(string $url, int $status = 303): void
+{
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    header('Location: ' . $url, true, $status);
+    exit;
+}
+
+// The current page's own URL, for "back to where you were" redirects.
+function current_url(): string
+{
+    return $_SERVER['REQUEST_URI'] ?? './';
+}
+
+// Address / email / phone from tblcontactusinfo (one query per request).
+function site_contact_info(PDO $dbh): object
+{
+    static $info = null;
+    if ($info === null) {
+        $row = $dbh->query("SELECT Address, EmailId, ContactNo FROM tblcontactusinfo LIMIT 1")->fetch(PDO::FETCH_OBJ);
+        $info = $row ?: (object)['Address' => '', 'EmailId' => '', 'ContactNo' => ''];
+    }
+    return $info;
+}
+
+// "AB" initials for an avatar.
+function initials(?string $name): string
+{
+    $parts = preg_split('/\s+/', trim((string)$name)) ?: [];
+    $first = mb_substr($parts[0] ?? '', 0, 1);
+    $last = count($parts) > 1 ? mb_substr(end($parts), 0, 1) : '';
+    return mb_strtoupper($first . $last) ?: '?';
+}
 ?>

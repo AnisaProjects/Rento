@@ -3,6 +3,7 @@
 //   $pageUsesCarousel  true on pages with an Owl carousel (optional)
 //   $pageScripts       extra script URLs loaded last (optional)
 ?>
+<?php echo flash_render_toasts(); ?>
 <script src="assets/vendor/jquery/jquery.min.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <?php if (!empty($pageUsesCarousel)) { ?>

@@ -3,7 +3,9 @@
 //   $pageTitle         page name, shown as "<title> | Rento"
 //   $pageDescription   meta description (optional; falls back to the site description)
 //   $pageUsesCarousel  true on pages with an Owl carousel (optional)
-//   $pageStyles        extra stylesheet URLs loaded after style.css (optional)
+//   $pageStyles        extra stylesheet URLs loaded after the site CSS (optional)
+//   $pageModern        true once a page uses the redesign (app.css) only, without the
+//                      old template stylesheet; the page's <body> gets class="r-page".
 $pageTitle = $pageTitle ?? 'Car Rental in Nepal';
 
 // Pages shown at a deeper clean URL (car/..., or a missing URL in any folder) resolve
@@ -17,6 +19,7 @@ $pageDescription = $pageDescription ?? 'Rento: rent a verified car anywhere in N
 <base href="<?php echo htmlentities($siteBase); ?>">
 <?php } ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.classList.add('r-js');</script>
 <title><?php echo htmlentities($pageTitle); ?> | Rento</title>
 <meta name="description" content="<?php echo htmlentities($pageDescription); ?>">
 <meta name="theme-color" content="#ff5a36">
@@ -32,7 +35,10 @@ $pageDescription = $pageDescription ?? 'Rento: rent a verified car anywhere in N
 <link rel="stylesheet" href="assets/css/owl.carousel.css">
 <?php } ?>
 <link rel="stylesheet" href="assets/css/tokens.css">
+<?php if (empty($pageModern)) { ?>
 <link rel="stylesheet" href="assets/css/style.css">
+<?php } ?>
+<link rel="stylesheet" href="assets/css/app.css">
 <?php foreach ($pageStyles ?? [] as $href) { ?>
 <link rel="stylesheet" href="<?php echo htmlentities($href); ?>">
 <?php } ?>

@@ -1,19 +1,17 @@
-<!-- ============ CTA: BOOK YOUR CAR ============ -->
-<!-- Drop this include wherever you want the "book your car" banner —
-     e.g. right above the footer include on any page. -->
-<div class="road"></div>
-
-<section class="cta" id="book-car">
-    <div class="container cta__inner">
-        <div class="cta__copy">
-            <span class="cta__eyebrow">Ready when you are</span>
-            <h2 class="cta__heading">Book your dream car in Nepal</h2>
-            <p class="cta__sub">From city runs in Kathmandu to mountain roads beyond — pick a car, pick a date, and go.
-                No hidden fees, no waiting around.</p>
-        </div>
-        <a href="car-listing" class="btn-key">
-            <span>Book Your Car</span>
-            <i class="fa fa-angle-right" aria-hidden="true"></i>
-        </a>
+<!-- CTA: book your car (include above the footer on any page) -->
+<section class="r-cta" aria-labelledby="r-cta-title">
+  <div class="container">
+    <div class="r-cta__inner">
+      <div>
+        <span class="r-eyebrow">Ready when you are</span>
+        <h2 id="r-cta-title">Book your car in Nepal</h2>
+        <p>From city runs in Kathmandu to mountain roads beyond: pick a car, pick your dates and go, with clear daily
+          prices in rupees.</p>
+      </div>
+      <div class="r-cta__actions">
+        <a href="car-listing" class="r-btn r-btn--lg">Browse cars <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+        <a href="car-recommendation" class="r-btn r-btn--lg r-btn--light">Help me choose</a>
+      </div>
     </div>
+  </div>
 </section>

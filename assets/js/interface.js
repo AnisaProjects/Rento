@@ -1,15 +1,74 @@
 /*
  * Site-wide behaviour for the public pages (loaded by includes/scripts.php).
- * Carousels are set up on the pages that have them (index.php, vehical-details.php).
+ * Carousels are set up on the pages that have them (vehical-details.php).
  */
 (function ($) {
   'use strict';
 
   $(function () {
-    // Header search: on small screens the magnifier shows/hides the search form.
-    $('#search_toggle').on('click', function () {
-      $('#header-search-form').slideToggle();
+    // Header gets a shadow once the page scrolls; the back-to-top button appears.
+    var header = document.querySelector('.r-header');
+    var backTop = document.getElementById('r-back-top');
+    function onScroll() {
+      var y = window.scrollY;
+      if (header) header.classList.toggle('is-scrolled', y > 8);
+      if (backTop) backTop.classList.toggle('is-visible', y > 600);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    if (backTop) {
+      backTop.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Put the cursor in the search box when the header search opens.
+    $('#r-search').on('shown.bs.collapse', function () {
+      $('#header-search').trigger('focus');
     });
+
+    // Flash messages rendered as toasts.
+    document.querySelectorAll('.r-toasts .toast').forEach(function (el) {
+      bootstrap.Toast.getOrCreateInstance(el).show();
+    });
+
+    // Opening a modal (e.g. Login from the mobile menu) closes the off-canvas menu.
+    document.addEventListener('show.bs.modal', function () {
+      var open = document.querySelector('.offcanvas.show');
+      if (open) bootstrap.Offcanvas.getOrCreateInstance(open).hide();
+    });
+
+    // A failed login / sign-up re-opens its form after the redirect.
+    var reopen = document.getElementById('r-open-modal');
+    if (reopen && document.getElementById(reopen.dataset.modal)) {
+      bootstrap.Modal.getOrCreateInstance(document.getElementById(reopen.dataset.modal)).show();
+    }
+
+    // Show / hide password buttons.
+    $(document).on('click', '.r-password__toggle', function () {
+      var input = document.getElementById(this.getAttribute('aria-controls'));
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      this.setAttribute('aria-pressed', show ? 'true' : 'false');
+      this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      $(this).find('i').toggleClass('fa-eye fa-eye-slash');
+    });
+
+    // Fade sections in as they scroll into view.
+    var reveal = document.querySelectorAll('.r-reveal');
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      reveal.forEach(function (el) { observer.observe(el); });
+    } else {
+      reveal.forEach(function (el) { el.classList.add('is-visible'); });
+    }
 
     // Pages at a deeper clean URL (car/...) have a <base>, which would turn plain "#..."
     // links into links to the home page. Keep them on the page instead.

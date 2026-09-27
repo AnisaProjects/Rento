@@ -5,13 +5,13 @@ if (!empty($_POST["emailid"])) {
 	$email = $_POST["emailid"];
 	// Per IP: this endpoint reveals whether an email is registered, so repeated lookups are throttled.
 	if (rate_limit_exceeded($dbh, 'email_check', null, RATE_LIMIT_EMAIL_CHECKS)) {
-		echo "<span style='color:red'> " . htmlentities(RATE_LIMIT_MESSAGE) . "</span>";
+		echo "<span class='r-hint--error'>" . htmlentities(RATE_LIMIT_MESSAGE) . "</span>";
 		exit;
 	}
 	rate_limit_record($dbh, 'email_check');
 	if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
 
-		echo "error : You did not enter a valid email.";
+		echo "<span class='r-hint--error'>Please enter a valid email address.</span>";
 	} else {
 		$sql = "SELECT EmailId FROM tblusers WHERE EmailId=:email";
 		$query = $dbh->prepare($sql);
@@ -20,11 +20,11 @@ if (!empty($_POST["emailid"])) {
 		$results = $query->fetchAll(PDO::FETCH_OBJ);
 		$cnt = 1;
 		if ($query->rowCount() > 0) {
-			echo "<span style='color:red'> Email already exists .</span>";
+			echo "<span class='r-hint--error'>This email is already registered. Try logging in.</span>";
 			echo "<script>$('#submit').prop('disabled',true);</script>";
 		} else {
 
-			echo "<span style='color:green'> Email available for Registration .</span>";
+			echo "<span class='r-hint--success'>Email is available.</span>";
 			echo "<script>$('#submit').prop('disabled',false);</script>";
 		}
 	}
