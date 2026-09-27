@@ -173,6 +173,7 @@ $today = date('Y-m-d');
   $pageTitle = $carName;
   $pageDescription = 'Rent the ' . $carName . ' in Nepal from ' . format_price_per_day($car->PricePerDay) . '. See photos, features and availability, and book online.';
   $pageUsesCarousel = true;
+  if (PRICING_ENABLED && !$driverOnly) $pageScripts = ['assets/js/price-calendar.js'];
   include('includes/head.php');
   ?>
 </head>
@@ -262,6 +263,21 @@ $today = date('Y-m-d');
             <?php } else { ?>
             <h2 id="book-title" class="r-book__title">Book this car</h2>
             <div class="r-price"><?php echo format_price($displayPrice); ?><small>/day</small></div>
+            <?php if (PRICING_ENABLED) { ?>
+              <div class="r-pcal" data-price-calendar data-car="<?php echo (int)$car->id; ?>" data-api="api/price-calendar.php" data-base="<?php echo (int)$car->PricePerDay; ?>" hidden>
+                <div class="r-pcal__head">
+                  <button type="button" class="r-pcal__nav" data-pcal-prev aria-label="Previous month"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
+                  <strong data-pcal-title aria-live="polite"></strong>
+                  <button type="button" class="r-pcal__nav" data-pcal-next aria-label="Next month"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+                </div>
+                <div class="r-pcal__week" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+                <div class="r-pcal__grid" data-pcal-grid role="group" aria-label="Prices per day<?php echo !empty($_SESSION['login']) ? '. Tap a pickup day, then a return day.' : ''; ?>"></div>
+                <ul class="r-pcal__legend" aria-hidden="true">
+                  <li><span class="is-cheap"></span>Cheaper</li><li><span class="is-normal"></span>Usual price</li><li><span class="is-high"></span>Higher</li><li><span class="is-booked"></span>Booked</li>
+                </ul>
+                <p class="r-pcal__detail" data-pcal-detail aria-live="polite">Hover or tap a day to see its price.</p>
+              </div>
+            <?php } ?>
 
             <?php if (!empty($_SESSION['login'])) { ?>
               <form method="post" class="r-book__form" data-price="<?php echo (float)$car->PricePerDay; ?>" data-car="<?php echo (int)$car->id; ?>" data-quote-url="api/price-quote.php">
@@ -291,6 +307,7 @@ $today = date('Y-m-d');
                   <summary>Price per day</summary>
                   <ul data-day-list></ul>
                 </details>
+                <p class="r-book__hint" data-pcal-hint hidden><i class="fa fa-piggy-bank" aria-hidden="true"></i><span><span data-pcal-hint-text></span> <button type="button" class="r-link-inline" data-pcal-hint-apply>Use these dates</button></span></p>
                 <p class="r-book__unavailable" data-unavailable hidden role="alert"><i class="fa fa-circle-exclamation" aria-hidden="true"></i> This car is already booked on some of these days. Please try other dates.</p>
                 <button type="submit" name="submit" value="Book Now" class="r-btn r-btn--block r-btn--lg">Request booking</button>
                 <p class="r-hint r-book__note"><i class="fa fa-circle-info" aria-hidden="true"></i> No payment now. We confirm your booking and get in touch.</p>

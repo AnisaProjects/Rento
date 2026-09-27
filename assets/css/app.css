@@ -4511,3 +4511,160 @@ body.r-ai-busy {
   background: #1d5a96;
   color: #fff;
 }
+
+/* ---------- 27. Price calendar (assets/js/price-calendar.js) ---------- */
+.r-pcal {
+  margin: var(--rento-space-4) 0;
+  padding: var(--rento-space-3);
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius);
+  background: var(--rento-gray-50);
+}
+
+.r-pcal[hidden] {
+  display: none;
+}
+
+.r-pcal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--rento-space-2);
+  color: var(--rento-ink-900);
+  font-size: var(--rento-text-sm);
+}
+
+.r-pcal__nav {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-sm);
+  background: #fff;
+  color: var(--rento-ink-800);
+}
+
+.r-pcal__nav:disabled {
+  opacity: .35;
+}
+
+.r-pcal__week,
+.r-pcal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.r-pcal__week span {
+  padding-bottom: 2px;
+  color: var(--rento-gray-500);
+  font-size: 11px;
+  font-weight: var(--rento-weight-semibold);
+  text-align: center;
+}
+
+.r-pcal__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 2px 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--rento-ink-800);
+  line-height: 1.1;
+}
+
+.r-pcal__num {
+  font-size: 12px;
+  font-weight: var(--rento-weight-semibold);
+}
+
+.r-pcal__price {
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: var(--rento-weight-medium);
+}
+
+.r-pcal__day.is-cheap { background: var(--rento-success-soft); color: var(--rento-success-text); }
+.r-pcal__day.is-high { background: #fff1e6; color: #8a3a12; }
+.r-pcal__day.is-booked { background: var(--rento-gray-100); color: var(--rento-gray-400); text-decoration: line-through; cursor: not-allowed; }
+.r-pcal__day.is-past { background: transparent; color: var(--rento-gray-300); }
+
+.r-pcal__day:not(:disabled):not(.is-booked):hover,
+.r-pcal__day:focus-visible {
+  border-color: var(--rento-ink-900);
+}
+
+.r-pcal__day.is-in-range {
+  box-shadow: inset 0 0 0 2px rgba(210, 63, 28, .35);
+}
+
+.r-pcal__day.is-start,
+.r-pcal__day.is-end {
+  background: var(--rento-button);
+  color: #fff;
+}
+
+.r-pcal__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: var(--rento-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--rento-gray-600);
+  font-size: 11px;
+}
+
+.r-pcal__legend span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 4px;
+  border: 1px solid var(--rento-gray-300);
+  border-radius: 3px;
+  vertical-align: -1px;
+}
+
+.r-pcal__legend .is-cheap { background: var(--rento-success-soft); }
+.r-pcal__legend .is-normal { background: #fff; }
+.r-pcal__legend .is-high { background: #fff1e6; }
+.r-pcal__legend .is-booked { background: var(--rento-gray-100); }
+
+.r-pcal__detail {
+  min-height: 2.6em;
+  margin: var(--rento-space-2) 0 0;
+  color: var(--rento-ink-800);
+  font-size: var(--rento-text-xs);
+}
+
+.r-book__hint {
+  display: flex;
+  gap: var(--rento-space-2);
+  padding: var(--rento-space-3);
+  border-radius: var(--rento-radius);
+  background: var(--rento-success-soft);
+  color: var(--rento-success-text);
+  font-size: var(--rento-text-sm);
+}
+
+.r-book__hint[hidden] {
+  display: none;
+}
+
+.r-book__hint i {
+  margin-top: 3px;
+}
+
+.r-link-inline {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-weight: var(--rento-weight-bold);
+  text-decoration: underline;
+}
