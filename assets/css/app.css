@@ -126,6 +126,7 @@ body.r-page {
 .r-section--dark .r-eyebrow,
 .r-hero .r-eyebrow,
 .r-page-hero .r-eyebrow,
+.r-ai-hero .r-eyebrow,
 .r-cta .r-eyebrow,
 .r-panel--dark .r-eyebrow {
   color: var(--rento-primary);
@@ -2502,28 +2503,243 @@ a.r-chip:hover {
   color: var(--rento-success);
 }
 
-/* ---------- 15. Find my car (recommendations) ---------- */
-.r-match-form {
-  display: grid;
-  grid-template-columns: 1.2fr 1.4fr auto;
-  gap: var(--rento-space-6);
-  align-items: end;
-  padding: var(--rento-space-6);
-  border: 1px solid var(--rento-gray-200);
-  border-radius: var(--rento-radius-lg);
+/* ---------- 15. Find my car and smart search (assets/js/rento-ai.js) ---------- */
+.r-ai-hero {
+  position: relative;
+  padding: var(--rento-space-12) 0 var(--rento-space-16);
+  background: var(--rento-ink-900);
+  color: var(--rento-gray-300);
+  overflow: hidden;
+}
+
+.r-ai-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(45% 70% at 85% 10%, rgba(var(--rento-primary-rgb), .30), transparent 70%),
+    radial-gradient(40% 60% at 10% 90%, rgba(255, 178, 56, .14), transparent 70%),
+    radial-gradient(30% 50% at 50% 50%, rgba(120, 110, 255, .10), transparent 70%);
+  animation: r-ai-drift 18s ease-in-out infinite alternate;
+}
+
+.r-ai-hero .container {
+  position: relative;
+  max-width: 880px;
+  text-align: center;
+}
+
+.r-ai-hero .r-breadcrumb {
+  justify-content: center;
+}
+
+.r-ai-hero h1 {
+  margin: var(--rento-space-3) 0;
+  color: #fff;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  line-height: 1.1;
+}
+
+.r-ai-hero__lead {
+  max-width: 620px;
+  margin: 0 auto var(--rento-space-8);
+  font-size: var(--rento-text-lg);
+}
+
+.r-ai-form {
+  text-align: left;
+}
+
+.r-ai-prompt {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--rento-space-3);
+  padding: var(--rento-space-3);
+  padding-left: 3.25rem;
+  border-radius: var(--rento-radius-xl);
   background: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 20px 50px rgba(0, 0, 0, .35);
 }
 
-.r-match-form .r-field {
-  margin: 0;
-  border: 0;
-  padding: 0;
+/* Animated gradient ring while the prompt has focus. */
+.r-ai-prompt::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: calc(var(--rento-radius-xl) + 2px);
+  background: conic-gradient(from var(--r-ai-angle, 0deg), var(--rento-primary), var(--rento-secondary), #8b7bff, var(--rento-primary));
+  opacity: 0;
+  transition: opacity .3s;
+  animation: r-ai-spin 4s linear infinite;
 }
 
-.r-match-form output {
+.r-ai-prompt:focus-within::before {
+  opacity: 1;
+}
+
+.r-ai-prompt__icon {
+  position: absolute;
+  top: 50%;
+  left: 1.25rem;
   color: var(--rento-primary-text);
+  font-size: 1.15rem;
+  transform: translateY(-50%);
+}
+
+.r-ai-prompt textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  max-height: 160px;
+  padding: .85rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--rento-ink-900);
+  font-size: var(--rento-text-lg);
+  line-height: 1.4;
+  resize: none;
+  outline: none;
+}
+
+.r-ai-prompt textarea::placeholder {
+  color: var(--rento-gray-500);
+}
+
+.r-ai-prompt__submit {
+  flex-shrink: 0;
+}
+
+.r-ai-understood {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rento-space-2);
+  margin-top: var(--rento-space-4);
+}
+
+.r-ai-understood[hidden] {
+  display: none;
+}
+
+.r-ai-understood__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rento-space-2);
+  color: var(--rento-secondary);
+  font-size: var(--rento-text-sm);
+  font-weight: var(--rento-weight-semibold);
+}
+
+.r-ai-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rento-space-2);
+  padding: .35rem .8rem;
+  border: 1px solid rgba(var(--rento-primary-rgb), .45);
+  border-radius: var(--rento-radius-pill);
+  background: rgba(var(--rento-primary-rgb), .14);
+  color: #fff;
+  font-size: var(--rento-text-sm);
+  font-weight: var(--rento-weight-medium);
+  animation: r-ai-pop .35s var(--rento-ease) both;
+}
+
+.r-ai-chip i {
+  color: var(--rento-secondary);
+}
+
+.r-ai-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rento-space-2);
+  margin-top: var(--rento-space-5);
+}
+
+.r-ai-examples__label {
+  margin-right: var(--rento-space-1);
+  color: var(--rento-gray-400);
+  font-size: var(--rento-text-sm);
+}
+
+.r-ai-example {
+  padding: .45rem .9rem;
+  border: 1px solid var(--rento-line-dark);
+  border-radius: var(--rento-radius-pill);
+  background: rgba(255, 255, 255, .05);
+  color: var(--rento-gray-300);
+  font-size: var(--rento-text-sm);
+  transition: background var(--rento-duration), border-color var(--rento-duration), color var(--rento-duration);
+}
+
+.r-ai-example:hover,
+.r-ai-example:focus-visible {
+  border-color: rgba(var(--rento-primary-rgb), .6);
+  background: rgba(var(--rento-primary-rgb), .12);
+  color: #fff;
+}
+
+.r-ai-tune {
+  margin-top: var(--rento-space-6);
+  border: 1px solid var(--rento-line-dark);
+  border-radius: var(--rento-radius-lg);
+  background: rgba(255, 255, 255, .04);
+}
+
+.r-ai-tune summary {
+  display: flex;
+  align-items: center;
+  gap: var(--rento-space-2);
+  padding: var(--rento-space-4) var(--rento-space-5);
+  color: #fff;
+  font-weight: var(--rento-weight-semibold);
+  cursor: pointer;
+  list-style: none;
+}
+
+.r-ai-tune summary::-webkit-details-marker {
+  display: none;
+}
+
+.r-ai-tune summary::after {
+  content: "\f078";
+  margin-left: auto;
+  font: var(--fa-font-solid);
+  font-size: .8rem;
+  transition: transform var(--rento-duration);
+}
+
+.r-ai-tune[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.r-ai-tune__body {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: var(--rento-space-6);
+  padding: 0 var(--rento-space-5) var(--rento-space-5);
+}
+
+.r-ai-tune .r-field {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.r-ai-tune .r-label {
+  color: var(--rento-gray-300);
+}
+
+.r-ai-tune output {
+  color: #fff;
   font-family: var(--rento-font-heading);
   font-weight: var(--rento-weight-extrabold);
+}
+
+.r-ai-tune .r-range__scale {
+  color: var(--rento-gray-400);
 }
 
 .r-range {
@@ -2555,6 +2771,7 @@ a.r-chip:hover {
   font-size: var(--rento-text-sm);
   font-weight: var(--rento-weight-semibold);
   cursor: pointer;
+  transition: background var(--rento-duration), color var(--rento-duration), border-color var(--rento-duration);
 }
 
 .r-segmented label:hover {
@@ -2567,19 +2784,275 @@ a.r-chip:hover {
   color: #fff;
 }
 
+.r-ai-tune .r-segmented label {
+  border-color: var(--rento-line-dark);
+  background: transparent;
+  color: var(--rento-gray-300);
+}
+
+.r-ai-tune .r-segmented .btn-check:checked + label {
+  border-color: var(--rento-button);
+  background: var(--rento-button);
+  color: #fff;
+}
+
 .r-segmented .btn-check:focus-visible + label {
   outline: 3px solid rgba(var(--rento-primary-rgb), .45);
   outline-offset: 2px;
 }
 
-.r-match-results {
-  margin-top: var(--rento-space-12);
+/* "Thinking" overlay shown before the search is sent. */
+.r-ai-thinking {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: var(--rento-space-4);
+  background: rgba(16, 17, 20, .72);
+  backdrop-filter: blur(6px);
+  animation: r-ai-fade .2s ease both;
+}
+
+.r-ai-thinking[hidden] {
+  display: none;
+}
+
+.r-ai-thinking__card {
+  width: min(380px, 100%);
+  padding: var(--rento-space-8);
+  border: 1px solid var(--rento-line-dark);
+  border-radius: var(--rento-radius-xl);
+  background: var(--rento-ink-800);
+  color: var(--rento-gray-300);
+  text-align: center;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .45);
+}
+
+.r-ai-orb {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--rento-space-4);
+  border-radius: 50%;
+  background: conic-gradient(from var(--r-ai-angle, 0deg), var(--rento-primary), var(--rento-secondary), #8b7bff, var(--rento-primary));
+  -webkit-mask: radial-gradient(circle, transparent 52%, #000 54%);
+  mask: radial-gradient(circle, transparent 52%, #000 54%);
+  animation: r-ai-spin 1.2s linear infinite;
+}
+
+.r-ai-thinking__title {
+  margin: 0 0 var(--rento-space-5);
+  color: #fff;
+  font-family: var(--rento-font-heading);
+  font-size: var(--rento-text-lg);
+  font-weight: var(--rento-weight-bold);
+}
+
+.r-ai-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.r-ai-steps li {
+  display: flex;
+  align-items: center;
+  gap: var(--rento-space-3);
+  padding: var(--rento-space-2) 0;
+  color: var(--rento-gray-400);
+  font-size: var(--rento-text-sm);
+  transition: color .2s;
+}
+
+.r-ai-steps li::before {
+  content: "";
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--rento-ink-600);
+  border-radius: 50%;
+}
+
+.r-ai-steps li.is-active {
+  color: #fff;
+}
+
+.r-ai-steps li.is-active::before {
+  border-color: var(--rento-primary) transparent var(--rento-primary) var(--rento-primary);
+  animation: r-ai-spin-plain .7s linear infinite;
+}
+
+.r-ai-steps li.is-done::before {
+  content: "\f00c";
+  display: grid;
+  place-items: center;
+  border-color: var(--rento-success);
+  background: var(--rento-success);
+  color: #fff;
+  font: var(--fa-font-solid);
+  font-size: 9px;
+  animation: none;
+}
+
+body.r-ai-busy {
+  overflow: hidden;
+}
+
+/* Results */
+.r-ai-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--rento-space-4);
   margin-bottom: var(--rento-space-6);
 }
 
-@media (max-width: 991px) {
-  .r-match-form {
+.r-ai-summary .r-section-title {
+  margin: var(--rento-space-1) 0 0;
+}
+
+.r-ai-summary__trip {
+  margin: var(--rento-space-2) 0 0;
+  color: var(--rento-gray-600);
+  font-style: italic;
+}
+
+#results:focus {
+  outline: none;
+}
+
+.r-ai-result {
+  display: flex;
+}
+
+.r-ai-result > * {
+  flex: 1;
+}
+
+.r-ai-result:first-child .r-car-card {
+  box-shadow: 0 0 0 2px var(--rento-primary), var(--rento-shadow-lg);
+}
+
+.r-ai-results .r-ai-result {
+  animation: r-ai-rise .5s var(--rento-ease) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+/* Smart search bar on the car listing */
+.r-smart-search {
+  margin-top: var(--rento-space-6);
+  max-width: 760px;
+}
+
+.r-smart-search .r-ai-prompt {
+  align-items: center;
+  padding: var(--rento-space-2);
+  padding-left: 3rem;
+}
+
+.r-smart-search .r-ai-prompt__icon {
+  left: 1.1rem;
+}
+
+.r-smart-search input {
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+  border: 0;
+  background: transparent;
+  color: var(--rento-ink-900);
+  font-size: var(--rento-text-base);
+  outline: none;
+}
+
+.r-smart-search.is-thinking .r-ai-prompt {
+  background: linear-gradient(90deg, #fff 0%, #fff4ef 40%, #fff 80%) 0 0 / 200% 100%;
+  animation: r-ai-shimmer 1s linear infinite;
+}
+
+.r-smart-search.is-thinking .r-ai-prompt::before {
+  opacity: 1;
+}
+
+.r-listing.is-thinking .r-grid--cards {
+  opacity: .45;
+  filter: saturate(.4);
+  transition: opacity .2s, filter .2s;
+}
+
+@property --r-ai-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes r-ai-spin {
+  to { --r-ai-angle: 360deg; }
+}
+
+@keyframes r-ai-spin-plain {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes r-ai-drift {
+  to { transform: translate3d(-3%, 2%, 0) scale(1.05); }
+}
+
+@keyframes r-ai-pop {
+  from { opacity: 0; transform: translateY(4px) scale(.94); }
+}
+
+@keyframes r-ai-fade {
+  from { opacity: 0; }
+}
+
+@keyframes r-ai-rise {
+  from { opacity: 0; transform: translateY(16px); }
+}
+
+@keyframes r-ai-shimmer {
+  to { background-position: -200% 0; }
+}
+
+@media (max-width: 767px) {
+  .r-ai-hero {
+    padding: var(--rento-space-8) 0 var(--rento-space-12);
+  }
+
+  .r-ai-form .r-ai-prompt {
+    flex-direction: column;
+    align-items: stretch;
+    padding-left: var(--rento-space-3);
+  }
+
+  .r-ai-form .r-ai-prompt textarea {
+    min-height: 76px;
+    padding-left: 2.1rem;
+  }
+
+  .r-ai-form .r-ai-prompt__icon {
+    top: 1.95rem;
+    left: 1.2rem;
+  }
+
+  .r-ai-form .r-ai-prompt__submit {
+    justify-content: center;
+  }
+
+  .r-ai-tune__body {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .r-ai-hero::before,
+  .r-ai-prompt::before,
+  .r-ai-chip,
+  .r-ai-results .r-ai-result,
+  .r-smart-search.is-thinking .r-ai-prompt {
+    animation: none;
   }
 }
 

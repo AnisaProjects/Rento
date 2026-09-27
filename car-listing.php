@@ -94,6 +94,7 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
   <?php
   $pageTitle = $heading === 'All cars' ? 'Car Listing' : $heading;
   $pageDescription = 'Browse every car available to rent with Rento: filter by type, brand, fuel and budget, with daily prices in rupees.';
+  $pageScripts = ['assets/js/rento-ai.js'];
   include('includes/head.php');
   ?>
   <?php if ($activeChips || $page > 1) { ?><meta name="robots" content="noindex, follow"><?php } ?>
@@ -104,7 +105,22 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
   <?php include('includes/header.php'); ?>
 
   <main id="main">
-    <?php echo page_hero($heading, 'Filter by type, brand, fuel and budget. Every price is per day, in rupees.', $heading === 'All cars' ? [] : [['Cars', 'car-listing']]); ?>
+    <?php
+    // Smart search: rento-ai.js turns a description into the filters below; without JS it is a keyword search.
+    ob_start(); ?>
+    <form class="r-smart-search" id="smart-search" action="car-listing" method="get" role="search"
+      data-brands="<?php echo htmlentities(json_encode(array_map(fn($b) => [(int)$b->id, $b->BrandName], $brands))); ?>"
+      data-fuels="<?php echo htmlentities(json_encode(array_values($fuelTypes))); ?>"
+      data-budgets="<?php echo htmlentities(json_encode(LISTING_BUDGETS)); ?>">
+      <div class="r-ai-prompt">
+        <label class="visually-hidden" for="smart-q">Describe the car you need</label>
+        <i class="fa fa-wand-magic-sparkles r-ai-prompt__icon" aria-hidden="true"></i>
+        <input type="search" id="smart-q" name="q" maxlength="80" autocomplete="off" placeholder="Try &quot;Toyota SUV for the mountains under Rs 5,000&quot;">
+        <button type="submit" class="r-btn">Search</button>
+      </div>
+      <div class="r-ai-understood" id="smart-understood" aria-live="polite" hidden></div>
+    </form>
+    <?php echo page_hero($heading, 'Describe what you need, or use the filters. Every price is per day, in rupees.', $heading === 'All cars' ? [] : [['Cars', 'car-listing']], '', ob_get_clean()); ?>
 
     <section class="r-section r-section--muted r-listing">
       <div class="container">

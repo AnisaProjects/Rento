@@ -62,7 +62,7 @@ function car_card(object $car, array $opts = []): string
 // Dark title band at the top of inner pages.
 //   $crumbs: [[label, url], ...] between Home and the current page (optional)
 //   $image:  name of a photo in assets/images (WebP + JPG) shown behind the title (optional)
-function page_hero(string $title, string $lead = '', array $crumbs = [], string $image = ''): string
+function page_hero(string $title, string $lead = '', array $crumbs = [], string $image = '', string $extraHtml = ''): string
 {
     ob_start(); ?>
     <section class="r-page-hero<?php echo $image !== '' ? ' r-page-hero--image' : ''; ?>">
@@ -84,6 +84,7 @@ function page_hero(string $title, string $lead = '', array $crumbs = [], string 
         </nav>
         <h1><?php echo htmlentities($title); ?></h1>
         <?php if ($lead !== '') { ?><p><?php echo htmlentities($lead); ?></p><?php } ?>
+        <?php echo $extraHtml; // trusted markup built by the page ?>
       </div>
     </section>
     <?php
