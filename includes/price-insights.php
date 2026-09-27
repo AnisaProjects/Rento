@@ -25,17 +25,26 @@ function market_benchmarks(): ?array
     return is_array($data) ? $data : null;
 }
 
-// The comparable market category for a car, or null when there is no self-drive data for it.
+// Brands whose cars are compared with the automatic/luxury SUV rate, never with ordinary sedans or hatchbacks.
+const MARKET_LUXURY_BRANDS = ['Audi', 'BMW', 'Mercedes', 'Mercedes-Benz', 'Lexus', 'Land Rover', 'Porsche', 'Jaguar', 'Volvo'];
+
+// The comparable market category for a car, or null when there is no self-drive data for it
+// (luxury sedans and coupes, sports cars, pickups and vans have no published self-drive rate).
 function market_category(object $car): ?string
 {
     $type = (string)$car->CarType;
     $electric = strcasecmp((string)$car->FuelType, 'Electric') === 0;
+    $luxury = in_array((string)($car->BrandName ?? ''), MARKET_LUXURY_BRANDS, true);
+    $suv = in_array($type, ['SUV', 'Crossover', 'MUV'], true);
     return match (true) {
+        $luxury && $suv => 'suv_luxury',
+        $luxury => null,
         $type === 'Hatchback' => 'hatchback',
         $type === 'Sedan' => 'sedan',
-        in_array($type, ['SUV', 'Crossover'], true) && (int)$car->SeatingCapacity >= 7 => 'suv_7seat',
-        in_array($type, ['SUV', 'Crossover'], true) && $electric => 'suv_ev',
-        in_array($type, ['SUV', 'Crossover'], true) => 'suv',
+        $suv && (int)$car->SeatingCapacity >= 7 => 'suv_7seat',
+        $type === 'MUV' => null,
+        $suv && $electric => 'suv_ev',
+        $suv => 'suv',
         default => null,
     };
 }
@@ -48,7 +57,8 @@ function car_price_infos(PDO $dbh): array
         return $infos;
     }
     $infos = [];
-    $cars = $dbh->query("SELECT id, VehiclesTitle, PricePerDay, CarType, FuelType, SeatingCapacity, DriverOnly FROM tblvehicles WHERE IsActive = 1")->fetchAll(PDO::FETCH_OBJ);
+    $cars = $dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.CarType, v.FuelType, v.SeatingCapacity, v.DriverOnly, b.BrandName
+        FROM tblvehicles v LEFT JOIN tblbrands b ON b.id = v.VehiclesBrand WHERE v.IsActive = 1")->fetchAll(PDO::FETCH_OBJ);
     $days = [];
     if (PRICING_ENABLED) {
         $query = $dbh->prepare("SELECT VehicleId, ForecastDate, Price, BasePrice, IsAvailable FROM tbl_price_forecast

@@ -7,6 +7,7 @@
     "sedan": {"label": "sedans", "price": 5000},
     "suv": {"label": "SUVs", "price": 7000, "note": "manual SUV rate (the lower of the two SUV rates)"},
     "suv_ev": {"label": "electric SUVs", "price": 10000},
-    "suv_7seat": {"label": "7-seat SUVs (Scorpio class)", "price": 10000}
+    "suv_luxury": {"label": "automatic and luxury SUVs", "price": 10000},
+    "suv_7seat": {"label": "7-seat SUVs and MUVs (Scorpio class)", "price": 10000}
   }
 }
