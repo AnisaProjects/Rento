@@ -79,7 +79,7 @@ $accountLinks = [
                 <li><a class="dropdown-item" href="<?php echo $linkUrl; ?>"><i class="fa <?php echo $linkIcon; ?>" aria-hidden="true"></i><?php echo $linkLabel; ?></a></li>
               <?php } ?>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="logout"><i class="fa fa-arrow-right-from-bracket" aria-hidden="true"></i>Sign out</a></li>
+              <li><form method="post" action="logout"><?php echo csrf_field(); ?><button type="submit" class="dropdown-item"><i class="fa fa-arrow-right-from-bracket" aria-hidden="true"></i>Sign out</button></form></li>
             </ul>
           </div>
         <?php } else { ?>
@@ -125,7 +125,7 @@ $accountLinks = [
         <?php foreach ($accountLinks as [$linkUrl, $linkIcon, $linkLabel]) { ?>
           <li><a href="<?php echo $linkUrl; ?>"><?php echo $linkLabel; ?></a></li>
         <?php } ?>
-        <li><a href="logout">Sign out</a></li>
+        <li><form method="post" action="logout"><?php echo csrf_field(); ?><button type="submit" class="r-link-button">Sign out</button></form></li>
       </ul>
     <?php } else { ?>
       <a href="#loginform" class="r-btn r-btn--block" data-bs-toggle="modal">Login / Register</a>

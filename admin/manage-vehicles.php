@@ -41,7 +41,7 @@ if (isset($_POST['del'])) {
   redirect_to(current_url());
 }
 
-$vehicles = $dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.FuelType, v.ModelYear, v.SeatingCapacity, v.CarType, v.IsActive, v.Vimage1,
+$vehicles = $dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.FuelType, v.ModelYear, v.SeatingCapacity, v.CarType, v.IsActive, v.DriverOnly, v.Vimage1,
     br.BrandName, (SELECT COUNT(*) FROM tblbooking b WHERE b.VehicleId = v.id) AS bookings
   FROM tblvehicles v LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand ORDER BY v.id DESC")->fetchAll(PDO::FETCH_OBJ);
 
@@ -78,7 +78,7 @@ admin_page_start('Manage Vehicles', 'manage-vehicles.php', [['Vehicles', 'manage
                 <?php echo admin_vehicle_thumb($v->Vimage1); ?>
                 <div>
                   <a class="a-strong text-decoration-none" href="edit-vehicle.php?id=<?php echo (int)$v->id; ?>"><?php echo h($v->VehiclesTitle); ?></a>
-                  <div class="a-muted"><?php echo h($v->CarType ?: 'No type set'); ?></div>
+                  <div class="a-muted"><?php echo h($v->CarType ?: 'No type set'); ?><?php echo (int)$v->DriverOnly ? ' · with driver only' : ''; ?></div>
                 </div>
               </div>
             </td>

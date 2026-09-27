@@ -4,7 +4,7 @@ include('includes/config.php');
 
 // Newest cars first.
 $featuredCars = $dbh->query("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
-    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblbrands.BrandName
+    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblvehicles.DriverOnly, tblbrands.BrandName
   FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand
   WHERE tblvehicles.IsActive = 1
   ORDER BY tblvehicles.id DESC LIMIT 6")->fetchAll(PDO::FETCH_OBJ);

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 require_once('includes/dynamic_pricing.php');
+require_once __DIR__ . '/includes/enquiry-form.php';
 
 $vhid = intval($_GET['vhid'] ?? 0);
 $vehicleQuery = $dbh->prepare("SELECT tblvehicles.*, tblbrands.BrandName, tblbrands.id AS bid FROM tblvehicles
@@ -34,6 +35,17 @@ function is_booking_date(string $value): bool
 {
   $date = DateTime::createFromFormat('Y-m-d', $value);
   return $date !== false && $date->format('Y-m-d') === $value;
+}
+
+// Driver-only cars (admin -> Edit vehicle) are rented with a driver: the page shows an
+// enquiry form instead of self-drive booking, and a direct booking POST is refused.
+$driverOnly = (int)($car->DriverOnly ?? 0) === 1;
+if ($driverOnly) {
+  enquiry_handle($dbh, ['vehicle' => $car, 'title' => $carName . ' (with driver)', 'maxPassengers' => max(1, (int)$car->SeatingCapacity)], $carUrl . '#book');
+  if (isset($_POST['submit'])) {
+    flash_set('error', 'This car is rented with a driver. Please send a request instead.');
+    redirect_to($carUrl . '#book');
+  }
 }
 
 // Booking request. Result is shown as a toast after redirecting (post/redirect/get).
@@ -127,7 +139,7 @@ foreach ($featureLabels as $column => $label) {
 
 // Similar cars: same brand or same type, never the car being viewed.
 $similarQuery = $dbh->prepare("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
-    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblbrands.BrandName
+    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblvehicles.DriverOnly, tblbrands.BrandName
   FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand
   WHERE tblvehicles.IsActive = 1 AND tblvehicles.id <> :id AND (tblvehicles.VehiclesBrand = :bid OR tblvehicles.CarType = :type)
   ORDER BY (tblvehicles.CarType = :type) DESC, ABS(tblvehicles.PricePerDay - :price) LIMIT 3");
@@ -176,6 +188,7 @@ $today = date('Y-m-d');
             <?php if ($car->FuelType) { ?><li><span class="r-chip"><i class="fa fa-gas-pump" aria-hidden="true"></i><?php echo htmlentities($car->FuelType); ?></span></li><?php } ?>
             <?php if ($car->SeatingCapacity) { ?><li><span class="r-chip"><i class="fa fa-user-group" aria-hidden="true"></i><?php echo (int)$car->SeatingCapacity; ?> seats</span></li><?php } ?>
             <?php if ($car->ModelYear) { ?><li><span class="r-chip"><i class="fa fa-calendar" aria-hidden="true"></i><?php echo (int)$car->ModelYear; ?> model</span></li><?php } ?>
+            <?php if ($driverOnly) { ?><li><span class="r-chip"><i class="fa fa-id-card" aria-hidden="true"></i>With driver</span></li><?php } ?>
           </ul>
         </div>
         <div class="r-car__price">
@@ -183,7 +196,7 @@ $today = date('Y-m-d');
           <?php if (($pricingQuote['status'] ?? '') === 'model') { ?>
             <span class="r-badge r-badge--primary">Smart price <?php echo sprintf('%+0.0f%%', (($pricingQuote['multiplier'] ?? 1) - 1) * 100); ?></span>
           <?php } ?>
-          <a href="#book" class="r-btn r-car__book-jump">Book this car</a>
+          <a href="#book" class="r-btn r-car__book-jump"><?php echo $driverOnly ? 'Request with driver' : 'Book this car'; ?></a>
         </div>
       </div>
 
@@ -228,6 +241,13 @@ $today = date('Y-m-d');
 
         <aside class="r-car__aside" id="book" aria-labelledby="book-title">
           <div class="r-book">
+            <?php if ($driverOnly) { ?>
+              <h2 id="book-title" class="r-book__title">Rent with a driver</h2>
+              <div class="r-price"><?php echo format_price($displayPrice); ?><small>/day, from</small></div>
+              <p class="r-hint">This car is only rented with one of our drivers. Send your trip details and we call you to confirm the price and pickup. No payment now.</p>
+              <?php echo flash_render(); ?>
+              <?php echo enquiry_form($dbh, $carUrl . '#book', [], max(1, (int)$car->SeatingCapacity), 'Request with driver'); ?>
+            <?php } else { ?>
             <h2 id="book-title" class="r-book__title">Book this car</h2>
             <div class="r-price"><?php echo format_price($displayPrice); ?><small>/day</small></div>
 
@@ -258,6 +278,7 @@ $today = date('Y-m-d');
               <p class="r-book__guest">Log in or create a free account to pick dates and send a booking request.</p>
               <a href="#loginform" class="r-btn r-btn--block r-btn--lg" data-bs-toggle="modal">Log in to book</a>
               <p class="r-hint r-book__note">New here? <a href="#signupform" data-bs-toggle="modal">Create an account</a></p>
+            <?php } ?>
             <?php } ?>
           </div>
         </aside>

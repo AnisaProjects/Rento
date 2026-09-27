@@ -68,7 +68,7 @@ $pages = max(1, (int)ceil($total / LISTING_PER_PAGE));
 $page = min($page, $pages);
 
 $list = $dbh->prepare("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
-    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblbrands.BrandName
+    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblvehicles.DriverOnly, tblbrands.BrandName
   $from ORDER BY " . LISTING_SORTS[$sort][1] . " LIMIT " . LISTING_PER_PAGE . " OFFSET " . (($page - 1) * LISTING_PER_PAGE));
 $list->execute($bind);
 $cars = $list->fetchAll(PDO::FETCH_OBJ);

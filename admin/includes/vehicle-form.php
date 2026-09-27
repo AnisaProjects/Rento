@@ -36,6 +36,8 @@ function vehicle_form_input(PDO $dbh): array
         'CarType' => (string)($_POST['cartype'] ?? ''),
         // New field isactive: unticked = hidden from the website and Find My Car.
         'IsActive' => empty($_POST['isactive']) ? 0 : 1,
+        // New field driveronly: rented only with a driver (enquiry instead of self-drive booking).
+        'DriverOnly' => empty($_POST['driveronly']) ? 0 : 1,
     ];
     foreach (VEHICLE_FEATURES as $field => [$column]) {
         $v[$column] = empty($_POST[$field]) ? null : 1;
@@ -111,6 +113,7 @@ function vehicle_form_sections(PDO $dbh, ?object $vehicle): void
     $selectedFuel = $val('fueltype', 'FuelType');
     $selectedBrand = (int)$val('brandname', 'VehiclesBrand');
     $isActive = $posted ? !empty($_POST['isactive']) : ($vehicle === null || (int)$vehicle->IsActive === 1);
+    $driverOnly = $posted ? !empty($_POST['driveronly']) : ((int)($vehicle->DriverOnly ?? 0) === 1);
     ?>
     <section class="a-card a-form-section">
       <div class="a-card__body d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -118,9 +121,16 @@ function vehicle_form_sections(PDO $dbh, ?object $vehicle): void
           <h2 class="a-card__title mb-1"><i class="fa fa-eye" aria-hidden="true"></i>Visibility</h2>
           <p class="a-muted mb-0">Inactive cars are hidden from the website and Find My Car, and can't be booked.</p>
         </div>
-        <div class="form-check form-switch fs-5 mb-0">
-          <input class="form-check-input" type="checkbox" role="switch" id="isactive" name="isactive" value="1"<?php echo $isActive ? ' checked' : ''; ?>>
-          <label class="form-check-label fs-6 fw-semibold" for="isactive">Active (shown on the website)</label>
+        <div>
+          <div class="form-check form-switch fs-5 mb-1">
+            <input class="form-check-input" type="checkbox" role="switch" id="isactive" name="isactive" value="1"<?php echo $isActive ? ' checked' : ''; ?>>
+            <label class="form-check-label fs-6 fw-semibold" for="isactive">Active (shown on the website)</label>
+          </div>
+          <div class="form-check form-switch fs-5 mb-0">
+            <input class="form-check-input" type="checkbox" role="switch" id="driveronly" name="driveronly" value="1"<?php echo $driverOnly ? ' checked' : ''; ?> aria-describedby="driveronly-hint">
+            <label class="form-check-label fs-6 fw-semibold" for="driveronly">Driver only</label>
+          </div>
+          <div class="form-text" id="driveronly-hint">Shown as "With driver": customers send a request instead of booking self-drive.</div>
         </div>
       </div>
     </section>

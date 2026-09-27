@@ -42,7 +42,7 @@ const ADMIN_MENU = [
     ]],
     ['Packages', 'fa-map-location-dot', [
         ['Manage Packages', 'manage-packages.php', ['package-edit.php']],
-        ['Enquiries', 'package-enquiries.php', []],
+        ['Enquiries', 'package-enquiries.php', ['package-enquiry.php']],
         ['Categories', 'package-categories.php', []],
     ]],
     ['Festivals', 'fa-calendar-days', 'festivals.php'],

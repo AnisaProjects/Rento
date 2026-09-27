@@ -23,7 +23,7 @@
         <li><span class="dropdown-item-text small text-body-secondary">Signed in as <strong><?php echo h($adminName); ?></strong></span></li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="change-password.php"><i class="fa fa-key fa-fw me-2" aria-hidden="true"></i>Change password</a></li>
-        <li><a class="dropdown-item" href="logout.php"><i class="fa fa-arrow-right-from-bracket fa-fw me-2" aria-hidden="true"></i>Log out</a></li>
+        <li><form method="post" action="logout.php"><?php echo csrf_field(); ?><button type="submit" class="dropdown-item"><i class="fa fa-arrow-right-from-bracket fa-fw me-2" aria-hidden="true"></i>Log out</button></form></li>
       </ul>
     </div>
   </div>

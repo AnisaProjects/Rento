@@ -25,10 +25,11 @@ function car_card(object $car, array $opts = []): string
     <article class="r-car-card">
       <div class="r-car-card__media">
         <?php echo vehicle_image($car->Vimage1 ?? '', $name, ['sizes' => $opts['sizes'] ?? '(min-width: 1200px) 400px, (min-width: 768px) 50vw, 100vw']); ?>
-        <?php if (!empty($opts['badge']) || !empty($car->CarType)) { ?>
+        <?php if (!empty($opts['badge']) || !empty($car->CarType) || !empty($car->DriverOnly)) { ?>
           <div class="r-car-card__badges">
             <?php if (!empty($opts['badge'])) { ?><span class="r-badge r-badge--primary"><?php echo htmlentities($opts['badge']); ?></span><?php } ?>
             <?php if (!empty($car->CarType)) { ?><span class="r-badge r-badge--dark"><?php echo htmlentities($car->CarType); ?></span><?php } ?>
+            <?php if (!empty($car->DriverOnly)) { ?><span class="r-badge r-badge--dark"><i class="fa fa-id-card" aria-hidden="true"></i> With driver</span><?php } ?>
           </div>
         <?php } ?>
       </div>
@@ -138,7 +139,7 @@ function account_start(PDO $dbh, string $active, string $title, string $lead = '
                 <?php foreach ($links as $url => [$icon, $label]) { ?>
                   <li><a href="<?php echo $url; ?>" class="<?php echo $url === $active ? 'is-active' : ''; ?>" <?php echo $url === $active ? 'aria-current="page"' : ''; ?>><i class="fa <?php echo $icon; ?>" aria-hidden="true"></i><?php echo $label; ?></a></li>
                 <?php } ?>
-                <li><a href="logout"><i class="fa fa-arrow-right-from-bracket" aria-hidden="true"></i>Sign out</a></li>
+                <li><form method="post" action="logout"><?php echo csrf_field(); ?><button type="submit" class="r-account__signout"><i class="fa fa-arrow-right-from-bracket" aria-hidden="true"></i>Sign out</button></form></li>
               </ul>
             </nav>
           </aside>

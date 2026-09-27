@@ -21,8 +21,8 @@ $where = [];
 $bind = [];
 if ($filter !== 'all') { $where[] = 'e.Status = :status'; $bind[':status'] = $filter; }
 if ($packageFilter) { $where[] = 'e.PackageId = :pid'; $bind[':pid'] = $packageFilter; }
-$query = $dbh->prepare("SELECT e.*, p.id AS pkgId, p.Title AS CurrentTitle, p.IsActive AS PackageActive FROM tblpackageenquiries e
-  LEFT JOIN tblpackages p ON p.id = e.PackageId" . ($where ? ' WHERE ' . implode(' AND ', $where) : '') . " ORDER BY e.CreatedAt DESC, e.id DESC");
+$query = $dbh->prepare("SELECT e.*, p.id AS pkgId, p.Title AS CurrentTitle, p.IsActive AS PackageActive, v.VehiclesTitle, br.BrandName FROM tblpackageenquiries e
+  LEFT JOIN tblpackages p ON p.id = e.PackageId LEFT JOIN tblvehicles v ON v.id = e.VehicleId LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand" . ($where ? ' WHERE ' . implode(' AND ', $where) : '') . " ORDER BY e.CreatedAt DESC, e.id DESC");
 $query->execute($bind);
 $enquiries = $query->fetchAll(PDO::FETCH_OBJ);
 $counts = ['all' => 0] + array_fill_keys(array_keys(PACKAGE_ENQUIRY_STATUSES), 0);
@@ -73,7 +73,10 @@ admin_page_start('Package Enquiries', 'package-enquiries.php', [['Packages', 'ma
               <?php if ($e->Email) { ?><a class="a-muted" href="mailto:<?php echo h($e->Email); ?>"><?php echo h($e->Email); ?></a><?php } ?>
             </td>
             <td>
-              <?php if ($e->pkgId) { ?><a href="package-edit.php?id=<?php echo (int)$e->pkgId; ?>"><?php echo h($e->CurrentTitle); ?></a><?php } else { ?><?php echo h($e->PackageTitle); ?> <span class="a-muted">(deleted)</span><?php } ?>
+              <?php if ($e->pkgId) { ?><a href="package-edit.php?id=<?php echo (int)$e->pkgId; ?>"><?php echo h($e->CurrentTitle); ?></a>
+              <?php } elseif ($e->VehicleId && $e->VehiclesTitle !== null) { ?><a href="edit-vehicle.php?id=<?php echo (int)$e->VehicleId; ?>"><?php echo h(vehicle_display_name($e->BrandName, $e->VehiclesTitle)); ?></a> <span class="a-muted">(with driver)</span>
+              <?php } else { ?><?php echo h($e->PackageTitle); ?> <span class="a-muted">(deleted)</span><?php } ?>
+              <?php if ($e->AdminNotes) { ?><i class="fa fa-note-sticky text-body-secondary ms-1" title="Has admin notes" aria-label="Has admin notes"></i><?php } ?>
             </td>
             <td data-order="<?php echo h($e->TravelDate); ?>" class="text-nowrap"><?php echo admin_date($e->TravelDate); ?><?php echo $e->TravelDate < date('Y-m-d') ? ' <span class="a-muted">(past)</span>' : ''; ?></td>
             <td><?php echo h($e->PickupLocation); ?></td>
@@ -83,6 +86,7 @@ admin_page_start('Package Enquiries', 'package-enquiries.php', [['Packages', 'ma
             <td data-order="<?php echo array_search($e->Status, array_keys(PACKAGE_ENQUIRY_STATUSES)); ?>"><?php echo admin_badge($statusLabel, $variant); ?></td>
             <td>
               <div class="a-actions">
+                <?php echo admin_icon_link('package-enquiry.php?id=' . (int)$e->id, 'fa-eye', 'View and add notes'); ?>
                 <?php echo admin_icon_link('tel:' . preg_replace('/[^0-9+]/', '', $e->Phone), 'fa-phone', 'Call ' . $e->FullName); ?>
                 <?php if ($e->Status === 'new') echo admin_action_button(['enquiryid' => $e->id, 'setstatus' => 'contacted'], 'fa-headset', 'Mark as contacted', 'primary'); ?>
                 <?php if (!in_array($e->Status, ['confirmed', 'cancelled'], true)) echo admin_action_button(['enquiryid' => $e->id, 'setstatus' => 'confirmed'], 'fa-check', 'Confirm', 'success', 'Mark this request from ' . $e->FullName . ' as confirmed?'); ?>

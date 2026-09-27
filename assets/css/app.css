@@ -4159,3 +4159,48 @@ body.r-ai-busy {
     left: 31px;
   }
 }
+
+/* ---------- 23. Sign-out buttons (logout is a POST form) ---------- */
+.r-offcanvas__nav form,
+.r-account__nav form {
+  margin: 0;
+}
+
+.r-offcanvas__nav .r-link-button {
+  display: block;
+  width: 100%;
+  padding: var(--rento-space-3) var(--rento-space-2);
+  border: 0;
+  border-bottom: 1px solid var(--rento-gray-100);
+  background: none;
+  color: var(--rento-ink-900);
+  font-size: var(--rento-text-base);
+  font-weight: var(--rento-weight-semibold);
+  text-align: left;
+}
+
+.r-account__signout {
+  display: flex;
+  align-items: center;
+  gap: var(--rento-space-3);
+  width: 100%;
+  padding: var(--rento-space-3);
+  border: 0;
+  border-radius: var(--rento-radius-sm);
+  background: none;
+  color: var(--rento-ink-800);
+  font-size: var(--rento-text-sm);
+  font-weight: var(--rento-weight-medium);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.r-account__signout i {
+  width: 18px;
+  color: var(--rento-gray-400);
+  text-align: center;
+}
+
+.r-account__signout:hover {
+  background: var(--rento-gray-50);
+}
