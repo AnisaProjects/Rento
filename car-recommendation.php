@@ -1,339 +1,107 @@
-<?php 
+<?php
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 include('includes/recommendation_engine.php');
 
 $recommendations = [];
 $userEmail = $_SESSION['login'] ?? null;
+$carTypes = ['Any' => 'Any type', 'Hatchback' => 'Hatchback', 'Sedan' => 'Sedan', 'SUV' => 'SUV'];
+$budget = 1000;
+$carType = 'Any';
+$searched = isset($_POST['getRecommendations']);
 
-if(isset($_POST['getRecommendations'])) {
-    $budget = intval($_POST['budget']);
-    $carType = $_POST['carType'];
-    
-    $recommendationEngine = new CarRecommendationEngine($dbh);
-    $recommendations = $recommendationEngine->getRecommendations($budget, $carType, $userEmail);
+if ($searched) {
+  $budget = max(200, min(5000, intval($_POST['budget'] ?? 1000)));
+  $carType = isset($carTypes[$_POST['carType'] ?? '']) ? $_POST['carType'] : 'Any';
+
+  $recommendationEngine = new CarRecommendationEngine($dbh);
+  $recommendations = $recommendationEngine->getRecommendations($budget, $carType, $userEmail);
+  $userPreferences = $recommendationEngine->getUserPreferences($userEmail);
 }
 ?>
-
 <!DOCTYPE HTML>
 <html lang="en">
+
 <head>
   <?php
-  $pageTitle = 'AI Car Recommendations';
-  $pageDescription = 'Tell Rento your budget and car type and get personalised car recommendations.';
+  $pageTitle = 'Find My Car';
+  $pageDescription = 'Tell Rento your budget and the type of car you like, and get car suggestions that fit your trip.';
+  $pageModern = true;
   include('includes/head.php');
   ?>
-  <style>
-.recommendation-card__img { height: 200px; object-fit: cover; width: 100%; }
-.recommendation-card {
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-}
-
-.recommendation-card:hover {
-    border-color: #007bff;
-    box-shadow: 0 8px 25px rgba(0,123,255,0.15);
-    transform: translateY(-2px);
-}
-
-.recommendation-score {
-    background: linear-gradient(45deg, #28a745, #20c997);
-    color: white;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 14px;
-    display: inline-block;
-    margin-bottom: 10px;
-}
-
-.ai-badge {
-    background: linear-gradient(45deg, #6f42c1, #e83e8c);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-size: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.feature-list {
-    list-style: none;
-    padding: 0;
-}
-
-.feature-list li {
-    padding: 5px 0;
-    color: #6c757d;
-}
-
-.feature-list li:before {
-    content: "✓ ";
-    color: #28a745;
-    font-weight: bold;
-}
-
-.explanation-box {
-    background: #e3f2fd;
-    border-left: 4px solid #2196f3;
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 0 5px 5px 0;
-}
-
-.budget-slider {
-    margin: 20px 0;
-}
-
-.form-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 40px;
-    border-radius: 15px;
-    margin-bottom: 30px;
-}
-
-.no-recommendations {
-    text-align: center;
-    padding: 60px 20px;
-    color: #6c757d;
-}
-
-.no-recommendations i {
-    font-size: 64px;
-    margin-bottom: 20px;
-    color: #dee2e6;
-}
-</style>
 </head>
 
-<body>
-<!--Header--> 
-<?php include('includes/header.php');?>
-<!-- /Header -->
+<body class="r-page">
 
-<!--Page Header-->
-<section class="page-header listing_page">
-  <div class="container">
-    <div class="page-header_wrap">
-      <div class="page-heading">
-        <h1>AI Car Recommendations</h1>
-      </div>
-      <ul class="coustom-breadcrumb">
-        <li><a href="./">Home</a></li>
-        <li>AI Recommendations</li>
-      </ul>
-    </div>
-  </div>
-  <!-- Dark Overlay-->
-  <div class="dark-overlay"></div>
-</section>
-<!-- /Page Header-->
+  <?php include('includes/header.php'); ?>
 
-<!--Listing-->
-<section class="listing-page">
-  <div class="container">
-    <div class="row">
-      
-      <!--Recommendation Form-->
-      <div class="col-md-12">
-        <div class="form-section">
-          <h2><i class="fa fa-robot"></i> Get Personalized Car Recommendations</h2>
-          <p class="mb-4">Our AI analyzes your preferences and budget to suggest the perfect car for you.</p>
-          
-          <form method="post" action="">
-<?php echo csrf_field(); ?>
-            <div class="row">
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label for="budget" class="form-label">Your Budget (per day)</label>
-                  <div class="budget-slider">
-                    <input type="range" class="form-range" id="budget" name="budget" 
-                           min="200" max="5000" value="1000" 
-                           oninput="document.getElementById('budgetValue').textContent = 'Rs ' + Number(this.value).toLocaleString('en-US')">
-                    <div class="d-flex justify-content-between">
-                      <small>Rs 200</small>
-                      <span id="budgetValue" class="badge text-bg-light">Rs 1,000</span>
-                      <small>Rs 5,000</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label for="carType" class="form-label">Preferred Car Type</label>
-                  <select class="form-control" id="carType" name="carType" required>
-                    <option value="Any">Any Type</option>
-                    <option value="SUV">SUV</option>
-                    <option value="Sedan">Sedan</option>
-                    <option value="Hatchback">Hatchback</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label class="form-label">&nbsp;</label>
-                  <button type="submit" name="getRecommendations" class="btn btn-light btn-block">
-                    <i class="fa fa-wand-magic-sparkles"></i> Get AI Recommendations
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-      
-      <!--Recommendations Results-->
-      <?php if(!empty($recommendations)): ?>
-      <div class="col-md-12">
-        <div class="row">
-          <div class="col-md-12">
-            <h3><i class="fa fa-star"></i> Recommended Cars for You</h3>
-            <p class="text-muted">Based on your preferences and our AI analysis</p>
+  <main id="main">
+    <?php echo page_hero('Find my car', 'Set your daily budget and the kind of car you like. We suggest the best matches' . ($userEmail ? ', using your past rentals too.' : '.')); ?>
+
+    <section class="r-section r-section--muted">
+      <div class="container">
+        <form method="post" class="r-match-form" aria-label="Your preferences">
+          <?php echo csrf_field(); ?>
+          <div class="r-field">
+            <label class="r-label" for="budget">Budget per day: <output id="budgetValue" for="budget"><?php echo format_price($budget); ?></output></label>
+            <input type="range" class="form-range r-range" id="budget" name="budget" min="200" max="5000" step="100" value="<?php echo $budget; ?>"
+              oninput="document.getElementById('budgetValue').textContent = 'Rs ' + Number(this.value).toLocaleString('en-US')">
+            <div class="r-range__scale"><span>Rs 200</span><span>Rs 5,000</span></div>
           </div>
-        </div>
-        
-        <div class="row">
-          <?php 
-          $recommendationEngine = new CarRecommendationEngine($dbh);
-          $userPreferences = $recommendationEngine->getUserPreferences($userEmail);
-          
-          foreach($recommendations as $index => $car): 
-              $explanations = $recommendationEngine->getRecommendationExplanation($car, $userPreferences);
-          ?>
-          <div class="col-md-6 col-lg-4">
-            <div class="recommendation-card">
-              <div class="d-flex justify-content-between align-items-start mb-3">
-                <span class="recommendation-score">
-                  <i class="fa fa-star"></i> 
-                  <?php echo round(($car->recommendationScore ?? 0.8) * 100); ?>% Match
-                </span>
-                <span class="ai-badge">AI Recommended</span>
-              </div>
-              
-              <div class="text-center mb-3">
-                <?php if($car->Vimage1): ?>
-                <?php echo vehicle_image($car->Vimage1, vehicle_display_name($car->BrandName ?? '', $car->VehiclesTitle), ['class' => 'img-fluid rounded recommendation-card__img', 'sizes' => '(min-width: 992px) 360px, (min-width: 576px) 50vw, 100vw']); ?>
-                <?php else: ?>
-                <div class="bg-light d-flex align-items-center justify-content-center" 
-                     style="height: 200px; border-radius: 8px;">
-                  <i class="fa fa-car fa-3x text-muted"></i>
-                </div>
-                <?php endif; ?>
-              </div>
-              
-              <h5 class="mb-2"><?php echo htmlentities($car->VehiclesTitle); ?></h5>
-              <p class="text-muted mb-2"><?php echo htmlentities($car->BrandName); ?> • <?php echo htmlentities($car->CarType); ?></p>
-              
-              <div class="row text-center mb-3">
-                <div class="col-4">
-                  <small class="text-muted">Price/Day</small>
-                  <div class="h5 text-primary"><?php echo format_price($car->PricePerDay); ?></div>
-                </div>
-                <div class="col-4">
-                  <small class="text-muted">Seating</small>
-                  <div class="h6"><?php echo htmlentities($car->SeatingCapacity); ?> Seats</div>
-                </div>
-                <div class="col-4">
-                  <small class="text-muted">Fuel</small>
-                  <div class="h6"><?php echo htmlentities($car->FuelType); ?></div>
-                </div>
-              </div>
-              
-              <ul class="feature-list">
-                <?php 
-                $features = [];
-                if($car->AirConditioner) $features[] = 'AC';
-                if($car->PowerSteering) $features[] = 'Power Steering';
-                if($car->DriverAirbag) $features[] = 'Airbags';
-                if($car->PowerWindows) $features[] = 'Power Windows';
-                if($car->CentralLocking) $features[] = 'Central Lock';
-                
-                foreach(array_slice($features, 0, 3) as $feature): ?>
-                <li><?php echo htmlentities($feature); ?></li>
-                <?php endforeach; ?>
-              </ul>
-              
-              <?php if(!empty($explanations)): ?>
-              <div class="explanation-box">
-                <small><strong>Why we recommend this:</strong></small>
-                <ul class="mb-0 mt-1">
-                  <?php foreach($explanations as $explanation): ?>
-                  <li><small><?php echo htmlentities($explanation); ?></small></li>
-                  <?php endforeach; ?>
-                </ul>
-              </div>
-              <?php endif; ?>
-              
-              <div class="text-center mt-3">
-                <a href="<?php echo htmlentities(vehicle_url($car->id, $car->BrandName ?? '', $car->VehiclesTitle ?? '')); ?>" 
-                   class="btn btn-primary btn-sm">
-                  <i class="fa fa-eye"></i> View Details
-                </a>
-                <a href="<?php echo htmlentities(vehicle_url($car->id, $car->BrandName ?? '', $car->VehiclesTitle ?? '')); ?>" 
-                   class="btn btn-outline-primary btn-sm ms-2">
-                  <i class="fa fa-calendar"></i> Book Now
-                </a>
-              </div>
+          <fieldset class="r-field">
+            <legend class="r-label">Car type</legend>
+            <div class="r-segmented">
+              <?php foreach ($carTypes as $value => $label) { ?>
+                <input type="radio" class="btn-check" name="carType" id="type-<?php echo $value; ?>" value="<?php echo $value; ?>" <?php echo $carType === $value ? 'checked' : ''; ?>>
+                <label for="type-<?php echo $value; ?>"><?php echo $label; ?></label>
+              <?php } ?>
             </div>
+          </fieldset>
+          <button type="submit" name="getRecommendations" class="r-btn r-btn--lg">
+            <i class="fa fa-wand-magic-sparkles" aria-hidden="true"></i>Show my matches
+          </button>
+        </form>
+
+        <?php if ($searched) { ?>
+          <div class="r-section-head r-section-head--start r-match-results">
+            <h2 class="r-section-title"><?php echo $recommendations ? 'Your best matches' : 'No matches yet'; ?></h2>
+            <?php if ($recommendations) { ?>
+              <p class="r-section-lead">Cars up to <?php echo format_price_per_day($budget); ?><?php echo $carType !== 'Any' ? ', ' . htmlentities($carType) : ''; ?>, best match first.</p>
+            <?php } ?>
           </div>
-          <?php endforeach; ?>
-        </div>
+
+          <?php if ($recommendations) { ?>
+            <div class="r-grid r-grid--cards">
+              <?php foreach ($recommendations as $car) {
+                $reasons = [];
+                if ((int)$car->PricePerDay <= $budget) {
+                  $reasons[] = 'Within your budget of ' . format_price_per_day($budget);
+                }
+                if ($carType !== 'Any' && ($car->CarType ?? '') === $carType) {
+                  $reasons[] = 'The ' . $carType . ' you asked for';
+                }
+                foreach ($recommendationEngine->getRecommendationExplanation($car, $userPreferences) as $explanation) {
+                  $reasons[] = $explanation;
+                }
+                // A match % only when there is a real score (from the user's rental history).
+                $badge = isset($car->recommendationScore) ? round($car->recommendationScore * 100) . '% match' : '';
+                echo car_card($car, ['heading' => 'h3', 'badge' => $badge, 'reasons' => array_slice($reasons, 0, 3)]);
+              } ?>
+            </div>
+          <?php } else {
+            echo empty_state('fa-magnifying-glass', 'No cars fit that budget and type', 'Try a higher budget or "Any type". You can also browse every car.', 'Browse all cars', 'car-listing');
+          } ?>
+        <?php } ?>
       </div>
-      
-      <?php elseif(isset($_POST['getRecommendations'])): ?>
-      <div class="col-md-12">
-        <div class="no-recommendations">
-          <i class="fa fa-magnifying-glass"></i>
-          <h4>No cars found matching your criteria</h4>
-          <p>Try adjusting your budget or car type preferences to get better recommendations.</p>
-          <a href="car-recommendation" class="btn btn-primary">
-            <i class="fa fa-rotate"></i> Try Again
-          </a>
-        </div>
-      </div>
-      <?php endif; ?>
-      
-    </div>
-  </div>
-</section>
-<!-- /Listing-->
+    </section>
+  </main>
 
-<!--Footer -->
-<?php include('includes/footer.php');?>
-<!-- /Footer-->
-
-<!--Login-Form -->
-<?php include('includes/login.php');?>
-<!--/Login-Form -->
-
-<!--Register-Form -->
-<?php include('includes/registration.php');?>
-<?php include('includes/scripts.php'); ?>
-
-<script>
-// Budget slider functionality
-document.getElementById('budget').addEventListener('input', function() {
-    document.getElementById('budgetValue').textContent = 'Rs ' + Number(this.value).toLocaleString('en-US');
-});
-
-// Smooth scrolling for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
-});
-</script>
+  <?php include('includes/footer.php'); ?>
+  <?php include('includes/login.php'); ?>
+  <?php include('includes/registration.php'); ?>
+  <?php include('includes/forgotpassword.php'); ?>
+  <?php include('includes/scripts.php'); ?>
 
 </body>
+
 </html>

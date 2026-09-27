@@ -2207,3 +2207,108 @@ a.r-chip:hover {
     text-align: left;
   }
 }
+
+.r-car-card__reasons {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 var(--rento-space-4);
+  padding: var(--rento-space-3);
+  border-radius: var(--rento-radius);
+  background: var(--rento-success-soft);
+  list-style: none;
+}
+
+.r-car-card__reasons li {
+  display: flex;
+  gap: var(--rento-space-2);
+  margin: 0;
+  color: var(--rento-ink-800);
+  font-size: var(--rento-text-sm);
+  line-height: 1.4;
+}
+
+.r-car-card__reasons i {
+  margin-top: 3px;
+  color: var(--rento-success);
+}
+
+/* ---------- 15. Find my car (recommendations) ---------- */
+.r-match-form {
+  display: grid;
+  grid-template-columns: 1.2fr 1.4fr auto;
+  gap: var(--rento-space-6);
+  align-items: end;
+  padding: var(--rento-space-6);
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-lg);
+  background: #fff;
+}
+
+.r-match-form .r-field {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.r-match-form output {
+  color: var(--rento-primary);
+  font-family: var(--rento-font-heading);
+  font-weight: var(--rento-weight-extrabold);
+}
+
+.r-range {
+  accent-color: var(--rento-primary);
+}
+
+.r-range__scale {
+  display: flex;
+  justify-content: space-between;
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-xs);
+}
+
+.r-segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rento-space-2);
+}
+
+.r-segmented label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 var(--rento-space-4);
+  border: 1px solid var(--rento-gray-200);
+  border-radius: var(--rento-radius-pill);
+  background: #fff;
+  color: var(--rento-ink-800);
+  font-size: var(--rento-text-sm);
+  font-weight: var(--rento-weight-semibold);
+  cursor: pointer;
+}
+
+.r-segmented label:hover {
+  border-color: var(--rento-gray-300);
+}
+
+.r-segmented .btn-check:checked + label {
+  border-color: var(--rento-ink-900);
+  background: var(--rento-ink-900);
+  color: #fff;
+}
+
+.r-segmented .btn-check:focus-visible + label {
+  outline: 3px solid rgba(var(--rento-primary-rgb), .45);
+  outline-offset: 2px;
+}
+
+.r-match-results {
+  margin-top: var(--rento-space-12);
+  margin-bottom: var(--rento-space-6);
+}
+
+@media (max-width: 991px) {
+  .r-match-form {
+    grid-template-columns: 1fr;
+  }
+}

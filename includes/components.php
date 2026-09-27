@@ -3,7 +3,8 @@
 
 // One car in a grid: photo, brand, name, key specs, daily price. The whole card links to the car.
 //   $car needs: id, BrandName, VehiclesTitle, Vimage1, FuelType, SeatingCapacity, ModelYear, PricePerDay
-//   $opts: 'badge' => text shown on the photo, 'sizes' => image sizes attribute, 'heading' => h2|h3
+//   $opts: 'badge' => text shown on the photo, 'sizes' => image sizes attribute, 'heading' => h2|h3,
+//          'reasons' => short "why this car" lines shown under the specs
 function car_card(object $car, array $opts = []): string
 {
     $name = vehicle_display_name($car->BrandName ?? '', $car->VehiclesTitle ?? '');
@@ -38,6 +39,13 @@ function car_card(object $car, array $opts = []): string
           <ul class="r-car-card__specs">
             <?php foreach ($specs as [$icon, $label]) { ?>
               <li><i class="fa <?php echo $icon; ?>" aria-hidden="true"></i><?php echo htmlentities((string)$label); ?></li>
+            <?php } ?>
+          </ul>
+        <?php } ?>
+        <?php if (!empty($opts['reasons'])) { ?>
+          <ul class="r-car-card__reasons">
+            <?php foreach ($opts['reasons'] as $reason) { ?>
+              <li><i class="fa fa-check" aria-hidden="true"></i><?php echo htmlentities($reason); ?></li>
             <?php } ?>
           </ul>
         <?php } ?>
