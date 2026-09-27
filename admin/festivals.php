@@ -25,6 +25,10 @@ function festival_input(): array
     'Verification' => (string)($_POST['verification'] ?? ''),
     'SourceUrl' => trim((string)($_POST['sourceurl'] ?? '')),
     'Notes' => trim((string)($_POST['notes'] ?? '')),
+    // Optional travel-days window before the main days, with its own surcharge (new fields).
+    'TravelFrom' => (string)($_POST['travelfrom'] ?? ''),
+    'TravelTo' => (string)($_POST['travelto'] ?? ''),
+    'TravelPct' => trim((string)($_POST['travelpct'] ?? '')),
   ];
   $isDate = fn($d) => preg_match('/^\d{4}-\d{2}-\d{2}$/', $d) && checkdate((int)substr($d, 5, 2), (int)substr($d, 8, 2), (int)substr($d, 0, 4));
   $error = match (true) {
@@ -34,8 +38,16 @@ function festival_input(): array
     !isset(FESTIVAL_DEMAND[$v['DemandLevel']]) => 'Please choose the demand level.',
     !isset(FESTIVAL_VERIFICATION[$v['Verification']]) => 'Please choose how the dates were checked.',
     $v['SourceUrl'] !== '' && !preg_match('#^https?://\S+$#i', $v['SourceUrl']) => 'The source must be a full link starting with https://.',
+    ($v['TravelFrom'] === '') !== ($v['TravelTo'] === '') => 'Give both travel-day dates, or neither.',
+    $v['TravelFrom'] !== '' && (!$isDate($v['TravelFrom']) || !$isDate($v['TravelTo'])) => 'Please enter valid travel-day dates.',
+    $v['TravelFrom'] !== '' && $v['TravelTo'] < $v['TravelFrom'] => 'The travel days must end on or after they start.',
+    $v['TravelFrom'] !== '' && $v['TravelFrom'] > $v['EndDate'] => 'The travel days must start before the festival ends.',
+    $v['TravelPct'] !== '' && (!is_numeric($v['TravelPct']) || (float)$v['TravelPct'] < -50 || (float)$v['TravelPct'] > 100) => 'The travel-days surcharge must be a number between -50 and 100.',
     default => '',
   };
+  $v['TravelFrom'] = $v['TravelFrom'] !== '' ? $v['TravelFrom'] : null;
+  $v['TravelTo'] = $v['TravelTo'] !== '' ? $v['TravelTo'] : null;
+  $v['TravelPct'] = $v['TravelPct'] !== '' && $v['TravelFrom'] ? round((float)$v['TravelPct'], 2) : null;
   $v['SourceUrl'] = $v['SourceUrl'] !== '' ? mb_substr($v['SourceUrl'], 0, 500) : null;
   $v['FestivalName'] = mb_substr($v['FestivalName'], 0, 150);
   return [$v, $error];
@@ -51,12 +63,12 @@ if (isset($_POST['addfestival']) || isset($_POST['updatefestival'])) {
   }
   if ($id) {
     $query = $dbh->prepare("UPDATE tblfestivals SET FestivalName = :FestivalName, StartDate = :StartDate, EndDate = :EndDate, DemandLevel = :DemandLevel,
-      Verification = :Verification, SourceUrl = :SourceUrl, Notes = :Notes WHERE id = :id");
+      Verification = :Verification, SourceUrl = :SourceUrl, Notes = :Notes, TravelFrom = :TravelFrom, TravelTo = :TravelTo, TravelPct = :TravelPct WHERE id = :id");
     $query->execute($v + [':id' => $id]);
     flash_set('success', $v['FestivalName'] . ' updated.');
   } else {
-    $query = $dbh->prepare("INSERT INTO tblfestivals (FestivalName, StartDate, EndDate, DemandLevel, Verification, SourceUrl, Notes)
-      VALUES (:FestivalName, :StartDate, :EndDate, :DemandLevel, :Verification, :SourceUrl, :Notes)");
+    $query = $dbh->prepare("INSERT INTO tblfestivals (FestivalName, StartDate, EndDate, DemandLevel, Verification, SourceUrl, Notes, TravelFrom, TravelTo, TravelPct)
+      VALUES (:FestivalName, :StartDate, :EndDate, :DemandLevel, :Verification, :SourceUrl, :Notes, :TravelFrom, :TravelTo, :TravelPct)");
     $query->execute($v);
     flash_set('success', $v['FestivalName'] . ' added.');
   }
@@ -118,7 +130,9 @@ admin_page_start('Festivals & Travel Peaks', 'festivals.php', [], [
           $variant = ['official' => 'success', 'two sources' => 'info', 'disagreement' => 'danger', 'unverified' => 'warning', 'guidance' => 'neutral'][$f->Verification] ?? 'neutral'; ?>
           <tr<?php echo $past ? ' class="opacity-50"' : ''; ?>>
             <td><span class="a-strong"><?php echo h($f->FestivalName); ?></span><?php echo $now ? ' ' . admin_badge('Now', 'primary') : ''; ?></td>
-            <td data-order="<?php echo h($f->StartDate); ?>" class="text-nowrap"><?php echo admin_date($f->StartDate); ?><?php echo $f->EndDate !== $f->StartDate ? ' – ' . admin_date($f->EndDate) : ''; ?></td>
+            <td data-order="<?php echo h($f->StartDate); ?>" class="text-nowrap"><?php echo admin_date($f->StartDate); ?><?php echo $f->EndDate !== $f->StartDate ? ' – ' . admin_date($f->EndDate) : ''; ?>
+              <?php if ($f->TravelFrom) { ?><span class="a-muted d-block"><i class="fa fa-suitcase-rolling" aria-hidden="true"></i> Travel <?php echo date('j M', strtotime($f->TravelFrom)) . ($f->TravelTo !== $f->TravelFrom ? '–' . date('j M', strtotime($f->TravelTo)) : ''); ?> · <?php echo $f->TravelPct !== null ? rtrim(rtrim((string)$f->TravelPct, '0'), '.') . '%' : 'default ' . setting('pricing_travel_days_pct') . '%'; ?></span><?php } ?>
+            </td>
             <td><?php echo $days; ?></td>
             <td data-order="<?php echo $f->DemandLevel === 'high' ? 2 : 1; ?>"><?php echo $f->DemandLevel === 'high' ? admin_badge('High', 'primary', 'fa-fire') : admin_badge('Medium'); ?></td>
             <td><?php echo admin_badge(FESTIVAL_VERIFICATION[$f->Verification] ?? $f->Verification, $variant); ?></td>
@@ -170,6 +184,22 @@ admin_page_start('Festivals & Travel Peaks', 'festivals.php', [], [
         <?php foreach (FESTIVAL_VERIFICATION as $key => $label) { ?><option value="<?php echo h($key); ?>"<?php echo ($val('verification', 'Verification') ?: 'unverified') === $key ? ' selected' : ''; ?>><?php echo h($label); ?></option><?php } ?>
       </select>
     </div>
+    <fieldset class="a-span-all a-form-grid a-form-grid--3 border-top pt-3">
+      <legend class="form-label">Travel days <span class="a-muted fw-normal">(optional: the days before the main festival days when people travel home)</span></legend>
+      <div>
+        <label class="form-label" for="travelfrom">From</label>
+        <input class="form-control" type="date" id="travelfrom" name="travelfrom" value="<?php echo h($val('travelfrom', 'TravelFrom')); ?>">
+      </div>
+      <div>
+        <label class="form-label" for="travelto">To</label>
+        <input class="form-control" type="date" id="travelto" name="travelto" value="<?php echo h($val('travelto', 'TravelTo')); ?>">
+      </div>
+      <div>
+        <label class="form-label" for="travelpct">Surcharge (%)</label>
+        <input class="form-control" type="number" step="0.5" min="-50" max="100" id="travelpct" name="travelpct" value="<?php echo h($val('travelpct', 'TravelPct')); ?>" placeholder="<?php echo h(setting('pricing_travel_days_pct')); ?> (default)">
+        <div class="form-text">Used instead of the festival surcharge on these days.</div>
+      </div>
+    </fieldset>
     <div class="a-span-all">
       <label class="form-label" for="sourceurl">Source link</label>
       <input class="form-control" type="url" id="sourceurl" name="sourceurl" maxlength="500" value="<?php echo h($val('sourceurl', 'SourceUrl')); ?>" placeholder="https://www.moha.gov.np/...">

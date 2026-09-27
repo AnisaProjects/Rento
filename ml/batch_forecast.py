@@ -62,11 +62,19 @@ def compute(cur, settings: dict, today: date) -> tuple[list, int]:
     cars = cur.fetchall()
 
     cur.execute(
-        "SELECT FestivalName, StartDate, EndDate, DemandLevel, Verification FROM tblfestivals WHERE EndDate >= %s AND StartDate <= %s",
-        [today, last_day],
+        "SELECT FestivalName, StartDate, EndDate, DemandLevel, Verification, TravelFrom, TravelTo, TravelPct FROM tblfestivals"
+        " WHERE (EndDate >= %s AND StartDate <= %s) OR (TravelTo >= %s AND TravelFrom <= %s)",
+        [today, last_day, today, last_day],
     )
-    festivals = [Festival(r["FestivalName"], r["StartDate"], r["EndDate"], r["DemandLevel"], r["Verification"] == "guidance")
+    festivals = [Festival(r["FestivalName"], r["StartDate"], r["EndDate"], r["DemandLevel"], r["Verification"] == "guidance",
+                          r["TravelFrom"], r["TravelTo"], None if r["TravelPct"] is None else float(r["TravelPct"]))
                  for r in cur.fetchall()]
+
+    # Occupancy and demand only count once there are enough real confirmed bookings.
+    cur.execute("SELECT COUNT(*) n FROM tblbooking WHERE Status = 1")
+    confirmed = int(cur.fetchone()["n"])
+    settings["_demand_on"] = confirmed >= int(settings.get("pricing_demand_min_bookings", 0))
+    settings["_confirmed"] = confirmed
 
     # Bookings that block a car (pending or confirmed), for availability and occupancy.
     window_end = today + timedelta(days=int(settings["pricing_occupancy_window"]) - 1)
@@ -140,8 +148,10 @@ def main() -> int:
             ml_note = ""
             if int(settings.get("pricing_ml_enabled", 0)):
                 ml_note = " The gradient-boosting model is switched on but not used by the forecast yet."
+            demand_note = "" if settings["_demand_on"] else (
+                f" Occupancy and demand factors off ({settings['_confirmed']} of {settings['pricing_demand_min_bookings']} confirmed bookings).")
             finish_runs(cur, run_ids, "done", cars, len(rows),
-                        f"{cars} cars x {settings['pricing_forecast_days']} days from {today.isoformat()}.{ml_note}")
+                        f"{cars} cars x {settings['pricing_forecast_days']} days from {today.isoformat()}.{demand_note}{ml_note}")
             conn.commit()
             cur.execute("SELECT RELEASE_LOCK(%s)", [LOCK_NAME])
         print(f"Forecast written: {len(rows)} rows for {cars} cars.")

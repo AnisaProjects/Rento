@@ -8,10 +8,13 @@ Factors (sizes are admin settings, see includes/settings.php):
   weekend      the day is a weekend day (Nepal: Friday, Saturday)
   festival     the day is inside a festival row (Festivals page): high or medium demand;
                the strongest festival that day counts
+  travel days  the day is inside a festival's travel window (days before the main days);
+               it uses the travel surcharge instead of the festival one (never both)
   season       the day is inside a festival row checked as "guidance" (e.g. trekking season)
   lead time    last-minute (few days ahead) or early booking (many days ahead)
   occupancy    share of the car's next N days that are already booked
   demand       booking requests made for the car in the last N days
+               (both only once there are enough real confirmed bookings: settings["_demand_on"])
 
 No database access here, so the rules can be tested on their own (test_pricing_rules.py).
 """
@@ -29,6 +32,9 @@ class Festival:
     end: date
     demand: str          # "high" or "medium"
     is_season: bool      # Verification == "guidance"
+    travel_from: date | None = None
+    travel_to: date | None = None
+    travel_pct: float | None = None   # None = settings["pricing_travel_days_pct"]
 
 
 @dataclass
@@ -51,15 +57,23 @@ def price_for_day(day: date, today: date, car: CarContext, festivals: list, s: d
     if day.isoweekday() in weekend_days and s["pricing_weekend_pct"]:
         reasons.append({"label": "Weekend", "pct": _pct(s["pricing_weekend_pct"])})
 
-    # The strongest festival that day (seasons are counted separately).
-    todays = [f for f in festivals if f.start <= day <= f.end]
+    # The strongest festival that day; a travel day uses the travel surcharge instead
+    # (seasons are counted separately).
     best = None
-    for f in todays:
+    for f in festivals:
         if f.is_season:
             continue
-        pct = s["pricing_festival_high_pct"] if f.demand == "high" else s["pricing_festival_medium_pct"]
+        if f.travel_from and f.travel_to and f.travel_from <= day <= f.travel_to:
+            pct = s["pricing_travel_days_pct"] if f.travel_pct is None else f.travel_pct
+            label = f"{f.name}: travel days"
+        elif f.start <= day <= f.end:
+            pct = s["pricing_festival_high_pct"] if f.demand == "high" else s["pricing_festival_medium_pct"]
+            label = f.name
+        else:
+            continue
         if best is None or pct > best[1]:
-            best = (f.name, pct)
+            best = (label, pct)
+    todays = [f for f in festivals if f.start <= day <= f.end]
     if best and best[1]:
         reasons.append({"label": best[0], "pct": _pct(best[1])})
     seasons = [f for f in todays if f.is_season]
@@ -72,14 +86,17 @@ def price_for_day(day: date, today: date, car: CarContext, festivals: list, s: d
     elif days_ahead >= s["pricing_early_days"] and s["pricing_early_pct"]:
         reasons.append({"label": "Early booking", "pct": _pct(s["pricing_early_pct"])})
 
+    demand_on = s.get("_demand_on", True)
     booked_pct = round(car.occupancy * 100)
-    if car.occupancy * 100 >= s["pricing_occupancy_high"] and s["pricing_occupancy_high_pct"]:
+    if not demand_on:
+        pass
+    elif car.occupancy * 100 >= s["pricing_occupancy_high"] and s["pricing_occupancy_high_pct"]:
         reasons.append({"label": f"In demand ({booked_pct}% of the next {s['pricing_occupancy_window']} days booked)",
                         "pct": _pct(s["pricing_occupancy_high_pct"])})
     elif car.occupancy * 100 <= s["pricing_occupancy_low"] and s["pricing_occupancy_low_pct"]:
         reasons.append({"label": "Quiet period for this car", "pct": _pct(s["pricing_occupancy_low_pct"])})
 
-    if car.recent_requests >= s["pricing_demand_high_count"] and s["pricing_demand_high_pct"]:
+    if demand_on and car.recent_requests >= s["pricing_demand_high_count"] and s["pricing_demand_high_pct"]:
         reasons.append({"label": f"Popular ({car.recent_requests} requests in {s['pricing_demand_days']} days)",
                         "pct": _pct(s["pricing_demand_high_pct"])})
 

@@ -74,9 +74,9 @@ if (isset($_POST['savesettings'])) {
 $groups = [
   'Limits' => ['pricing_max_discount', 'pricing_max_surcharge', 'pricing_round_to', 'pricing_forecast_days'],
   'Weekend' => ['pricing_weekend_pct', 'pricing_weekend_days'],
-  'Festivals and seasons' => ['pricing_festival_high_pct', 'pricing_festival_medium_pct', 'pricing_season_pct'],
+  'Festivals and seasons' => ['pricing_festival_high_pct', 'pricing_festival_medium_pct', 'pricing_travel_days_pct', 'pricing_season_pct'],
   'Lead time' => ['pricing_lastminute_days', 'pricing_lastminute_pct', 'pricing_early_days', 'pricing_early_pct'],
-  'Occupancy of the car' => ['pricing_occupancy_window', 'pricing_occupancy_high', 'pricing_occupancy_high_pct', 'pricing_occupancy_low', 'pricing_occupancy_low_pct'],
+  'Occupancy of the car' => ['pricing_demand_min_bookings', 'pricing_occupancy_window', 'pricing_occupancy_high', 'pricing_occupancy_high_pct', 'pricing_occupancy_low', 'pricing_occupancy_low_pct'],
   'Recent demand for the car' => ['pricing_demand_days', 'pricing_demand_high_count', 'pricing_demand_high_pct'],
   'Machine-learning model' => ['pricing_ml_threshold', 'pricing_ml_enabled'],
 ];
@@ -159,6 +159,19 @@ $runVariant = ['done' => 'success', 'failed' => 'danger', 'running' => 'info', '
     <section class="a-card a-form-section">
       <div class="a-card__head"><h2 class="a-card__title"><i class="fa fa-sliders" aria-hidden="true"></i><?php echo h($groupLabel); ?></h2></div>
       <div class="a-card__body a-form-grid a-form-grid--3">
+        <?php if ($groupLabel === 'Occupancy of the car') {
+          $confirmedCount = (int)$dbh->query("SELECT COUNT(*) FROM tblbooking WHERE Status = 1")->fetchColumn();
+          $demandMin = (int)setting('pricing_demand_min_bookings'); ?>
+          <div class="a-span-all">
+            <div class="a-notice<?php echo $confirmedCount >= $demandMin ? ' a-notice--success' : ' a-notice--warning'; ?>"><i class="fa fa-<?php echo $confirmedCount >= $demandMin ? 'circle-check' : 'pause'; ?> mt-1" aria-hidden="true"></i><div>
+              <strong>Occupancy and recent-demand factors are <?php echo $confirmedCount >= $demandMin ? 'on' : 'off'; ?></strong>:
+              <?php echo $confirmedCount; ?> of <?php echo $demandMin; ?> confirmed bookings. <?php echo $confirmedCount >= $demandMin ? '' : 'They switch on by themselves at the next recompute after that.'; ?>
+            </div></div>
+          </div>
+        <?php } ?>
+        <?php if ($groupLabel === 'Recent demand for the car') { ?>
+          <div class="a-span-all a-muted small">Uses the same confirmed-bookings threshold as occupancy (above).</div>
+        <?php } ?>
         <?php if ($groupLabel === 'Machine-learning model') { ?>
           <div class="a-span-all">
             <div class="a-notice"><i class="fa fa-flask mt-1" aria-hidden="true"></i><div>
