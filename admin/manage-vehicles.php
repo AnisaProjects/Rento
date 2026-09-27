@@ -4,6 +4,18 @@ require_once __DIR__ . '/includes/layout.php';
 require_once __DIR__ . '/includes/upload.php';
 admin_require_login();
 
+// Quick show/hide from the list (new field toggleactive = vehicle id).
+if (isset($_POST['toggleactive'])) {
+  $id = intval($_POST['toggleactive']);
+  $query = $dbh->prepare("UPDATE tblvehicles SET IsActive = 1 - IsActive WHERE id = :id");
+  $query->execute([':id' => $id]);
+  $state = $dbh->prepare("SELECT IsActive, VehiclesTitle FROM tblvehicles WHERE id = :id");
+  $state->execute([':id' => $id]);
+  $row = $state->fetch(PDO::FETCH_OBJ);
+  flash_set($row ? 'success' : 'error', $row ? $row->VehiclesTitle . ($row->IsActive ? ' is now active and shown on the website.' : ' is now inactive and hidden from the website.') : 'That vehicle no longer exists.');
+  redirect_to(current_url());
+}
+
 if (isset($_POST['del'])) {
   $delid = intval($_POST['del']);
   // Vehicles with bookings are kept so the booking history keeps its vehicle.
@@ -29,13 +41,13 @@ if (isset($_POST['del'])) {
   redirect_to(current_url());
 }
 
-$vehicles = $dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.FuelType, v.ModelYear, v.SeatingCapacity, v.CarType, v.Vimage1,
+$vehicles = $dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.FuelType, v.ModelYear, v.SeatingCapacity, v.CarType, v.IsActive, v.Vimage1,
     br.BrandName, (SELECT COUNT(*) FROM tblbooking b WHERE b.VehicleId = v.id) AS bookings
   FROM tblvehicles v LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand ORDER BY v.id DESC")->fetchAll(PDO::FETCH_OBJ);
 
 admin_page_start('Manage Vehicles', 'manage-vehicles.php', [['Vehicles', 'manage-vehicles.php']], [
   'libs' => ['datatables'],
-  'lead' => count($vehicles) . ' vehicles in the fleet.',
+  'lead' => count($vehicles) . ' vehicles, ' . count(array_filter($vehicles, fn($v) => (int)$v->IsActive === 1)) . ' active on the website.',
   'actions' => '<a class="btn btn-primary" href="post-avehical.php"><i class="fa fa-plus" aria-hidden="true"></i>Post a vehicle</a>',
 ]);
 ?>
@@ -52,6 +64,7 @@ admin_page_start('Manage Vehicles', 'manage-vehicles.php', [['Vehicles', 'manage
           <th>Seats</th>
           <th>Year</th>
           <th>Bookings</th>
+          <th data-priority="2">Status</th>
           <th class="no-sort" data-priority="1">Actions</th>
         </tr>
       </thead>
@@ -75,9 +88,15 @@ admin_page_start('Manage Vehicles', 'manage-vehicles.php', [['Vehicles', 'manage
             <td><?php echo (int)$v->SeatingCapacity; ?></td>
             <td><?php echo h($v->ModelYear); ?></td>
             <td><?php echo (int)$v->bookings; ?></td>
+            <td data-order="<?php echo (int)$v->IsActive; ?>"><?php echo (int)$v->IsActive ? admin_badge('Active', 'success', 'fa-eye') : admin_badge('Inactive', 'neutral', 'fa-eye-slash'); ?></td>
             <td>
               <div class="a-actions">
-                <?php echo admin_icon_link('../' . vehicle_url($v->id, $v->BrandName, $v->VehiclesTitle), 'fa-eye', 'View on website'); ?>
+                <?php echo (int)$v->IsActive
+                  ? admin_icon_link('../' . vehicle_url($v->id, $v->BrandName, $v->VehiclesTitle), 'fa-arrow-up-right-from-square', 'View on website')
+                  : ''; ?>
+                <?php echo (int)$v->IsActive
+                  ? admin_action_button(['toggleactive' => $v->id], 'fa-eye-slash', 'Make inactive', '', 'Hide ' . $name . ' from the website and Find My Car?')
+                  : admin_action_button(['toggleactive' => $v->id], 'fa-eye', 'Make active', 'success', 'Show ' . $name . ' on the website?'); ?>
                 <?php echo admin_icon_link('edit-vehicle.php?id=' . (int)$v->id, 'fa-pen', 'Edit vehicle', 'primary'); ?>
                 <?php echo admin_icon_link('edit-vehicle.php?id=' . (int)$v->id . '#images', 'fa-images', 'Manage images'); ?>
                 <?php if ((int)$v->bookings > 0) { ?>

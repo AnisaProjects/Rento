@@ -21,7 +21,7 @@ if ($searched) {
   $recommendations = array_values($recommendationEngine->getRecommendations($budget, $carType, $userEmail));
   $userPreferences = $recommendationEngine->getUserPreferences($userEmail);
 }
-$fleetCount = (int)$dbh->query("SELECT COUNT(*) FROM tblvehicles")->fetchColumn();
+$fleetCount = (int)$dbh->query("SELECT COUNT(*) FROM tblvehicles WHERE IsActive = 1")->fetchColumn();
 // Example prompts: admin -> Site content -> Other pages.
 $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 4]);
 ?>

@@ -6,12 +6,13 @@ include('includes/config.php');
 $featuredCars = $dbh->query("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
     tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblbrands.BrandName
   FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand
+  WHERE tblvehicles.IsActive = 1
   ORDER BY tblvehicles.id DESC LIMIT 6")->fetchAll(PDO::FETCH_OBJ);
 
 // Car types with how many cars and the lowest daily price, for "Browse by type".
 $carTypes = [];
 foreach ($dbh->query("SELECT CarType, COUNT(*) AS cars, MIN(PricePerDay) AS fromPrice FROM tblvehicles
-    WHERE CarType IS NOT NULL AND CarType <> '' GROUP BY CarType ORDER BY MIN(PricePerDay)")->fetchAll(PDO::FETCH_OBJ) as $row) {
+    WHERE IsActive = 1 AND CarType IS NOT NULL AND CarType <> '' GROUP BY CarType ORDER BY MIN(PricePerDay)")->fetchAll(PDO::FETCH_OBJ) as $row) {
   $carTypes[$row->CarType] = $row;
 }
 // Texts: admin -> Site content -> Home page.
@@ -23,8 +24,8 @@ $typeInfo = [
 
 // Brands with cars: count, lowest daily price and the photo of their cheapest car.
 $brands = $dbh->query("SELECT tblbrands.id, tblbrands.BrandName, tblbrands.BrandLogo, COUNT(tblvehicles.id) AS cars, MIN(tblvehicles.PricePerDay) AS fromPrice,
-    (SELECT v2.Vimage1 FROM tblvehicles v2 WHERE v2.VehiclesBrand = tblbrands.id ORDER BY v2.PricePerDay, v2.id LIMIT 1) AS photo
-  FROM tblbrands JOIN tblvehicles ON tblvehicles.VehiclesBrand = tblbrands.id
+    (SELECT v2.Vimage1 FROM tblvehicles v2 WHERE v2.VehiclesBrand = tblbrands.id AND v2.IsActive = 1 ORDER BY v2.PricePerDay, v2.id LIMIT 1) AS photo
+  FROM tblbrands JOIN tblvehicles ON tblvehicles.VehiclesBrand = tblbrands.id AND tblvehicles.IsActive = 1
   GROUP BY tblbrands.id, tblbrands.BrandName, tblbrands.BrandLogo ORDER BY cars DESC, tblbrands.BrandName")->fetchAll(PDO::FETCH_OBJ);
 
 // Hero slides: admin -> Site content -> Home page. Values are HTML-escaped.

@@ -14,7 +14,8 @@ $kpi['revenue'] = (int)$dbh->query("SELECT COALESCE(SUM(" . BOOKING_DAYS_SQL . "
 // Active: confirmed and not yet finished (on the road now or starting later).
 $kpi['active'] = (int)$dbh->query("SELECT COUNT(*) FROM tblbooking WHERE Status = 1 AND ToDate >= CURDATE()")->fetchColumn();
 $kpi['pending'] = (int)$dbh->query("SELECT COUNT(*) FROM tblbooking WHERE Status = 0 OR Status IS NULL")->fetchColumn();
-$fleet = (int)$dbh->query("SELECT COUNT(*) FROM tblvehicles")->fetchColumn();
+// Active vehicles only (inactive ones can't be booked).
+$fleet = (int)$dbh->query("SELECT COUNT(*) FROM tblvehicles WHERE IsActive = 1")->fetchColumn();
 // Utilisation: confirmed rental days inside the last 30 days / (fleet x 30 days).
 $bookedDays = (int)$dbh->query("SELECT COALESCE(SUM(GREATEST(0, DATEDIFF(LEAST(b.ToDate, CURDATE()),
   GREATEST(b.FromDate, CURDATE() - INTERVAL " . UTILISATION_WINDOW_DAYS . " DAY)))), 0) FROM tblbooking b WHERE b.Status = 1")->fetchColumn();

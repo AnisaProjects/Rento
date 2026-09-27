@@ -10,8 +10,8 @@ $vehicleQuery->bindParam(':vhid', $vhid, PDO::PARAM_INT);
 $vehicleQuery->execute();
 $car = $vehicleQuery->fetch(PDO::FETCH_OBJ);
 
-// Unknown or missing vehicle id: show the "page not found" page.
-if (!$car) {
+// Unknown, missing or inactive vehicle: show the "page not found" page (it can't be booked).
+if (!$car || !(int)$car->IsActive) {
   require __DIR__ . '/404.php';
   exit;
 }
@@ -129,7 +129,7 @@ foreach ($featureLabels as $column => $label) {
 $similarQuery = $dbh->prepare("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
     tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblbrands.BrandName
   FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand
-  WHERE tblvehicles.id <> :id AND (tblvehicles.VehiclesBrand = :bid OR tblvehicles.CarType = :type)
+  WHERE tblvehicles.IsActive = 1 AND tblvehicles.id <> :id AND (tblvehicles.VehiclesBrand = :bid OR tblvehicles.CarType = :type)
   ORDER BY (tblvehicles.CarType = :type) DESC, ABS(tblvehicles.PricePerDay - :price) LIMIT 3");
 $similarQuery->bindValue(':id', (int)$car->id, PDO::PARAM_INT);
 $similarQuery->bindValue(':bid', (int)$car->bid, PDO::PARAM_INT);

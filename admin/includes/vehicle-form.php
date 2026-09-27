@@ -34,6 +34,8 @@ function vehicle_form_input(PDO $dbh): array
         'ModelYear' => (int)($_POST['modelyear'] ?? 0),
         'SeatingCapacity' => (int)($_POST['seatingcapacity'] ?? 0),
         'CarType' => (string)($_POST['cartype'] ?? ''),
+        // New field isactive: unticked = hidden from the website and Find My Car.
+        'IsActive' => empty($_POST['isactive']) ? 0 : 1,
     ];
     foreach (VEHICLE_FEATURES as $field => [$column]) {
         $v[$column] = empty($_POST[$field]) ? null : 1;
@@ -108,7 +110,20 @@ function vehicle_form_sections(PDO $dbh, ?object $vehicle): void
     $selectedType = $val('cartype', 'CarType');
     $selectedFuel = $val('fueltype', 'FuelType');
     $selectedBrand = (int)$val('brandname', 'VehiclesBrand');
+    $isActive = $posted ? !empty($_POST['isactive']) : ($vehicle === null || (int)$vehicle->IsActive === 1);
     ?>
+    <section class="a-card a-form-section">
+      <div class="a-card__body d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <h2 class="a-card__title mb-1"><i class="fa fa-eye" aria-hidden="true"></i>Visibility</h2>
+          <p class="a-muted mb-0">Inactive cars are hidden from the website and Find My Car, and can't be booked.</p>
+        </div>
+        <div class="form-check form-switch fs-5 mb-0">
+          <input class="form-check-input" type="checkbox" role="switch" id="isactive" name="isactive" value="1"<?php echo $isActive ? ' checked' : ''; ?>>
+          <label class="form-check-label fs-6 fw-semibold" for="isactive">Active (shown on the website)</label>
+        </div>
+      </div>
+    </section>
     <section class="a-card a-form-section">
       <div class="a-card__head"><h2 class="a-card__title"><i class="fa fa-circle-info" aria-hidden="true"></i>Basic info</h2></div>
       <div class="a-card__body a-form-grid">

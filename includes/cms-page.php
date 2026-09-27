@@ -28,9 +28,9 @@ $detail = clean_cms_html($detail);
 if ($isAboutUs) {
   // Real fleet numbers and photos for the About page.
   $fleet = $dbh->query("SELECT COUNT(*) AS cars, COUNT(DISTINCT VehiclesBrand) AS brands, COUNT(DISTINCT NULLIF(CarType, '')) AS types,
-      MIN(PricePerDay) AS fromPrice FROM tblvehicles")->fetch(PDO::FETCH_OBJ);
+      MIN(PricePerDay) AS fromPrice FROM tblvehicles WHERE IsActive = 1")->fetch(PDO::FETCH_OBJ);
   $fleetPhotos = $dbh->query("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.Vimage1, tblvehicles.Vimage2, tblbrands.BrandName
-    FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE tblvehicles.Vimage1 <> '' ORDER BY tblvehicles.id DESC LIMIT 6")->fetchAll(PDO::FETCH_OBJ);
+    FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE tblvehicles.IsActive = 1 AND tblvehicles.Vimage1 <> '' ORDER BY tblvehicles.id DESC LIMIT 6")->fetchAll(PDO::FETCH_OBJ);
 }
 ?>
 <!DOCTYPE HTML>

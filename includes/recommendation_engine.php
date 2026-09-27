@@ -82,7 +82,7 @@ class CarRecommendationEngine {
         $sql = "SELECT v.*, b.BrandName 
                 FROM tblvehicles v 
                 LEFT JOIN tblbrands b ON v.VehiclesBrand = b.id 
-                WHERE v.id IS NOT NULL";
+                WHERE v.id IS NOT NULL AND v.IsActive = 1";
         
         $query = $this->dbh->prepare($sql);
         $query->execute();

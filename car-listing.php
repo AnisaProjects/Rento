@@ -14,12 +14,13 @@ const LISTING_SORTS = [
 const LISTING_TYPES = ['Hatchback', 'Sedan', 'SUV'];
 const LISTING_BUDGETS = [1000, 2000, 3000, 5000];
 
-$brands = $dbh->query("SELECT id, BrandName FROM tblbrands ORDER BY BrandName")->fetchAll(PDO::FETCH_OBJ);
+// Only brands with at least one active car can be chosen.
+$brands = $dbh->query("SELECT id, BrandName FROM tblbrands WHERE EXISTS (SELECT 1 FROM tblvehicles v WHERE v.VehiclesBrand = tblbrands.id AND v.IsActive = 1) ORDER BY BrandName")->fetchAll(PDO::FETCH_OBJ);
 $brandNames = [];
 foreach ($brands as $brand) {
   $brandNames[(int)$brand->id] = $brand->BrandName;
 }
-$fuelTypes = $dbh->query("SELECT DISTINCT FuelType FROM tblvehicles WHERE FuelType IS NOT NULL AND FuelType <> '' ORDER BY FuelType")->fetchAll(PDO::FETCH_COLUMN);
+$fuelTypes = $dbh->query("SELECT DISTINCT FuelType FROM tblvehicles WHERE IsActive = 1 AND FuelType IS NOT NULL AND FuelType <> '' ORDER BY FuelType")->fetchAll(PDO::FETCH_COLUMN);
 
 $param = fn(string $key) => is_string($_GET[$key] ?? null) ? trim($_GET[$key]) : '';
 $filters = [
@@ -56,7 +57,9 @@ if ($filters['max'] !== '') {
   $where[] = "tblvehicles.PricePerDay <= :max";
   $bind[':max'] = $filters['max'];
 }
-$from = "FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand" . ($where ? ' WHERE ' . implode(' AND ', $where) : '');
+// Inactive vehicles (admin -> Edit vehicle) are never listed.
+$where[] = 'tblvehicles.IsActive = 1';
+$from = "FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE " . implode(' AND ', $where);
 
 $count = $dbh->prepare("SELECT COUNT(*) $from");
 $count->execute($bind);
