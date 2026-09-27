@@ -160,7 +160,10 @@
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { go(); return; }
       form.classList.add('is-thinking');
       var listing = document.querySelector('.r-listing');
-      if (listing) listing.classList.add('is-thinking');
+      if (listing) {
+        listing.classList.add('is-thinking', 'r-skel-cards'); // skeleton cards until the ranked list loads
+        listing.setAttribute('aria-busy', 'true');
+      }
       setTimeout(go, 700);
     });
   }

@@ -175,6 +175,23 @@ The customer and booking were then deleted. Revenue is back at Rs 57,000, and pr
 
 **Undo.** Revert the commit "SEO: …". The migration 020 columns can stay empty.
 
+### P8. Motion
+
+**What.** CSS only, no animation library.
+- **Skeleton loaders** (section 29 of `app.css`):
+  - The price calendar shows a skeleton month while its data loads. Before, it was hidden until then.
+  - The booking total shows a skeleton while a new quote loads.
+  - During a smart search on the car listing, the cards turn into skeleton cards. Before, they faded
+    to 45%.
+  - The Find My Car "thinking" panel shows preview rows.
+  - A loader only appears if loading takes over 150 ms, so fast answers don't flash.
+- **Scroll reveal:** items in a row now appear one after another (60 ms apart, at most six steps).
+- **Hover effects** were already on cards, buttons, type and brand tiles, and were kept.
+- **Reduced motion:** every sweep, lift and reveal is off (global rule, P6). Skeletons show as still
+  grey blocks.
+
+**Undo.** Revert the commit "Motion: skeleton loaders…".
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`

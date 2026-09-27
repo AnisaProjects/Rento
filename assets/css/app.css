@@ -190,6 +190,13 @@ main:focus {
   transition: opacity .6s var(--rento-ease), transform .6s var(--rento-ease);
 }
 
+/* Items in a row reveal one after another (at most six steps, 60 ms apart). */
+.r-js .r-reveal:nth-child(2) { transition-delay: 60ms; }
+.r-js .r-reveal:nth-child(3) { transition-delay: 120ms; }
+.r-js .r-reveal:nth-child(4) { transition-delay: 180ms; }
+.r-js .r-reveal:nth-child(5) { transition-delay: 240ms; }
+.r-js .r-reveal:nth-child(n + 6) { transition-delay: 300ms; }
+
 .r-js .r-reveal.is-visible,
 .r-js .r-reveal:focus-within,
 .r-js .r-reveal:focus-visible {
@@ -3018,11 +3025,7 @@ body.r-ai-busy {
   opacity: 1;
 }
 
-.r-listing.is-thinking .r-grid--cards {
-  opacity: .45;
-  filter: saturate(.4);
-  transition: opacity .2s, filter .2s;
-}
+/* Smart search: the cards turn into skeletons until the ranked list arrives (section 29). */
 
 @property --r-ai-angle {
   syntax: "<angle>";
@@ -4727,4 +4730,117 @@ body.r-ai-busy {
 .r-festival-prices .r-num {
   text-align: right;
   white-space: nowrap;
+}
+
+/* ---------- 29. Skeleton loaders (AI results and prices) ----------
+   .r-skel              a grey block with a light sweep (any element; its text is hidden)
+   .r-skel-cards        on a card grid's container: every car card becomes a skeleton card
+   Loaders appear only after a short delay (set by the scripts), so fast answers don't flash.
+   Under reduced motion they stay as static grey blocks. */
+:root {
+  --r-skel-base: var(--rento-gray-100);
+  --r-skel-shine: rgba(255, 255, 255, .65);
+}
+
+.r-skel {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--rento-radius-sm);
+  background: var(--r-skel-base) !important;
+  color: transparent !important;
+  pointer-events: none;
+  user-select: none;
+}
+
+.r-skel::after,
+.r-skel-cards .r-car-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background: linear-gradient(90deg, transparent 0%, var(--r-skel-shine) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: r-skel-sweep 1.3s ease-in-out infinite;
+}
+
+@keyframes r-skel-sweep {
+  to { transform: translateX(100%); }
+}
+
+/* A skeleton card: photo, title, two lines and the price, drawn over the real card. */
+.r-skel-cards .r-car-card {
+  pointer-events: none;
+}
+
+.r-skel-cards .r-car-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background:
+    linear-gradient(var(--r-skel-base), var(--r-skel-base)) 0 0 / 100% 52% no-repeat,
+    linear-gradient(var(--r-skel-base), var(--r-skel-base)) 20px calc(52% + 22px) / 62% 18px no-repeat,
+    linear-gradient(var(--r-skel-base), var(--r-skel-base)) 20px calc(52% + 56px) / 44% 12px no-repeat,
+    linear-gradient(var(--r-skel-base), var(--r-skel-base)) 20px calc(52% + 80px) / 70% 12px no-repeat,
+    linear-gradient(var(--r-skel-base), var(--r-skel-base)) 20px calc(100% - 26px) / 34% 22px no-repeat,
+    var(--rento-surface, #fff);
+}
+
+.r-skel-cards .r-car-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Price calendar while its months load, and the booking total while a quote loads. */
+.r-pcal__day.r-skel {
+  min-height: 42px;
+  border-radius: 6px;
+}
+
+.r-pcal__title-skel {
+  display: inline-block;
+  width: 8em;
+  height: 1.1em;
+  vertical-align: middle;
+}
+
+[data-quote-box].is-loading [data-total],
+[data-quote-box].is-loading [data-days] {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--rento-radius-sm);
+  background: var(--r-skel-base);
+  color: transparent;
+}
+
+[data-quote-box].is-loading [data-total]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--r-skel-shine) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: r-skel-sweep 1.3s ease-in-out infinite;
+}
+
+/* Find My Car: preview rows under the thinking steps. */
+.r-ai-thinking__preview {
+  display: grid;
+  gap: var(--rento-space-2);
+  margin-top: var(--rento-space-5);
+}
+
+.r-ai-thinking__preview .r-skel {
+  height: 44px;
+  border-radius: var(--rento-radius);
+  background: rgba(255, 255, 255, .08) !important;
+  --r-skel-shine: rgba(255, 255, 255, .12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .r-skel::after,
+  .r-skel-cards .r-car-card::before,
+  [data-quote-box].is-loading [data-total]::after {
+    animation: none;
+    display: none;
+  }
 }

@@ -139,6 +139,7 @@ $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 
           <li data-step>Matching budget and car type</li>
           <li data-step><?php echo $userEmail ? 'Ranking with your rental history' : 'Ranking the best matches'; ?></li>
         </ol>
+        <div class="r-ai-thinking__preview" aria-hidden="true"><span class="r-skel"></span><span class="r-skel"></span><span class="r-skel"></span></div>
       </div>
     </div>
 

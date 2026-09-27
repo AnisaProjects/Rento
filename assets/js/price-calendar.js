@@ -228,6 +228,16 @@
   if (from) from.addEventListener('change', function () { markRange(); updateHint(); });
   if (to) to.addEventListener('change', function () { markRange(); updateHint(); });
 
+  // Skeleton grid while the months load (only if loading takes more than a moment).
+  var skeletonTimer = setTimeout(function () {
+    if (months.length) return;
+    root.hidden = false;
+    root.setAttribute('aria-busy', 'true');
+    title.innerHTML = '<span class="r-skel r-pcal__title-skel"></span>';
+    grid.innerHTML = new Array(36).join('<span class="r-pcal__day r-skel" aria-hidden="true"></span>');
+  }, 150);
+  function loaded() { clearTimeout(skeletonTimer); root.removeAttribute('aria-busy'); }
+
   // This month and the next two (the forecast covers about 60 days).
   var now = new Date();
   var wanted = [0, 1, 2].map(function (n) { return iso(new Date(now.getFullYear(), now.getMonth() + n, 1)).slice(0, 7); });
@@ -235,8 +245,9 @@
     months.sort();
     var pickMonth = from && from.value ? from.value.slice(0, 7) : null;
     if (pickMonth && months.indexOf(pickMonth) > 0) shown = months.indexOf(pickMonth);
+    loaded();
     root.hidden = months.length === 0;
     render();
     updateHint();
-  }).catch(function () { root.hidden = true; });
+  }).catch(function () { loaded(); root.hidden = true; });
 })();

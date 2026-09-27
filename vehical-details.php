@@ -419,11 +419,15 @@ $today = date('Y-m-d');
         if (!from.value || !to.value) return;
         var id = ++request;
         box.setAttribute('aria-busy', 'true');
+        // Skeleton on the total only if the quote takes more than a moment.
+        clearTimeout(box.skeletonTimer);
+        box.skeletonTimer = setTimeout(function () { if (id === request) box.classList.add('is-loading'); }, 150);
+        var done = function () { clearTimeout(box.skeletonTimer); box.classList.remove('is-loading'); box.removeAttribute('aria-busy'); };
         fetch(form.dataset.quoteUrl + '?car=' + form.dataset.car + '&from=' + from.value + '&to=' + to.value, { headers: { Accept: 'application/json' } })
           .then(function (r) { return r.json(); })
           .then(function (q) {
             if (id !== request) return;
-            box.removeAttribute('aria-busy');
+            done();
             if (!q.ok) { fallback(); return; }
             showDays(q.rental_days);
             form.querySelector('[data-total]').textContent = fmt(q.total);
@@ -443,7 +447,7 @@ $today = date('Y-m-d');
             unavailable.hidden = q.available;
             submit.disabled = !q.available;
           })
-          .catch(function () { if (id === request) { box.removeAttribute('aria-busy'); fallback(); } });
+          .catch(function () { if (id === request) { done(); fallback(); } });
       }
       from.addEventListener('change', update);
       to.addEventListener('change', update);
