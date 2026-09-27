@@ -301,6 +301,34 @@ lawyer.
 ipsum*. Both should be replaced soon, which is what publishing the reviewed drafts will do.
 **Undo.** Admin → Manage Pages → Discard draft.
 
+### P12. Production readiness (nothing deployed)
+
+**What.**
+- **`docs/deployment.md`** is a checklist for real hosting: requirements, copying files, moving from
+  `/Rento/` to the domain root, web server rules (Apache and nginx), the two database users, configuration
+  through environment variables or `config.local.php`, php.ini, Composer and the Python venv, **cron instead of
+  launchd**, file permissions, email, backups, logging, and the launch checklist.
+- **`tools/check-production.php [url]`** (command line) and **admin → System check** (inside the web
+  server) run the same checks (`includes/production-check.php`), and never print secrets. They cover:
+  - dev mode;
+  - where secrets come from and their file mode;
+  - a root or privileged DB user, and a weak DB password;
+  - APP_KEY, SMTP and PHPMailer;
+  - the admin account email;
+  - the site address and https, including the actual request and proxy headers when run from admin;
+  - `display_errors`, `log_errors` and `expose_php`;
+  - the logs folder, the pricing venv and a recent price run;
+  - template text on legal pages and the contact address;
+  - over HTTP: that internal files (config, logs, vendor, migrations, Python, docs, tools, .git) are
+    not served, and that http redirects to https.
+- The command-line tool exits with code 1 while anything fails.
+
+**Result on MAMP today:** 3 failed (dev mode on; Terms and Privacy show template text), 6 warnings (email
+not set up, no admin email, no site address, `display_errors` and `expose_php` on in MAMP's php.ini,
+template contact address), 10 passed. All of these are expected on MAMP; each has its fix in deployment.md.
+**Undo.** Delete `tools/check-production.php`, `includes/production-check.php` and
+`admin/system-check.php`, and remove the menu line.
+
 ## 2026-09-27: Phase 5 follow-ups (data update, listing prices, FAQ)
 
 **Backup taken before any change:** `~/Rento-backups/rento-20260927-174141-before-phase5-followups.sql`

@@ -62,6 +62,7 @@ const ADMIN_MENU = [
     ]],
     ['Contact Info', 'fa-address-card', 'update-contactinfo.php'],
     ['Email', 'fa-envelope', 'email-settings.php'],
+    ['System check', 'fa-shield-halved', 'system-check.php'],
 ];
 
 // HTML-escapes any value (null-safe; database columns are often NULL).

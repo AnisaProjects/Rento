@@ -126,6 +126,7 @@
   --bs-link-color: var(--rento-primary-text);
   --bs-link-color-rgb: var(--rento-primary-rgb);
   --bs-link-hover-color: var(--rento-primary-text-hover);
+  --bs-code-color: var(--rento-primary-text); /* inline code: 5.2:1 light, 7.4:1 dark */
   --bs-body-font-family: var(--rento-font-body);
   --bs-body-color: var(--rento-gray-600);
   --bs-border-color: var(--rento-gray-200);
