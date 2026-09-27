@@ -9,7 +9,7 @@ if (empty($_SESSION['login'])) {
 
 $sql = "SELECT tblvehicles.Vimage1 AS Vimage1, tblvehicles.VehiclesTitle, tblvehicles.id AS vid, tblbrands.BrandName, tblbooking.FromDate,
     tblbooking.ToDate, tblbooking.message, tblbooking.Status, tblbooking.PostingDate, tblvehicles.PricePerDay,
-    DATEDIFF(tblbooking.ToDate, tblbooking.FromDate) AS totaldays, tblbooking.BookingNumber
+    " . rental_days_sql('tblbooking.FromDate', 'tblbooking.ToDate') . " AS totaldays, tblbooking.BookingNumber
   FROM tblbooking JOIN tblvehicles ON tblbooking.VehicleId = tblvehicles.id JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand
   WHERE tblbooking.userEmail = :useremail ORDER BY tblbooking.id DESC";
 $query = $dbh->prepare($sql);
@@ -36,7 +36,7 @@ $bookings = $query->fetchAll(PDO::FETCH_OBJ);
     <?php if ($bookings) {
       foreach ($bookings as $booking) {
         // A same-day rental counts as one day (same rule as the booking form).
-        $days = max(1, (int)$booking->totaldays);
+        $days = (int)$booking->totaldays;
         $carName = vehicle_display_name($booking->BrandName, $booking->VehiclesTitle);
         $url = vehicle_url($booking->vid, $booking->BrandName, $booking->VehiclesTitle); ?>
         <article class="r-booking">

@@ -3,8 +3,8 @@ require_once __DIR__ . '/../includes/security.php';
 require_once __DIR__ . '/includes/layout.php';
 admin_require_login();
 
-// Rental days as the public site counts them (DATEDIFF, never negative).
-const BOOKING_DAYS_SQL = "GREATEST(DATEDIFF(b.ToDate, b.FromDate), 0)";
+// Rental days: the shared inclusive rule (1st to 3rd = 3 days).
+define('BOOKING_DAYS_SQL', rental_days_sql('b.FromDate', 'b.ToDate'));
 const UTILISATION_WINDOW_DAYS = 30;
 
 $kpi = [];
@@ -17,8 +17,9 @@ $kpi['pending'] = (int)$dbh->query("SELECT COUNT(*) FROM tblbooking WHERE Status
 // Active vehicles only (inactive ones can't be booked).
 $fleet = (int)$dbh->query("SELECT COUNT(*) FROM tblvehicles WHERE IsActive = 1")->fetchColumn();
 // Utilisation: confirmed rental days inside the last 30 days / (fleet x 30 days).
-$bookedDays = (int)$dbh->query("SELECT COALESCE(SUM(GREATEST(0, DATEDIFF(LEAST(b.ToDate, CURDATE()),
-  GREATEST(b.FromDate, CURDATE() - INTERVAL " . UTILISATION_WINDOW_DAYS . " DAY)))), 0) FROM tblbooking b WHERE b.Status = 1")->fetchColumn();
+// Window: the 30 days before today; both booking dates count (inclusive).
+$bookedDays = (int)$dbh->query("SELECT COALESCE(SUM(GREATEST(0, DATEDIFF(LEAST(b.ToDate, CURDATE() - INTERVAL 1 DAY),
+  GREATEST(b.FromDate, CURDATE() - INTERVAL " . UTILISATION_WINDOW_DAYS . " DAY)) + 1)), 0) FROM tblbooking b WHERE b.Status = 1")->fetchColumn();
 $kpi['utilisation'] = $fleet > 0 ? round($bookedDays / ($fleet * UTILISATION_WINDOW_DAYS) * 100, 1) : 0;
 $kpi['newUsers'] = (int)$dbh->query("SELECT COUNT(*) FROM tblusers WHERE RegDate >= DATE_FORMAT(CURDATE(), '%Y-%m-01')")->fetchColumn();
 $kpi['newUsersLast'] = (int)$dbh->query("SELECT COUNT(*) FROM tblusers WHERE RegDate >= DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%Y-%m-01')

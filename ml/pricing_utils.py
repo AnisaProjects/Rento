@@ -89,7 +89,8 @@ def enrich_temporal_columns(start_date: DateLike, end_date: DateLike, booking_da
     end_dt = _to_datetime(end_date)
     booking_dt = _to_datetime(booking_date) if booking_date else datetime.now()
 
-    rental_days = max((end_dt - start_dt).days, 1)
+    # Inclusive, like the website (1st to 3rd = 3 days; same day = 1).
+    rental_days = max((end_dt - start_dt).days + 1, 1)
     lead_time_days = max((start_dt - booking_dt).days, 0)
     booking_month = start_dt.month
     booking_dow = start_dt.weekday()  # 0 = Monday .. 6 = Sunday

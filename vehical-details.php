@@ -328,7 +328,7 @@ $today = date('Y-m-d');
         $slider.trigger('to.owl.carousel', [Number(this.dataset.slide), 300]);
       });
 
-      // Live booking total: days between pickup and return (a same-day rental counts as one day).
+      // Live booking total. Rental days are inclusive: 1st to 3rd = 3 days, same day = 1 (rental_days()).
       var form = document.querySelector('.r-book__form');
       if (!form) return;
       var price = Number(form.dataset.price);
@@ -338,7 +338,7 @@ $today = date('Y-m-d');
       function update() {
         if (from.value) to.min = from.value;
         if (from.value && to.value && to.value < from.value) to.value = from.value;
-        var days = from.value && to.value ? Math.max(1, Math.round((new Date(to.value) - new Date(from.value)) / 86400000)) : 1;
+        var days = from.value && to.value ? Math.max(1, Math.round((new Date(to.value) - new Date(from.value)) / 86400000) + 1) : 1;
         form.querySelector('[data-days]').textContent = days + (days === 1 ? ' day' : ' days');
         form.querySelector('[data-total]').textContent = fmt(days * price);
       }

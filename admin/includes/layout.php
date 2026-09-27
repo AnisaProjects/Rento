@@ -45,6 +45,7 @@ const ADMIN_MENU = [
         ['Enquiries', 'package-enquiries.php', ['package-enquiry.php']],
         ['Categories', 'package-categories.php', []],
     ]],
+    ['Smart Pricing', 'fa-chart-line', 'pricing.php'],
     ['Festivals', 'fa-calendar-days', 'festivals.php'],
     ['Registered Users', 'fa-users', 'reg-users.php'],
     ['Testimonials', 'fa-comment-dots', 'testimonials.php'],
@@ -260,12 +261,10 @@ function admin_date_cell(?string $value, bool $withTime = false): string
     return '<td data-order="' . ($time ?: 0) . '">' . admin_date($value, $withTime) . '</td>';
 }
 
-// Number of rental days between two Y-m-d dates, the same way the public site counts them.
+// Number of rental days: the shared inclusive rule (rental_days() in includes/helpers.php).
 function admin_rental_days(?string $from, ?string $to): int
 {
-    $start = strtotime((string)$from);
-    $end = strtotime((string)$to);
-    return ($start && $end && $end > $start) ? (int)round(($end - $start) / 86400) : 0;
+    return rental_days($from, $to);
 }
 
 // Login, forgot-password and reset pages: a split screen without the sidebar.

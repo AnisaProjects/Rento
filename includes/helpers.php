@@ -85,6 +85,25 @@ function vehicle_url($id, ?string $brand = null, ?string $title = null): string
     return 'car/' . ($slug === '' ? '' : $slug . '-') . (int)$id;
 }
 
+// Rental days, the one rule used everywhere (price, booking total, invoices, admin revenue,
+// smart pricing): inclusive, so the 1st to the 3rd is 3 days and a same-day rental is 1 day.
+// Returns 0 for missing, invalid or reversed dates.
+function rental_days(?string $from, ?string $to): int
+{
+    $start = DateTime::createFromFormat('!Y-m-d', substr((string)$from, 0, 10));
+    $end = DateTime::createFromFormat('!Y-m-d', substr((string)$to, 0, 10));
+    if (!$start || !$end || $end < $start) {
+        return 0;
+    }
+    return (int)$start->diff($end)->days + 1;
+}
+
+// The same rule in SQL, e.g. rental_days_sql('b.FromDate', 'b.ToDate').
+function rental_days_sql(string $fromColumn, string $toColumn): string
+{
+    return "GREATEST(DATEDIFF($toColumn, $fromColumn) + 1, 0)";
+}
+
 // Ends the request with a redirect, dropping any page output buffered so far.
 // Used after handling a form (post/redirect/get), so refreshing never re-submits it.
 // Relative URLs ("my-booking", "car/...") are resolved from the site root, so they work
