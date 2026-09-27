@@ -57,7 +57,8 @@ function delete_unused_vehicle_images(PDO $dbh, array $files): void
 {
     $check = $dbh->prepare("SELECT COUNT(*) FROM tblvehicles WHERE :f IN (Vimage1, Vimage2, Vimage3, Vimage4, Vimage5)");
     foreach (array_unique(array_map('basename', $files)) as $file) {
-        if ($file === '' || $file === '.' || $file === '..') {
+        // Shared placeholder photos (placeholder-*.jpg) are never deleted.
+        if ($file === '' || $file === '.' || $file === '..' || str_starts_with($file, 'placeholder-')) {
             continue;
         }
         $check->execute([':f' => $file]);
