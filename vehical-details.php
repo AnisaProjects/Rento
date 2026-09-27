@@ -3,28 +3,32 @@ require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 require_once('includes/dynamic_pricing.php');
 
+$vhid = intval($_GET['vhid'] ?? 0);
+$vehicleQuery = $dbh->prepare("SELECT tblvehicles.*, tblbrands.BrandName, tblbrands.id AS bid FROM tblvehicles
+  JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE tblvehicles.id = :vhid");
+$vehicleQuery->bindParam(':vhid', $vhid, PDO::PARAM_INT);
+$vehicleQuery->execute();
+$car = $vehicleQuery->fetch(PDO::FETCH_OBJ);
+
 // Unknown or missing vehicle id: show the "page not found" page.
-$vehicleCheck = $dbh->prepare("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblbrands.BrandName FROM tblvehicles LEFT JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE tblvehicles.id = :vhid");
-$vehicleCheck->bindValue(':vhid', intval($_GET['vhid'] ?? 0), PDO::PARAM_INT);
-$vehicleCheck->execute();
-$checkedVehicle = $vehicleCheck->fetch(PDO::FETCH_OBJ);
-if (!$checkedVehicle) {
+if (!$car) {
   require __DIR__ . '/404.php';
   exit;
 }
 
+$carName = vehicle_display_name($car->BrandName, $car->VehiclesTitle);
+$carUrl = vehicle_url($car->id, $car->BrandName, $car->VehiclesTitle);
+
 // Every car has one address, car/<brand-model>-<id>. Old links (vehical-details.php?vhid=)
 // and outdated names redirect to it permanently.
 if (in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) {
-  $canonicalPath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/'
-    . vehicle_url($checkedVehicle->id, $checkedVehicle->BrandName, $checkedVehicle->VehiclesTitle);
+  $canonicalPath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/' . $carUrl;
   if (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== $canonicalPath) {
     header('Location: ' . $canonicalPath, true, 301);
     exit;
   }
 }
-$requestedFromDate = isset($_POST['fromdate']) && $_POST['fromdate'] != '' ? $_POST['fromdate'] : date('Y-m-d', strtotime('+1 day'));
-$requestedToDate = isset($_POST['todate']) && $_POST['todate'] != '' ? $_POST['todate'] : date('Y-m-d', strtotime('+2 day'));
+
 // Returns true for a real calendar date in Y-m-d format.
 function is_booking_date(string $value): bool
 {
@@ -32,466 +36,293 @@ function is_booking_date(string $value): bool
   return $date !== false && $date->format('Y-m-d') === $value;
 }
 
+// Booking request. Result is shown as a toast after redirecting (post/redirect/get).
 if (isset($_POST['submit'])) {
   $fromdate = (string)($_POST['fromdate'] ?? '');
   $todate = (string)($_POST['todate'] ?? '');
-  $message = $_POST['message'];
+  $message = trim((string)($_POST['message'] ?? ''));
   $useremail = $_SESSION['login'] ?? '';
   $status = 0;
-  $vhid = intval($_GET['vhid'] ?? 0);
   $bookingno = mt_rand(100000000, 999999999);
+  $backToForm = $carUrl . '#book';
 
   // Server-side checks: the booking form alone can be bypassed with a direct POST.
   if ($useremail === '') {
-    echo "<script>alert('Please login to book this car.');</script>";
-  } elseif (!is_booking_date($fromdate) || !is_booking_date($todate)) {
-    echo "<script>alert('Please choose valid From and To dates.');</script>";
-  } elseif ($fromdate < date('Y-m-d')) {
-    echo "<script>alert('The From date cannot be in the past.');</script>";
-  } elseif ($todate < $fromdate) {
-    echo "<script>alert('The To date must be on or after the From date.');</script>";
-  } else {
-    $ret = "SELECT * FROM tblbooking where (:fromdate BETWEEN date(FromDate) and date(ToDate) || :todate BETWEEN date(FromDate) and date(ToDate) || date(FromDate) BETWEEN :fromdate and :todate) and VehicleId=:vhid";
-    $query1 = $dbh->prepare($ret);
-    $query1->bindParam(':vhid', $vhid, PDO::PARAM_STR);
-    $query1->bindParam(':fromdate', $fromdate, PDO::PARAM_STR);
-    $query1->bindParam(':todate', $todate, PDO::PARAM_STR);
-    $query1->execute();
-    $results1 = $query1->fetchAll(PDO::FETCH_OBJ);
-
-    if ($query1->rowCount() == 0) {
-      $sql = "INSERT INTO  tblbooking(BookingNumber,userEmail,VehicleId,FromDate,ToDate,message,Status) VALUES(:bookingno,:useremail,:vhid,:fromdate,:todate,:message,:status)";
-      $query = $dbh->prepare($sql);
-      $query->bindParam(':bookingno', $bookingno, PDO::PARAM_STR);
-      $query->bindParam(':useremail', $useremail, PDO::PARAM_STR);
-      $query->bindParam(':vhid', $vhid, PDO::PARAM_STR);
-      $query->bindParam(':fromdate', $fromdate, PDO::PARAM_STR);
-      $query->bindParam(':todate', $todate, PDO::PARAM_STR);
-      $query->bindParam(':message', $message, PDO::PARAM_STR);
-      $query->bindParam(':status', $status, PDO::PARAM_STR);
-      $query->execute();
-      $lastInsertId = $dbh->lastInsertId();
-      if ($lastInsertId) {
-        echo "<script>alert('Booking successfull.');</script>";
-        echo "<script type='text/javascript'> document.location = 'my-booking'; </script>";
-      } else {
-        echo "<script>alert('Something went wrong. Please try again');</script>";
-        echo "<script type='text/javascript'> document.location = 'car-listing'; </script>";
-      }
-    } else {
-      echo "<script>alert('Car already booked for these days');</script>";
-      echo "<script type='text/javascript'> document.location = 'car-listing'; </script>";
-    }
+    flash_set('error', 'Please log in to book this car.');
+    flash_open_modal('loginform');
+    redirect_to($carUrl);
+  }
+  if (!is_booking_date($fromdate) || !is_booking_date($todate)) {
+    flash_set('error', 'Please choose valid pickup and return dates.');
+    redirect_to($backToForm);
+  }
+  if ($fromdate < date('Y-m-d')) {
+    flash_set('error', 'The pickup date cannot be in the past.');
+    redirect_to($backToForm);
+  }
+  if ($todate < $fromdate) {
+    flash_set('error', 'The return date must be on or after the pickup date.');
+    redirect_to($backToForm);
   }
 
+  // Overlapping bookings for this car, ignoring cancelled ones (Status 2).
+  $ret = "SELECT id FROM tblbooking WHERE (:fromdate BETWEEN date(FromDate) AND date(ToDate) OR :todate BETWEEN date(FromDate) AND date(ToDate)
+    OR date(FromDate) BETWEEN :fromdate AND :todate) AND VehicleId=:vhid AND (Status IS NULL OR Status <> 2)";
+  $query1 = $dbh->prepare($ret);
+  $query1->bindParam(':vhid', $vhid, PDO::PARAM_INT);
+  $query1->bindParam(':fromdate', $fromdate, PDO::PARAM_STR);
+  $query1->bindParam(':todate', $todate, PDO::PARAM_STR);
+  $query1->execute();
+  if ($query1->fetch()) {
+    flash_set('error', 'Sorry, this car is already booked for some of those days. Please try other dates.');
+    redirect_to($backToForm);
+  }
+
+  $sql = "INSERT INTO  tblbooking(BookingNumber,userEmail,VehicleId,FromDate,ToDate,message,Status) VALUES(:bookingno,:useremail,:vhid,:fromdate,:todate,:message,:status)";
+  $query = $dbh->prepare($sql);
+  $query->bindParam(':bookingno', $bookingno, PDO::PARAM_STR);
+  $query->bindParam(':useremail', $useremail, PDO::PARAM_STR);
+  $query->bindParam(':vhid', $vhid, PDO::PARAM_STR);
+  $query->bindParam(':fromdate', $fromdate, PDO::PARAM_STR);
+  $query->bindParam(':todate', $todate, PDO::PARAM_STR);
+  $query->bindParam(':message', $message, PDO::PARAM_STR);
+  $query->bindParam(':status', $status, PDO::PARAM_STR);
+  $query->execute();
+  if ($dbh->lastInsertId()) {
+    flash_set('success', 'Booking request sent (#' . $bookingno . '). We will confirm it shortly.');
+    redirect_to('my-booking');
+  }
+  flash_set('error', 'Something went wrong. Please try again.');
+  redirect_to($backToForm);
 }
 
+// Price shown on the page (dynamic pricing is off by default, see PRICING_ENABLED).
+$pricingQuote = dynamic_price_quote($dbh, (int)$car->id, ['base_price' => (float)$car->PricePerDay]);
+$displayPrice = isset($pricingQuote['recommended_price']) && $pricingQuote['recommended_price'] > 0
+  ? $pricingQuote['recommended_price']
+  : $car->PricePerDay;
+
+$photos = array_values(array_filter([$car->Vimage1, $car->Vimage2, $car->Vimage3, $car->Vimage4, $car->Vimage5]));
+
+$featureLabels = [
+  'AirConditioner' => ['fa-snowflake', 'Air conditioning'],
+  'PowerSteering' => ['fa-dharmachakra', 'Power steering'],
+  'PowerWindows' => ['fa-window-maximize', 'Power windows'],
+  'PowerDoorLocks' => ['fa-lock', 'Power door locks'],
+  'CentralLocking' => ['fa-key', 'Central locking'],
+  'AntiLockBrakingSystem' => ['fa-circle-stop', 'ABS brakes'],
+  'BrakeAssist' => ['fa-gauge-high', 'Brake assist'],
+  'DriverAirbag' => ['fa-user-shield', 'Driver airbag'],
+  'PassengerAirbag' => ['fa-shield-halved', 'Passenger airbag'],
+  'CrashSensor' => ['fa-car-burst', 'Crash sensor'],
+  'CDPlayer' => ['fa-music', 'Music system'],
+  'LeatherSeats' => ['fa-couch', 'Leather seats'],
+];
+$features = [];
+foreach ($featureLabels as $column => $label) {
+  if (!empty($car->$column)) {
+    $features[] = $label;
+  }
+}
+
+// Similar cars: same brand or same type, never the car being viewed.
+$similarQuery = $dbh->prepare("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
+    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblbrands.BrandName
+  FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand
+  WHERE tblvehicles.id <> :id AND (tblvehicles.VehiclesBrand = :bid OR tblvehicles.CarType = :type)
+  ORDER BY (tblvehicles.CarType = :type) DESC, ABS(tblvehicles.PricePerDay - :price) LIMIT 3");
+$similarQuery->bindValue(':id', (int)$car->id, PDO::PARAM_INT);
+$similarQuery->bindValue(':bid', (int)$car->bid, PDO::PARAM_INT);
+$similarQuery->bindValue(':type', (string)$car->CarType, PDO::PARAM_STR);
+$similarQuery->bindValue(':price', (int)$car->PricePerDay, PDO::PARAM_INT);
+$similarQuery->execute();
+$similarCars = $similarQuery->fetchAll(PDO::FETCH_OBJ);
+
+$tomorrow = date('Y-m-d', strtotime('+1 day'));
+$today = date('Y-m-d');
 ?>
-
-
 <!DOCTYPE HTML>
 <html lang="en">
 
 <head>
   <?php
-  // Title and description name the car being viewed.
-  $metaQuery = $dbh->prepare("SELECT tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblbrands.BrandName FROM tblvehicles JOIN tblbrands ON tblbrands.id = tblvehicles.VehiclesBrand WHERE tblvehicles.id = :vhid");
-  $metaQuery->bindValue(':vhid', intval($_GET['vhid'] ?? 0), PDO::PARAM_INT);
-  $metaQuery->execute();
-  $metaVehicle = $metaQuery->fetch(PDO::FETCH_OBJ);
-  $pageTitle = $metaVehicle ? vehicle_display_name($metaVehicle->BrandName, $metaVehicle->VehiclesTitle) : 'Vehicle Details';
-  $pageDescription = $metaVehicle ? 'Rent the ' . $pageTitle . ' in Nepal from ' . format_price_per_day($metaVehicle->PricePerDay) . '. See photos, features and availability, and book online.' : null;
+  $pageTitle = $carName;
+  $pageDescription = 'Rent the ' . $carName . ' in Nepal from ' . format_price_per_day($car->PricePerDay) . '. See photos, features and availability, and book online.';
   $pageUsesCarousel = true;
+  $pageModern = true;
   include('includes/head.php');
   ?>
 </head>
 
-<body>
+<body class="r-page">
 
-
-  <!--Header-->
   <?php include('includes/header.php'); ?>
-  <!-- /Header -->
 
-  <!--Listing-Image-Slider-->
+  <main id="main" class="r-car">
+    <div class="container">
+      <nav aria-label="Breadcrumb">
+        <ol class="r-breadcrumb r-breadcrumb--light">
+          <li><a href="./">Home</a></li>
+          <li><a href="car-listing">Cars</a></li>
+          <li aria-current="page"><?php echo htmlentities($carName); ?></li>
+        </ol>
+      </nav>
 
-  <?php
-  $vhid = intval($_GET['vhid'] ?? 0);
-  $sql = "SELECT tblvehicles.*,tblbrands.BrandName,tblbrands.id as bid  from tblvehicles join tblbrands on tblbrands.id=tblvehicles.VehiclesBrand where tblvehicles.id=:vhid";
-  $query = $dbh->prepare($sql);
-  $query->bindParam(':vhid', $vhid, PDO::PARAM_STR);
-  $query->execute();
-  $results = $query->fetchAll(PDO::FETCH_OBJ);
-  $cnt = 1;
-  if ($query->rowCount() > 0) {
-    foreach ($results as $result) {
-      $similarBrandId = $result->bid;
-      $pricingQuote = dynamic_price_quote($dbh, (int) $result->id, [
-        'start_date' => $requestedFromDate,
-        'end_date' => $requestedToDate,
-        'base_price' => (float) $result->PricePerDay
-      ]);
-      $displayPrice = isset($pricingQuote['recommended_price']) && $pricingQuote['recommended_price'] > 0
-        ? $pricingQuote['recommended_price']
-        : $result->PricePerDay;
-      ?>
-
-      <section class="vehicle-slider-wrap">
-        <div id="listing_img_slider" class="owl-carousel">
-          <div><?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 1', ['class' => 'img-fluid', 'sizes' => '100vw', 'lazy' => false]); ?></div>
-          <div><?php echo vehicle_image($result->Vimage2, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 2', ['class' => 'img-fluid', 'sizes' => '100vw']); ?></div>
-          <div><?php echo vehicle_image($result->Vimage3, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 3', ['class' => 'img-fluid', 'sizes' => '100vw']); ?></div>
-          <div><?php echo vehicle_image($result->Vimage4, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 4', ['class' => 'img-fluid', 'sizes' => '100vw']); ?></div>
-          <?php if ($result->Vimage5 == "") {
-
-          } else {
-            ?>
-            <div><?php echo vehicle_image($result->Vimage5, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle) . ' – photo 5', ['class' => 'img-fluid', 'sizes' => '100vw']); ?></div>
+      <div class="r-car__head">
+        <div>
+          <div class="r-car-card__brand"><?php echo htmlentities($car->BrandName); ?></div>
+          <h1 class="r-car__title"><?php echo htmlentities($car->VehiclesTitle); ?></h1>
+          <ul class="r-chips">
+            <?php if ($car->CarType) { ?><li><span class="r-chip"><i class="fa fa-car" aria-hidden="true"></i><?php echo htmlentities($car->CarType); ?></span></li><?php } ?>
+            <?php if ($car->FuelType) { ?><li><span class="r-chip"><i class="fa fa-gas-pump" aria-hidden="true"></i><?php echo htmlentities($car->FuelType); ?></span></li><?php } ?>
+            <?php if ($car->SeatingCapacity) { ?><li><span class="r-chip"><i class="fa fa-user-group" aria-hidden="true"></i><?php echo (int)$car->SeatingCapacity; ?> seats</span></li><?php } ?>
+            <?php if ($car->ModelYear) { ?><li><span class="r-chip"><i class="fa fa-calendar" aria-hidden="true"></i><?php echo (int)$car->ModelYear; ?> model</span></li><?php } ?>
+          </ul>
+        </div>
+        <div class="r-car__price">
+          <div class="r-price r-price--lg"><?php echo format_price($displayPrice); ?><small>/day</small></div>
+          <?php if (($pricingQuote['status'] ?? '') === 'model') { ?>
+            <span class="r-badge r-badge--primary">Smart price <?php echo sprintf('%+0.0f%%', (($pricingQuote['multiplier'] ?? 1) - 1) * 100); ?></span>
           <?php } ?>
+          <a href="#book" class="r-btn r-car__book-jump">Book this car</a>
+        </div>
+      </div>
+
+      <div class="r-car__layout">
+        <div class="r-car__main">
+
+          <?php if ($photos) { ?>
+            <div class="r-gallery">
+              <div id="listing_img_slider" class="owl-carousel r-gallery__main">
+                <?php foreach ($photos as $i => $photo) { ?>
+                  <div><?php echo vehicle_image($photo, $carName . ' – photo ' . ($i + 1), ['sizes' => '(min-width: 1200px) 760px, 100vw', 'lazy' => $i > 0]); ?></div>
+                <?php } ?>
+              </div>
+              <?php if (count($photos) > 1) { ?>
+                <div class="r-gallery__thumbs" role="group" aria-label="Photos">
+                  <?php foreach ($photos as $i => $photo) { ?>
+                    <button type="button" class="r-gallery__thumb <?php echo $i === 0 ? 'is-active' : ''; ?>" data-slide="<?php echo $i; ?>" aria-label="Show photo <?php echo $i + 1; ?>">
+                      <?php echo vehicle_image($photo, '', ['sizes' => '120px']); ?>
+                    </button>
+                  <?php } ?>
+                </div>
+              <?php } ?>
+            </div>
+          <?php } ?>
+
+          <section class="r-car__section" aria-labelledby="overview-title">
+            <h2 id="overview-title">Overview</h2>
+            <div class="r-car__overview"><?php echo nl2br(htmlentities(trim((string)$car->VehiclesOverview))); ?></div>
+          </section>
+
+          <?php if ($features) { ?>
+            <section class="r-car__section" aria-labelledby="features-title">
+              <h2 id="features-title">Features</h2>
+              <ul class="r-features">
+                <?php foreach ($features as [$icon, $label]) { ?>
+                  <li><i class="fa <?php echo $icon; ?>" aria-hidden="true"></i><?php echo $label; ?></li>
+                <?php } ?>
+              </ul>
+            </section>
+          <?php } ?>
+        </div>
+
+        <aside class="r-car__aside" id="book" aria-labelledby="book-title">
+          <div class="r-book">
+            <h2 id="book-title" class="r-book__title">Book this car</h2>
+            <div class="r-price"><?php echo format_price($displayPrice); ?><small>/day</small></div>
+
+            <?php if (!empty($_SESSION['login'])) { ?>
+              <form method="post" class="r-book__form" data-price="<?php echo (float)$displayPrice; ?>">
+                <?php echo csrf_field(); ?>
+                <div class="r-form-row">
+                  <div class="r-field">
+                    <label class="r-label" for="fromdate">Pickup date</label>
+                    <input type="date" id="fromdate" name="fromdate" class="r-input" min="<?php echo $today; ?>" value="<?php echo $tomorrow; ?>" required>
+                  </div>
+                  <div class="r-field">
+                    <label class="r-label" for="todate">Return date</label>
+                    <input type="date" id="todate" name="todate" class="r-input" min="<?php echo $today; ?>" value="<?php echo date('Y-m-d', strtotime('+2 day')); ?>" required>
+                  </div>
+                </div>
+                <div class="r-field">
+                  <label class="r-label" for="message">Message <span class="r-hint">(optional)</span></label>
+                  <textarea id="message" name="message" class="r-textarea" rows="3" maxlength="255" placeholder="Pickup time, trip plans, questions..."></textarea>
+                </div>
+                <dl class="r-book__total" aria-live="polite">
+                  <div><dt><span data-days>1 day</span> &times; <?php echo format_price($displayPrice); ?></dt><dd data-total><?php echo format_price($displayPrice); ?></dd></div>
+                </dl>
+                <button type="submit" name="submit" value="Book Now" class="r-btn r-btn--block r-btn--lg">Request booking</button>
+                <p class="r-hint r-book__note"><i class="fa fa-circle-info" aria-hidden="true"></i> No payment now. We confirm your booking and get in touch.</p>
+              </form>
+            <?php } else { ?>
+              <p class="r-book__guest">Log in or create a free account to pick dates and send a booking request.</p>
+              <a href="#loginform" class="r-btn r-btn--block r-btn--lg" data-bs-toggle="modal">Log in to book</a>
+              <p class="r-hint r-book__note">New here? <a href="#signupform" data-bs-toggle="modal">Create an account</a></p>
+            <?php } ?>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <?php if ($similarCars) { ?>
+      <section class="r-section r-section--muted">
+        <div class="container">
+          <div class="r-section-head r-section-head--start">
+            <h2 class="r-section-title">Similar cars</h2>
+          </div>
+          <div class="r-grid r-grid--cards">
+            <?php foreach ($similarCars as $similar) {
+              echo car_card($similar);
+            } ?>
+          </div>
         </div>
       </section>
-      <!--/Listing-Image-Slider-->
+    <?php } ?>
+  </main>
 
-
-      <!--Listing-detail-->
-      <section class="listing-detail">
-        <div class="container">
-          <div class="listing_detail_head row">
-            <div class="col-md-9">
-              <h2><?php echo htmlentities($result->BrandName); ?> , <?php echo htmlentities($result->VehiclesTitle); ?></h2>
-            </div>
-            <div class="col-md-3">
-              <div class="price_info">
-                <p><?php echo format_price($displayPrice); ?> </p>Per Day
-                <?php if (($pricingQuote['status'] ?? '') === 'model'): ?>
-                  <small class="text-muted">Dynamic price
-                    (<?php echo sprintf('%+0.1f%%', (($pricingQuote['multiplier'] ?? 1) - 1) * 100); ?>)</small>
-                <?php endif; ?>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-9">
-              <div class="main_features">
-                <ul>
-
-                  <li> <i class="fa fa-calendar" aria-hidden="true"></i>
-                    <h5><?php echo htmlentities($result->ModelYear); ?></h5>
-                    <p>Reg.Year</p>
-                  </li>
-                  <li> <i class="fa fa-gears" aria-hidden="true"></i>
-                    <h5><?php echo htmlentities($result->FuelType); ?></h5>
-                    <p>Fuel Type</p>
-                  </li>
-
-                  <li> <i class="fa fa-user-plus" aria-hidden="true"></i>
-                    <h5><?php echo htmlentities($result->SeatingCapacity); ?></h5>
-                    <p>Seats</p>
-                  </li>
-                </ul>
-              </div>
-              <div class="listing_more_info">
-                <div class="listing_detail_wrap">
-                  <!-- Nav tabs -->
-                  <ul class="nav nav-tabs gray-bg" role="tablist">
-                    <li role="presentation"><a href="#vehicle-overview" class="active" aria-controls="vehicle-overview"
-                        role="tab" data-bs-toggle="tab" aria-selected="true">Vehicle Overview</a></li>
-
-                    <li role="presentation"><a href="#accessories" aria-controls="accessories" role="tab"
-                        data-bs-toggle="tab" aria-selected="false">Accessories</a></li>
-                  </ul>
-
-                  <!-- Tab panes -->
-                  <div class="tab-content">
-                    <!-- vehicle-overview -->
-                    <div role="tabpanel" class="tab-pane fade show active" id="vehicle-overview">
-
-                      <p><?php echo htmlentities($result->VehiclesOverview); ?></p>
-                    </div>
-
-
-                    <!-- Accessories -->
-                    <div role="tabpanel" class="tab-pane fade" id="accessories">
-                      <!--Accessories-->
-                      <table>
-                        <thead>
-                          <tr>
-                            <th colspan="2">Accessories</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>Air Conditioner</td>
-                            <?php if ($result->AirConditioner == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                          <tr>
-                            <td>AntiLock Braking System</td>
-                            <?php if ($result->AntiLockBrakingSystem == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                          <tr>
-                            <td>Power Steering</td>
-                            <?php if ($result->PowerSteering == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-
-                          <tr>
-
-                            <td>Power Windows</td>
-
-                            <?php if ($result->PowerWindows == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                          <tr>
-                            <td>CD Player</td>
-                            <?php if ($result->CDPlayer == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                          <tr>
-                            <td>Leather Seats</td>
-                            <?php if ($result->LeatherSeats == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                          <tr>
-                            <td>Central Locking</td>
-                            <?php if ($result->CentralLocking == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                          <tr>
-                            <td>Power Door Locks</td>
-                            <?php if ($result->PowerDoorLocks == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-                          <tr>
-                            <td>Brake Assist</td>
-                            <?php if ($result->BrakeAssist == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                          <tr>
-                            <td>Driver Airbag</td>
-                            <?php if ($result->DriverAirbag == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                          <tr>
-                            <td>Passenger Airbag</td>
-                            <?php if ($result->PassengerAirbag == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                          <tr>
-                            <td>Crash Sensor</td>
-                            <?php if ($result->CrashSensor == 1) {
-                              ?>
-                              <td><i class="fa fa-check" aria-hidden="true"></i></td>
-                            <?php } else { ?>
-                              <td><i class="fa fa-xmark" aria-hidden="true"></i></td>
-                            <?php } ?>
-                          </tr>
-
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            <?php }
-  } ?>
-
-        </div>
-
-        <!--Side-Bar-->
-        <aside class="col-md-3">
-
-          <div class="booking-widget">
-            <div class="filter-widget__head">
-              <span class="filter-widget__icon"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i></span>
-              <h5>Book Now</h5>
-            </div>
-            <form class="filter-widget__form" method="post">
-<?php echo csrf_field(); ?>
-              <div class="form-group">
-                <label>From Date</label>
-                <input type="date" class="form-control" name="fromdate" placeholder="From Date" required>
-              </div>
-              <div class="form-group">
-                <label>To Date</label>
-                <input type="date" class="form-control" name="todate" placeholder="To Date" required>
-              </div>
-              <div class="form-group">
-                <label>Message</label>
-                <textarea rows="4" class="form-control" name="message" placeholder="Any special request?"
-                  required></textarea>
-              </div>
-              <?php if (!empty($_SESSION['login'])) { ?>
-                <div class="form-group">
-                  <input type="submit" class="btn btn-block" name="submit" value="Book Now">
-                </div>
-              <?php } else { ?>
-                <a href="#loginform" class="btn btn-block uppercase" data-bs-toggle="modal">Login to
-                  Book</a>
-              <?php } ?>
-            </form>
-
-            <div class="booking-widget__share">
-              <span>Share this car</span>
-              <div class="booking-widget__share-icons">
-                <a href="#" aria-label="Share on Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a>
-                <a href="#" aria-label="Share on Twitter"><i class="fa-brands fa-twitter" aria-hidden="true"></i></a>
-                <a href="#" aria-label="Share on LinkedIn"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
-                <a href="#" aria-label="Share on Google Plus"><i class="fa-brands fa-google-plus-g" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-
-        </aside>
-        <!--/Side-Bar-->
-      </div>
-
-      <div class="space-20"></div>
-      <div class="divider"></div>
-
-      <!--Similar-Cars-->
-      <div class="similar_cars">
-        <h3>Similar Cars</h3>
-        <div class="car-grid">
-          <?php
-          $bid = $similarBrandId ?? 0;
-          $sql = "SELECT tblvehicles.VehiclesTitle,tblbrands.BrandName,tblvehicles.PricePerDay,tblvehicles.FuelType,tblvehicles.ModelYear,tblvehicles.id,tblvehicles.SeatingCapacity,tblvehicles.VehiclesOverview,tblvehicles.Vimage1 from tblvehicles join tblbrands on tblbrands.id=tblvehicles.VehiclesBrand where tblvehicles.VehiclesBrand=:bid";
-          $query = $dbh->prepare($sql);
-          $query->bindParam(':bid', $bid, PDO::PARAM_STR);
-          $query->execute();
-          $results = $query->fetchAll(PDO::FETCH_OBJ);
-          $cnt = 1;
-          if ($query->rowCount() > 0) {
-            foreach ($results as $result) {
-              $overview = isset($result->VehiclesOverview) && $result->VehiclesOverview
-                ? substr(strip_tags($result->VehiclesOverview), 0, 70) . '...'
-                : 'No description available.';
-              ?>
-              <div class="col-list-3">
-                <div class="recent-car-list">
-                  <div class="car-info-box">
-                    <a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>" class="car-img-wrap">
-                      <?php echo vehicle_image($result->Vimage1, vehicle_display_name($result->BrandName ?? '', $result->VehiclesTitle), ['sizes' => '(min-width: 992px) 360px, (min-width: 576px) 50vw, 100vw']); ?>
-                    </a>
-                    <ul class="car-stats">
-                      <li><i class="fa fa-car" aria-hidden="true"></i><?php echo htmlentities($result->FuelType); ?></li>
-                      <li><i class="fa fa-calendar" aria-hidden="true"></i><?php echo htmlentities($result->ModelYear); ?>
-                      </li>
-                      <li><i class="fa fa-user" aria-hidden="true"></i><?php echo htmlentities($result->SeatingCapacity); ?>
-                        seats</li>
-                    </ul>
-                  </div>
-                  <div class="car-body">
-                    <div class="car-title-m">
-                      <h6><a href="<?php echo htmlentities(vehicle_url($result->id, $result->BrandName ?? '', $result->VehiclesTitle ?? '')); ?>">
-                          <?php echo htmlentities($result->BrandName); ?> ,
-                          <?php echo htmlentities($result->VehiclesTitle); ?></a></h6>
-                      <span class="price"><?php echo format_price($result->PricePerDay); ?><small>/Day</small></span>
-                    </div>
-                    <div class="inventory_info_m">
-                      <p><?php echo htmlentities($overview); ?></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            <?php }
-          } else { ?>
-            <p>No similar cars found for this brand right now.</p>
-          <?php } ?>
-        </div>
-      </div>
-      <!--/Similar-Cars-->
-
-    </div>
-  </section>
-  <!--/Listing-detail-->
-
-  <!--Footer -->
   <?php include('includes/footer.php'); ?>
-  <!-- /Footer-->
-
-
-  <!--Login-Form -->
   <?php include('includes/login.php'); ?>
-  <!--/Login-Form -->
-
-  <!--Register-Form -->
   <?php include('includes/registration.php'); ?>
-
-  <!--/Register-Form -->
-
-  <!--Forgot-password-Form -->
   <?php include('includes/forgotpassword.php'); ?>
-
   <?php include('includes/scripts.php'); ?>
-
   <script>
-    $(document).ready(function () {
-      $('#listing_img_slider').owlCarousel({
+    $(function () {
+      // Photo gallery with thumbnails.
+      var $slider = $('#listing_img_slider');
+      $slider.owlCarousel({
         items: 1,
-        loop: true,
+        loop: false,
         nav: true,
-        dots: true,
+        dots: false,
         smartSpeed: 400,
         navText: ['<i class="fa fa-angle-left" aria-hidden="true"></i><span class="visually-hidden">Previous photo</span>',
           '<i class="fa fa-angle-right" aria-hidden="true"></i><span class="visually-hidden">Next photo</span>']
       });
+      $slider.on('changed.owl.carousel', function (event) {
+        $('.r-gallery__thumb').removeClass('is-active').eq(event.item.index).addClass('is-active');
+      });
+      $('.r-gallery__thumb').on('click', function () {
+        $slider.trigger('to.owl.carousel', [Number(this.dataset.slide), 300]);
+      });
+
+      // Live booking total: days between pickup and return (a same-day rental counts as one day).
+      var form = document.querySelector('.r-book__form');
+      if (!form) return;
+      var price = Number(form.dataset.price);
+      var from = document.getElementById('fromdate');
+      var to = document.getElementById('todate');
+      var fmt = function (n) { return 'Rs ' + Math.round(n).toLocaleString('en-US'); };
+      function update() {
+        if (from.value) to.min = from.value;
+        if (from.value && to.value && to.value < from.value) to.value = from.value;
+        var days = from.value && to.value ? Math.max(1, Math.round((new Date(to.value) - new Date(from.value)) / 86400000)) : 1;
+        form.querySelector('[data-days]').textContent = days + (days === 1 ? ' day' : ' days');
+        form.querySelector('[data-total]').textContent = fmt(days * price);
+      }
+      from.addEventListener('change', update);
+      to.addEventListener('change', update);
+      update();
     });
   </script>
 

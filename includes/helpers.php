@@ -87,8 +87,13 @@ function vehicle_url($id, ?string $brand = null, ?string $title = null): string
 
 // Ends the request with a redirect, dropping any page output buffered so far.
 // Used after handling a form (post/redirect/get), so refreshing never re-submits it.
+// Relative URLs ("my-booking", "car/...") are resolved from the site root, so they work
+// from pages at deeper clean URLs too.
 function redirect_to(string $url, int $status = 303): void
 {
+    if (!preg_match('#^(/|https?://)#', $url)) {
+        $url = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/') . '/' . ltrim($url, './');
+    }
     while (ob_get_level() > 0) {
         ob_end_clean();
     }
