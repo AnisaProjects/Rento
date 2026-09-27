@@ -19,6 +19,7 @@ Content markup (docs/report/content/*.md, processed in file-name order):
   Table: Table 3.1 Caption         then | a | b | rows (first row = header)
   > text                           indented note paragraph           [[PAGEBREAK]]
   %% comment                       ignored                            {{REFERENCES}} references list
+  $$ p = b(1 + x) $$ (2.1)         numbered equation (matplotlib mathtext, rendered to an image)
 """
 from __future__ import annotations
 
@@ -212,8 +213,23 @@ def repeat_header(row):
 
 
 def add_table(doc, caption, rows):
+    # Optional column widths in inches at the end of the caption: "Table 2.2 Caption {widths=1.0,0.68,...}"
+    widths = None
+    m = re.search(r"\s*\{widths=([\d.,\s]+)\}\s*$", caption)
+    if m:
+        widths = [float(x) for x in m.group(1).split(",")]
+        caption = caption[:m.start()]
     para(doc, caption, style="Table Caption")
     table = doc.add_table(rows=len(rows), cols=len(rows[0]))
+    if widths:
+        table.autofit = False
+        layout = OxmlElement("w:tblLayout"); layout.set(qn("w:type"), "fixed")
+        table._tbl.tblPr.append(layout)
+        for col, w in zip(table._tbl.tblGrid.findall(qn("w:gridCol")), widths):
+            col.set(qn("w:w"), str(int(w * 1440)))
+        for r in table.rows:
+            for c, w in zip(r.cells, widths):
+                c.width = Inches(w)
     table.style = "Table Grid"
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     for r, row in enumerate(rows):
@@ -226,10 +242,18 @@ def add_table(doc, caption, rows):
             if r == 0:
                 set_cell_background(cell, "F2F2F2")
     repeat_header(table.rows[0])
+    # Rows never break across pages; short tables stay on one page with their caption.
+    for i, row in enumerate(table.rows):
+        trpr = row._tr.get_or_add_trPr()
+        trpr.append(OxmlElement("w:cantSplit"))
+        if len(rows) <= 12 and i < len(rows) - 1:
+            for cell in row.cells:
+                for cp in cell.paragraphs:
+                    cp.paragraph_format.keep_with_next = True
     # A little padding inside the cells.
     tblpr = table._tbl.tblPr
     mar = OxmlElement("w:tblCellMar")
-    for side, w in (("top", 40), ("bottom", 40), ("left", 80), ("right", 80)):
+    for side, w in (("top", 40), ("bottom", 40), ("left", 60), ("right", 60)):
         el = OxmlElement(f"w:{side}"); el.set(qn("w:w"), str(w)); el.set(qn("w:type"), "dxa"); mar.append(el)
     tblpr.append(mar)
     para(doc, "", after=4)
@@ -251,6 +275,53 @@ def add_figure(doc, caption, path, width_in=6.0):
     else:
         add_text(p, f"[INSERT FIGURE: {path}]", italic=True)
     para(doc, caption, style="Figure Caption")
+
+
+# ------------------------------------------------------------------ equations
+
+EQ_DIR = HERE / "figures" / "equations"
+
+
+def render_equation(latex: str, name: str) -> Path:
+    """Renders a LaTeX-style formula (matplotlib mathtext) to a 300-dpi PNG."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    EQ_DIR.mkdir(parents=True, exist_ok=True)
+    out = EQ_DIR / f"{name}.png"
+    plt.rcParams.update({"mathtext.fontset": "stix", "font.family": "STIXGeneral"})
+    fig = plt.figure(figsize=(0.01, 0.01))
+    fig.text(0, 0, f"${latex}$", fontsize=13)
+    fig.savefig(out, dpi=300, bbox_inches="tight", pad_inches=0.04, transparent=False, facecolor="white")
+    plt.close(fig)
+    return out
+
+
+def add_equation(doc, latex, number):
+    """Centred formula with its number right-aligned, e.g. (2.1)."""
+    img = render_equation(latex, "eq_" + number.strip("()").replace(".", "_"))
+    from PIL import Image
+    with Image.open(img) as im:
+        w_px, h_px = im.size
+    p = doc.add_paragraph(style="Normal")
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p.paragraph_format.line_spacing = 1.0
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.space_after = Pt(6)
+    stops = p.paragraph_format.tab_stops
+    from docx.enum.text import WD_TAB_ALIGNMENT
+    # Text width is 8.27" - 1.5" - 1.0" = 5.77": centre the formula, number flush right.
+    stops.add_tab_stop(Inches(2.885), WD_TAB_ALIGNMENT.CENTER)
+    stops.add_tab_stop(Inches(5.77), WD_TAB_ALIGNMENT.RIGHT)
+    p.add_run("\t")
+    width_in = min(4.9, w_px / 300)
+    p.add_run().add_picture(str(img), width=Inches(width_in))
+    r = p.add_run("\t" + number)
+    set_font(r, 12)
+    # Raise the number to the vertical middle of the formula (w:position is in half-points).
+    height_pt = width_in * h_px / w_px * 72
+    pos = OxmlElement("w:position"); pos.set(qn("w:val"), str(max(0, int(height_pt - 8))))
+    r._r.get_or_add_rPr().append(pos)
 
 
 # ------------------------------------------------------------------ content files
@@ -282,6 +353,9 @@ def render_markdown(doc, text, refs):
             doc.add_paragraph(line[4:].strip(), style="Heading 3")
         elif line.startswith("## "):
             doc.add_paragraph(line[3:].strip(), style="Heading 2")
+        elif line.startswith("$$"):
+            m = re.match(r"\$\$(.+?)\$\$\s*(\(\d+\.\d+\))", line)
+            add_equation(doc, m.group(1).strip(), m.group(2))
         elif line.startswith("!["):
             m = re.match(r"!\[(.+?)\]\((.+?)\)(?:\{width=([\d.]+)\})?", line)
             add_figure(doc, m.group(1), m.group(2), float(m.group(3)) if m.group(3) else 6.0)

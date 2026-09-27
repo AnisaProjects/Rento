@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- Figure 2.1 (conceptual framework). Render: see render_html.sh -->
+<html><head><meta charset="utf-8"><style>
+body{margin:0;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#101114}
+#d{display:inline-block;padding:20px 24px}
+h1{font-size:21px;font-weight:normal;text-align:center;margin:0 0 14px}
+.row{display:flex;align-items:stretch;gap:0}
+.col{width:245px;border:1px solid #d5d7dc;border-radius:4px;padding:10px;display:flex;flex-direction:column;gap:9px}
+.col h2{font-size:20px;font-weight:bold;text-align:center;margin:0 0 2px}
+.b{font-size:19px;line-height:1.3;text-align:center;padding:8px 6px;border:1px solid #4f5362;background:#fff}
+.th .b{background:#f1f2f4}
+.co .b{background:#fff0eb;border-color:#d23f1c}
+.ou .b{border-color:#d23f1c}
+.dash{border-style:dashed!important}
+.arr{width:30px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#4f5362}
+</style></head><body><div id="d">
+<h1>Conceptual framework of the study</h1>
+<div class="row">
+ <div class="col th"><h2>Theoretical foundations</h2>
+  <div class="b">Revenue management<br>(demand-based pricing)</div>
+  <div class="b">Price fairness and<br>transparency</div>
+  <div class="b">Demand forecasting<br>(ensembles, error metrics)</div>
+  <div class="b">Content- and knowledge-<br>based recommendation</div></div>
+ <div class="arr">&#10132;</div>
+ <div class="col"><h2>Inputs</h2>
+  <div class="b">Festival calendar (BS 2083 official, BS 2084 provisional)</div>
+  <div class="b">Fleet data: type, seats, fuel, rugged flag, base price</div>
+  <div class="b">Bookings: availability, occupancy, requests</div>
+  <div class="b">Trip description, budget, travellers, dates</div>
+  <div class="b">External datasets: hourly demand, scraped prices</div></div>
+ <div class="arr">&#10132;</div>
+ <div class="col co"><h2>Rento components</h2>
+  <div class="b">Rule-based smart pricer<br>7 factors, capped<br>&minus;15% / +25%</div>
+  <div class="b">60-day price forecast<br>(nightly and on change)</div>
+  <div class="b">Recommendation engine:<br>weighted scoring<br>with reasons</div>
+  <div class="b dash">ML models (offline)<br>LR, RF, GB, MLP</div></div>
+ <div class="arr">&#10132;</div>
+ <div class="col ou"><h2>Outcomes</h2>
+  <div class="b">Explained day prices, stored quote and invoice</div>
+  <div class="b">Admin insights and price suggestions</div>
+  <div class="b">Ranked cars with match % and reasons</div>
+  <div class="b dash">Future: learned pricer once about 200 bookings exist</div></div>
+</div></div></body></html>
