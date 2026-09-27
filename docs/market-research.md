@@ -10,7 +10,7 @@ website until activated in admin):
 - Brands: Hyundai, Tata, BYD, Deepal, Mahindra (Suzuki models use the existing "Maruti" brand).
 - 17 vehicles: `database/migrations/007_market_vehicles.sql`. (The Toyota Fortuner row was
   skipped because the fleet already has an active Toyota Fortuner.)
-- 16 packages: `database/migrations/009_packages_seed.sql`.
+- 16 packages: `database/migrations/009_packages.sql`.
 
 ## Benchmarks for the "below market" badge (Phase 5)
 

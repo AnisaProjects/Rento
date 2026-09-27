@@ -62,6 +62,7 @@ $socials = site_social_links();
         <ul class="r-footer__links">
           <li><a href="car-listing">All cars</a></li>
           <li><a href="car-recommendation">Find my car</a></li>
+          <?php if (packages_active_count($dbh)) { ?><li><a href="packages">Packages &amp; services</a></li><?php } ?>
           <li><a href="about-us">About Rento</a></li>
           <li><a href="contact-us">Contact us</a></li>
         </ul>

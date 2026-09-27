@@ -1,0 +1,95 @@
+<?php
+// Packages & services helpers shared by the public pages (packages.php, package-details.php)
+// and the admin (manage-packages.php, package-edit.php, package-enquiries.php).
+// Packages are enquiry-only: a request is stored in tblpackageenquiries, there is no payment.
+
+const PACKAGE_PLACEHOLDER = 'assets/images/placeholder-package.jpg';
+// Enquiry status => [label, admin badge variant]
+const PACKAGE_ENQUIRY_STATUSES = [
+    'new' => ['New', 'primary'],
+    'contacted' => ['Contacted', 'info'],
+    'confirmed' => ['Confirmed', 'success'],
+    'cancelled' => ['Cancelled', 'danger'],
+];
+
+// Clean address of a package: package/<title-slug>-<id>.
+function package_url($id, ?string $title = null): string
+{
+    $slug = trim(preg_replace('/[^a-z0-9]+/', '-', strtolower((string)$title)), '-');
+    return 'package/' . ($slug === '' ? '' : $slug . '-') . (int)$id;
+}
+
+// {"Sedan": 6500, ...} as an array, cheapest first; only positive prices.
+function package_prices(?object $package): array
+{
+    $prices = json_decode((string)($package->PricesJson ?? ''), true);
+    $prices = is_array($prices) ? array_filter(array_map('intval', $prices), fn($p) => $p > 0) : [];
+    asort($prices);
+    return $prices;
+}
+
+// [["day" => 1, "title" => "...", "text" => "..."], ...]
+function package_itinerary(?object $package): array
+{
+    $days = json_decode((string)($package->ItineraryJson ?? ''), true);
+    if (!is_array($days)) {
+        return [];
+    }
+    return array_values(array_filter(array_map(fn($d) => [
+        'day' => (int)($d['day'] ?? 0),
+        'title' => trim((string)($d['title'] ?? '')),
+        'text' => trim((string)($d['text'] ?? '')),
+    ], $days), fn($d) => $d['title'] !== '' || $d['text'] !== ''));
+}
+
+// A one-per-line text column as a list.
+function package_lines(?string $text): array
+{
+    return array_values(array_filter(array_map('trim', preg_split('/\R/', (string)$text)), fn($l) => $l !== ''));
+}
+
+// Cover image path (the placeholder when missing).
+function package_cover(?object $package): string
+{
+    $cover = (string)($package->CoverImage ?? '');
+    return ($cover !== '' && is_file(__DIR__ . '/../' . $cover)) ? $cover : PACKAGE_PLACEHOLDER;
+}
+
+// Number of active packages (the nav link and home section only show when there is one).
+function packages_active_count(PDO $dbh): int
+{
+    static $count = null;
+    if ($count === null) {
+        try {
+            $count = (int)$dbh->query("SELECT COUNT(*) FROM tblpackages p LEFT JOIN tblpackagecategories c ON c.id = p.CategoryId
+                WHERE p.IsActive = 1 AND (c.id IS NULL OR c.IsActive = 1)")->fetchColumn();
+        } catch (PDOException $e) {
+            $count = 0; // migration 009 not applied yet
+        }
+    }
+    return $count;
+}
+
+// Public card for a package (list page and home page).
+function package_card(object $p, string $heading = 'h3'): string
+{
+    $url = package_url($p->id, $p->Title);
+    ob_start(); ?>
+    <article class="r-package-card">
+      <a class="r-package-card__media" href="<?php echo htmlentities($url); ?>" tabindex="-1" aria-hidden="true">
+        <?php echo site_picture(package_cover($p), '', ['sizes' => '(min-width: 1200px) 380px, (min-width: 768px) 45vw, 100vw']); ?>
+        <?php if (!empty($p->CategoryName)) { ?><span class="r-badge r-package-card__badge"><i class="fa <?php echo htmlentities($p->Icon ?? 'fa-route'); ?>" aria-hidden="true"></i><?php echo htmlentities($p->CategoryName); ?></span><?php } ?>
+      </a>
+      <div class="r-package-card__body">
+        <<?php echo $heading; ?> class="r-package-card__title"><a href="<?php echo htmlentities($url); ?>"><?php echo htmlentities($p->Title); ?></a></<?php echo $heading; ?>>
+        <?php if (!empty($p->DurationLabel)) { ?><p class="r-package-card__meta"><i class="fa fa-clock" aria-hidden="true"></i><?php echo htmlentities($p->DurationLabel); ?></p><?php } ?>
+        <?php if (!empty($p->Summary)) { ?><p class="r-package-card__text"><?php echo htmlentities($p->Summary); ?></p><?php } ?>
+        <div class="r-package-card__foot">
+          <span class="r-package-card__price"><small>From</small> <?php echo format_price($p->StartingPrice); ?></span>
+          <a class="r-btn r-btn--sm" href="<?php echo htmlentities($url); ?>">View details<span class="visually-hidden"> of <?php echo htmlentities($p->Title); ?></span></a>
+        </div>
+      </div>
+    </article>
+    <?php
+    return ob_get_clean();
+}

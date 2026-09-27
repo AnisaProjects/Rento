@@ -40,6 +40,11 @@ const ADMIN_MENU = [
         ['Manage Brands', 'manage-brands.php', ['edit-brand.php']],
         ['Create Brand', 'create-brand.php', []],
     ]],
+    ['Packages', 'fa-map-location-dot', [
+        ['Manage Packages', 'manage-packages.php', ['package-edit.php']],
+        ['Enquiries', 'package-enquiries.php', []],
+        ['Categories', 'package-categories.php', []],
+    ]],
     ['Festivals', 'fa-calendar-days', 'festivals.php'],
     ['Registered Users', 'fa-users', 'reg-users.php'],
     ['Testimonials', 'fa-comment-dots', 'testimonials.php'],
@@ -78,6 +83,7 @@ function admin_menu_counts(PDO $dbh): array
         $counts = [
             'new-bookings.php' => (int)$dbh->query("SELECT COUNT(*) FROM tblbooking WHERE Status = 0 OR Status IS NULL")->fetchColumn(),
             'manage-conactusquery.php' => (int)$dbh->query("SELECT COUNT(*) FROM tblcontactusquery WHERE status IS NULL OR status = 0")->fetchColumn(),
+            'package-enquiries.php' => (int)$dbh->query("SELECT COUNT(*) FROM tblpackageenquiries WHERE Status = 'new'")->fetchColumn(),
         ];
     }
     return $counts;
@@ -327,7 +333,7 @@ function admin_password_input(string $name, string $label, string $autocomplete,
 //   $name       file input name
 //   $src        current image URL relative to admin/ ('' = none)
 //   $removeName optional checkbox name to remove the current image / restore the default
-function admin_image_field(string $name, string $label, string $src, string $hint = '', string $removeName = '', string $removeLabel = 'Remove'): string
+function admin_image_field(string $name, string $label, string $src, string $hint = '', string $removeName = '', string $removeLabel = 'Remove', string $removeValue = '1'): string
 {
     $has = $src !== '';
     ob_start(); ?>
@@ -349,7 +355,7 @@ function admin_image_field(string $name, string $label, string $src, string $hin
         <span class="d-inline-flex gap-1">
           <label class="btn btn-light btn-sm" for="<?php echo h($name); ?>"><i class="fa fa-<?php echo $has ? 'rotate' : 'plus'; ?>" aria-hidden="true"></i><?php echo $has ? 'Replace' : 'Choose'; ?></label>
           <?php if ($removeName !== '') { ?>
-            <label class="btn btn-light btn-sm mb-0"><input type="checkbox" class="form-check-input me-1" name="<?php echo h($removeName); ?>" value="1"> <?php echo h($removeLabel); ?></label>
+            <label class="btn btn-light btn-sm mb-0"><input type="checkbox" class="form-check-input me-1" name="<?php echo h($removeName); ?>" value="<?php echo h($removeValue); ?>"> <?php echo h($removeLabel); ?></label>
           <?php } ?>
         </span>
       </div>

@@ -36,6 +36,11 @@ foreach ([1, 2, 3] as $n) {
 }
 $heroPreload = preg_replace('/\.[a-z0-9]+$/i', '', $heroSlides[0][0]);
 
+// Packages section: the first three active packages (admin -> Packages, texts in Site content).
+$homePackages = packages_active_count($dbh) ? $dbh->query("SELECT p.*, c.CategoryName, c.Icon FROM tblpackages p
+  LEFT JOIN tblpackagecategories c ON c.id = p.CategoryId WHERE p.IsActive = 1 AND (c.id IS NULL OR c.IsActive = 1)
+  ORDER BY p.SortOrder, p.Title LIMIT 3")->fetchAll(PDO::FETCH_OBJ) : [];
+
 $tid = 1;
 $query = $dbh->prepare("SELECT tbltestimonial.Testimonial, tblusers.FullName FROM tbltestimonial
   JOIN tblusers ON tbltestimonial.UserEmail = tblusers.EmailId
@@ -179,6 +184,25 @@ $testimonials = $query->fetchAll(PDO::FETCH_OBJ);
         } ?>
       </div>
     </section>
+
+    <!-- Packages & services (only when some are active) -->
+    <?php if ($homePackages) { ?>
+      <section class="r-section">
+        <div class="container">
+          <div class="r-section-row">
+            <div class="r-section-head r-section-head--start">
+              <span class="r-eyebrow"><?php echo content('home_packages_eyebrow'); ?></span>
+              <h2 class="r-section-title"><?php echo content('home_packages_title'); ?></h2>
+              <p class="r-section-lead"><?php echo content('home_packages_lead'); ?></p>
+            </div>
+            <a href="packages" class="r-btn r-btn--outline"><?php echo content('home_packages_button'); ?> <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+          </div>
+          <div class="r-grid r-grid--packages">
+            <?php foreach ($homePackages as $package) echo '<div class="r-reveal">' . package_card($package) . '</div>'; ?>
+          </div>
+        </div>
+      </section>
+    <?php } ?>
 
     <!-- How it works -->
     <section class="r-section">

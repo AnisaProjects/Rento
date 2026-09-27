@@ -1250,6 +1250,7 @@ div.dt-container .dt-length select {
 
 .a-drop__hint {
   display: block;
+  color: var(--rento-gray-600);
   margin-top: .4rem;
   padding: 0 .75rem;
   font-size: var(--rento-text-xs);

@@ -9,10 +9,16 @@ $navItems = [
   ['./', 'Home', ['index.php']],
   ['car-listing', 'Cars', ['car-listing.php', 'vehical-details.php', 'search.php', 'search-carresult.php', 'search-brandresult.php']],
   ['car-recommendation', 'Find My Car', ['car-recommendation.php']],
+  // Shown once at least one package is active (admin -> Packages).
+  ['packages', 'Packages', ['packages.php', 'package-details.php']],
   ['about-us', 'About', ['about-us.php']],
   ['faqs', 'FAQs', ['faqs.php']],
   ['contact-us', 'Contact', ['contact-us.php']],
 ];
+
+if (!packages_active_count($dbh)) {
+  $navItems = array_values(array_filter($navItems, fn($navItem) => $navItem[0] !== 'packages'));
+}
 
 $accountName = '';
 if (!empty($_SESSION['login'])) {

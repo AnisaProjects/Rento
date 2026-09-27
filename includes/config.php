@@ -60,4 +60,5 @@ require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/flash.php';
 require_once __DIR__ . '/components.php';
 require_once __DIR__ . '/site-content.php';
+require_once __DIR__ . '/packages.php';
 ?>

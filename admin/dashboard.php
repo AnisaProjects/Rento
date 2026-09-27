@@ -23,6 +23,7 @@ $kpi['utilisation'] = $fleet > 0 ? round($bookedDays / ($fleet * UTILISATION_WIN
 $kpi['newUsers'] = (int)$dbh->query("SELECT COUNT(*) FROM tblusers WHERE RegDate >= DATE_FORMAT(CURDATE(), '%Y-%m-01')")->fetchColumn();
 $kpi['newUsersLast'] = (int)$dbh->query("SELECT COUNT(*) FROM tblusers WHERE RegDate >= DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%Y-%m-01')
   AND RegDate < DATE_FORMAT(CURDATE(), '%Y-%m-01')")->fetchColumn();
+$kpi['enquiries'] = (int)$dbh->query("SELECT COUNT(*) FROM tblpackageenquiries WHERE Status = 'new'")->fetchColumn();
 $kpi['unread'] = (int)$dbh->query("SELECT COUNT(*) FROM tblcontactusquery WHERE status IS NULL OR status = 0")->fetchColumn();
 $totals = $dbh->query("SELECT (SELECT COUNT(*) FROM tblbooking) bookings, (SELECT COUNT(*) FROM tblusers) users,
   (SELECT COUNT(*) FROM tblbrands) brands, (SELECT COUNT(*) FROM tblsubscribers) subscribers,
@@ -102,6 +103,12 @@ admin_page_start('Dashboard', 'dashboard.php', [], [
     <span class="a-kpi__label">New users this month</span>
     <span class="a-kpi__value"><?php echo $kpi['newUsers']; ?></span>
     <span class="a-kpi__note"><?php echo $kpi['newUsersLast']; ?> last month · <?php echo (int)$totals->users; ?> in total</span>
+  </a>
+  <a class="a-kpi a-kpi--warning" href="package-enquiries.php?status=new">
+    <span class="a-kpi__icon"><i class="fa fa-map-location-dot" aria-hidden="true"></i></span>
+    <span class="a-kpi__label">New package enquiries</span>
+    <span class="a-kpi__value"><?php echo $kpi['enquiries']; ?></span>
+    <span class="a-kpi__note"><?php echo $kpi['enquiries'] ? 'Requests waiting for a call' : 'No new requests'; ?></span>
   </a>
   <a class="a-kpi" href="manage-conactusquery.php">
     <span class="a-kpi__icon"><i class="fa fa-envelope" aria-hidden="true"></i></span>

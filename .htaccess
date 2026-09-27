@@ -8,7 +8,8 @@ ErrorDocument 404 /Rento/404.php
 ErrorDocument 403 /Rento/404.php
 
 # Clean URLs: /Rento/about-us serves about-us.php, and each car lives at
-# /Rento/car/<brand-model>-<id> (only the id matters; the name is for people).
+# /Rento/car/<brand-model>-<id> and each package at /Rento/package/<title>-<id>
+# (only the id matters; the name is for people).
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /Rento/
@@ -19,11 +20,12 @@ ErrorDocument 403 /Rento/404.php
     RewriteCond %{THE_REQUEST} ^(GET|HEAD)\s/Rento/index\.php[\s?]
     RewriteRule ^index\.php$ /Rento/ [R=301,L]
     RewriteCond %{THE_REQUEST} ^(GET|HEAD)\s/Rento/([a-z0-9-]+)\.php[\s?] [NC]
-    RewriteCond %2 !^(vehical-details|page|404|check_availability)$ [NC]
+    RewriteCond %2 !^(vehical-details|package-details|page|404|check_availability)$ [NC]
     RewriteRule ^[a-z0-9-]+\.php$ /Rento/%2 [R=301,L,NC]
 
-    # Car pages
+    # Car pages and package pages
     RewriteRule ^car/(?:[a-z0-9-]*-)?([0-9]+)/?$ vehical-details.php?vhid=$1 [QSA,L,NC]
+    RewriteRule ^package/(?:[a-z0-9-]*-)?([0-9]+)/?$ package-details.php?pid=$1 [QSA,L,NC]
 
     # Any other clean address maps to the .php file of the same name, if there is one.
     RewriteCond %{REQUEST_FILENAME} !-f
