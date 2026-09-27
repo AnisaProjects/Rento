@@ -94,16 +94,18 @@ if (isset($_POST['savepackage'])) {
     ':cover' => $cover,
     ':sort' => (int)($_POST['sortorder'] ?? 0),
     ':active' => empty($_POST['isactive']) ? 0 : 1,
+    // New field festivalpricing: add the festival and travel-day surcharges (default off).
+    ':festival' => empty($_POST['festivalpricing']) ? 0 : 1,
   ];
   if ($package) {
     $dbh->prepare("UPDATE tblpackages SET CategoryId = :cat, Title = :title, Slug = :slug, Summary = :summary, Description = :description,
       DurationLabel = :durationlabel, DurationDays = :days, RouteStops = :route, StartingPrice = :starting, PricesJson = :prices,
-      ItineraryJson = :itinerary, Inclusions = :inclusions, Exclusions = :exclusions, CoverImage = :cover, SortOrder = :sort, IsActive = :active
-      WHERE id = :id")->execute($values + [':id' => $id]);
+      ItineraryJson = :itinerary, Inclusions = :inclusions, Exclusions = :exclusions, CoverImage = :cover, SortOrder = :sort, IsActive = :active,
+      FestivalPricing = :festival WHERE id = :id")->execute($values + [':id' => $id]);
   } else {
     $dbh->prepare("INSERT INTO tblpackages (CategoryId, Title, Slug, Summary, Description, DurationLabel, DurationDays, RouteStops, StartingPrice,
-      PricesJson, ItineraryJson, Inclusions, Exclusions, CoverImage, SortOrder, IsActive)
-      VALUES (:cat, :title, :slug, :summary, :description, :durationlabel, :days, :route, :starting, :prices, :itinerary, :inclusions, :exclusions, :cover, :sort, :active)")->execute($values);
+      PricesJson, ItineraryJson, Inclusions, Exclusions, CoverImage, SortOrder, IsActive, FestivalPricing)
+      VALUES (:cat, :title, :slug, :summary, :description, :durationlabel, :days, :route, :starting, :prices, :itinerary, :inclusions, :exclusions, :cover, :sort, :active, :festival)")->execute($values);
     $id = (int)$dbh->lastInsertId();
   }
   if ($oldCover) delete_site_image($oldCover);
@@ -248,6 +250,13 @@ admin_page_start($package ? 'Edit Package' : 'Add Package', 'package-edit.php', 
           <input class="form-control" type="number" min="0" step="100" inputmode="numeric" id="startingprice" name="startingprice" value="<?php echo h($val('startingprice', 'StartingPrice')); ?>">
         </div>
         <div class="form-text">Shown as "From Rs …". Empty = the lowest price above.</div>
+      </div>
+      <div class="a-span-all">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="festivalpricing" name="festivalpricing" value="1"<?php echo ($form !== null ? !empty($form['festivalpricing']) : (int)($package->FestivalPricing ?? 0) === 1) ? ' checked' : ''; ?>>
+          <label class="form-check-label fw-semibold" for="festivalpricing">Festival pricing</label>
+        </div>
+        <div class="form-text">Adds the festival and travel-day surcharges from the Festivals page (up to +<?php echo setting('pricing_max_surcharge'); ?>%) on those dates. The package page lists them; the card keeps the lowest price.</div>
       </div>
     </div>
   </section>

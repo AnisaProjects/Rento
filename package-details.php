@@ -29,6 +29,8 @@ if (in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) {
 $prices = package_prices($package);
 $itinerary = package_itinerary($package);
 $inclusions = package_lines($package->Inclusions);
+// Festival and travel-day surcharges, only for packages that opt in (admin -> Edit package).
+$surcharges = (int)($package->FestivalPricing ?? 0) ? package_surcharge_windows($dbh) : [];
 $exclusions = package_lines($package->Exclusions);
 
 // ---- Request booking (enquiry): includes/enquiry-form.php ----
@@ -104,6 +106,25 @@ if ($prices) {
               </ol>
             <?php } ?>
 
+            <?php if ($surcharges) { ?>
+              <h2 class="r-section-title r-package-h">Festival dates</h2>
+              <p class="r-hint">Demand is highest around festivals, so these dates cost more. Prices below are starting prices for each vehicle.</p>
+              <div class="r-table-wrap">
+                <table class="r-festival-prices">
+                  <thead><tr><th scope="col">Dates</th><th scope="col">Why</th><?php foreach ($prices as $type => $price) { ?><th scope="col" class="r-num"><?php echo htmlentities($type); ?></th><?php } ?></tr></thead>
+                  <tbody>
+                    <?php foreach (array_slice($surcharges, 0, 10) as $w) { ?>
+                      <tr>
+                        <td class="text-nowrap"><?php echo date('j M', strtotime($w['from'])) . ($w['to'] !== $w['from'] ? ' – ' . date('j M Y', strtotime($w['to'])) : date(' Y', strtotime($w['from']))); ?></td>
+                        <td><?php echo htmlentities($w['label']); ?> <span class="r-hint">+<?php echo rtrim(rtrim(number_format($w['pct'], 1), '0'), '.'); ?>%</span></td>
+                        <?php foreach ($prices as $type => $price) { ?><td class="r-num"><?php echo format_price(package_price_with($price, $w['pct'])); ?></td><?php } ?>
+                      </tr>
+                    <?php } ?>
+                  </tbody>
+                </table>
+              </div>
+            <?php } ?>
+
             <?php if ($inclusions || $exclusions) { ?>
               <div class="r-package-lists">
                 <?php if ($inclusions) { ?>
@@ -147,7 +168,34 @@ if ($prices) {
               <?php } ?>
               <p class="r-hint">Send your request and we call you to confirm the price, car and pickup time. No payment now.</p>
               <?php echo flash_render(); ?>
+              <?php if ($surcharges) { ?>
+                <p class="r-hint">Festival dates cost more: see "Festival dates".</p>
+              <?php } ?>
               <?php echo enquiry_form($dbh, $packageUrl . '#request', $prices); ?>
+              <?php if ($surcharges) { ?>
+                <p class="r-book__hint" data-festival-note hidden><i class="fa fa-calendar-day" aria-hidden="true"></i><span></span></p>
+                <script>
+                  // Festival price for the chosen travel date (same windows as the table).
+                  (function () {
+                    var windows = <?php echo json_encode(array_map(fn($w) => [$w['from'], $w['to'], $w['label'], $w['pct']], $surcharges), JSON_HEX_TAG | JSON_HEX_AMP); ?>;
+                    var prices = <?php echo json_encode(array_map(fn($p) => (int)$p, $prices), JSON_HEX_TAG); ?>;
+                    var step = <?php echo max(1, (int)setting('pricing_round_to')); ?>;
+                    var date = document.getElementById('enq-date'), type = document.getElementById('enq-vehicle');
+                    var note = document.querySelector('[data-festival-note]');
+                    function update() {
+                      var d = date.value, best = null;
+                      windows.forEach(function (w) { if (d >= w[0] && d <= w[1] && (!best || w[3] > best[3])) best = w; });
+                      if (!best || !type || !prices[type.value]) { note.hidden = true; return; }
+                      var price = Math.round(prices[type.value] * (1 + best[3] / 100) / step) * step;
+                      note.querySelector('span').textContent = best[2] + ' (+' + best[3] + '%): ' + type.value + ' from Rs ' + price.toLocaleString('en-US') + ' on this date.';
+                      note.hidden = false;
+                    }
+                    date.addEventListener('change', update);
+                    if (type) type.addEventListener('change', update);
+                    update();
+                  })();
+                </script>
+              <?php } ?>
             </div>
           </aside>
         </div>

@@ -4668,3 +4668,33 @@ body.r-ai-busy {
   font-weight: var(--rento-weight-bold);
   text-decoration: underline;
 }
+
+/* ---------- 28. Package festival prices ---------- */
+.r-table-wrap {
+  overflow-x: auto;
+}
+
+.r-festival-prices {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--rento-text-sm);
+}
+
+.r-festival-prices th {
+  padding: var(--rento-space-2) var(--rento-space-3);
+  border-bottom: 1px solid var(--rento-gray-300);
+  color: var(--rento-gray-500);
+  font-size: var(--rento-text-xs);
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.r-festival-prices td {
+  padding: var(--rento-space-2) var(--rento-space-3);
+  border-bottom: 1px solid var(--rento-gray-100);
+}
+
+.r-festival-prices .r-num {
+  text-align: right;
+  white-space: nowrap;
+}

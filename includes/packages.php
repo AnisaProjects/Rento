@@ -93,3 +93,39 @@ function package_card(object $p, string $heading = 'h3'): string
     <?php
     return ob_get_clean();
 }
+
+// Festival and travel-day surcharge windows for packages that opt in (FestivalPricing), for
+// the next $days: [['label', 'from', 'to', 'pct'], ...]. Same percentages and cap as the car
+// pricing rules (admin -> Smart Pricing, Festivals); weekends and seasons don't apply to packages.
+function package_surcharge_windows(PDO $dbh, int $days = 365): array
+{
+    $cap = (float)setting('pricing_max_surcharge');
+    $end = date('Y-m-d', strtotime("+$days days"));
+    $query = $dbh->prepare("SELECT FestivalName, StartDate, EndDate, DemandLevel, TravelFrom, TravelTo, TravelPct FROM tblfestivals
+        WHERE Verification <> 'guidance' AND ((EndDate >= CURDATE() AND StartDate <= :end1) OR (TravelTo >= CURDATE() AND TravelFrom <= :end2))
+        ORDER BY COALESCE(TravelFrom, StartDate)");
+    $query->execute([':end1' => $end, ':end2' => $end]);
+    $windows = [];
+    foreach ($query->fetchAll(PDO::FETCH_OBJ) as $f) {
+        $festivalPct = (float)setting($f->DemandLevel === 'high' ? 'pricing_festival_high_pct' : 'pricing_festival_medium_pct');
+        if ($f->TravelFrom && $f->TravelTo && $f->TravelTo >= date('Y-m-d')) {
+            $travelPct = $f->TravelPct !== null ? (float)$f->TravelPct : (float)setting('pricing_travel_days_pct');
+            $windows[] = ['label' => $f->FestivalName . ': travel days', 'from' => max($f->TravelFrom, date('Y-m-d')), 'to' => $f->TravelTo, 'pct' => min($cap, $travelPct)];
+        }
+        // Main festival days after the travel window (a travel day never gets both).
+        $mainFrom = $f->TravelTo && $f->TravelTo >= $f->StartDate ? date('Y-m-d', strtotime($f->TravelTo . ' +1 day')) : $f->StartDate;
+        $mainFrom = max($mainFrom, date('Y-m-d'));
+        if ($f->EndDate >= $mainFrom && $festivalPct > 0) {
+            $windows[] = ['label' => $f->FestivalName, 'from' => $mainFrom, 'to' => $f->EndDate, 'pct' => min($cap, $festivalPct)];
+        }
+    }
+    usort($windows, fn($a, $b) => [$a['from'], -$a['pct']] <=> [$b['from'], -$b['pct']]);
+    return array_values(array_filter($windows, fn($w) => $w['pct'] > 0));
+}
+
+// A package price with a surcharge, rounded like car prices.
+function package_price_with(int $price, float $pct): int
+{
+    $step = max(1, (int)setting('pricing_round_to'));
+    return (int)(round($price * (1 + $pct / 100) / $step) * $step);
+}
