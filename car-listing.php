@@ -29,6 +29,8 @@ $filters = [
   'brand' => isset($brandNames[(int)$param('brand')]) ? (int)$param('brand') : '',
   'fueltype' => in_array($param('fueltype'), $fuelTypes, true) ? $param('fueltype') : '',
   'max' => in_array((int)$param('max'), LISTING_BUDGETS, true) ? (int)$param('max') : '',
+  // Set by the smart search: the visitor's description, used to rank by match score.
+  'trip' => mb_substr($param('trip'), 0, 200),
 ];
 $sort = isset(LISTING_SORTS[$param('sort')]) ? $param('sort') : 'newest';
 $page = max(1, (int)$param('page'));
@@ -67,11 +69,28 @@ $total = (int)$count->fetchColumn();
 $pages = max(1, (int)ceil($total / LISTING_PER_PAGE));
 $page = min($page, $pages);
 
-$list = $dbh->prepare("SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
-    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblvehicles.DriverOnly, tblbrands.BrandName
-  $from ORDER BY " . LISTING_SORTS[$sort][1] . " LIMIT " . LISTING_PER_PAGE . " OFFSET " . (($page - 1) * LISTING_PER_PAGE));
-$list->execute($bind);
-$cars = $list->fetchAll(PDO::FETCH_OBJ);
+$columns = "SELECT tblvehicles.id, tblvehicles.VehiclesTitle, tblvehicles.PricePerDay, tblvehicles.FuelType,
+    tblvehicles.ModelYear, tblvehicles.SeatingCapacity, tblvehicles.Vimage1, tblvehicles.CarType, tblvehicles.DriverOnly, tblbrands.BrandName";
+$matchScores = [];
+if ($filters['trip'] !== '' && $sort === 'newest') {
+  // Smart search: rank every car in the filtered list by its real match score (recommendation engine).
+  require_once __DIR__ . '/includes/recommendation_engine.php';
+  require_once __DIR__ . '/includes/trip-parser.php';
+  $all = $dbh->prepare("$columns $from ORDER BY tblvehicles.id DESC");
+  $all->execute($bind);
+  $allCars = $all->fetchAll(PDO::FETCH_OBJ);
+  $understood = trip_understand($filters['trip']);
+  $matchScores = (new CarRecommendationEngine($dbh))->scoreCars($allCars, [
+    'type' => $filters['type'] ?: $understood['type'], 'budget' => $filters['max'] ?: $understood['budget'],
+    'people' => $understood['people'], 'fuel' => $filters['fueltype'] ?: $understood['fuel'], 'tripType' => $understood['tripType'],
+  ], $_SESSION['login'] ?? null);
+  usort($allCars, fn($a, $b) => [($matchScores[$b->id]['score'] ?? -1), $a->PricePerDay] <=> [($matchScores[$a->id]['score'] ?? -1), $b->PricePerDay]);
+  $cars = array_slice($allCars, ($page - 1) * LISTING_PER_PAGE, LISTING_PER_PAGE);
+} else {
+  $list = $dbh->prepare("$columns $from ORDER BY " . LISTING_SORTS[$sort][1] . " LIMIT " . LISTING_PER_PAGE . " OFFSET " . (($page - 1) * LISTING_PER_PAGE));
+  $list->execute($bind);
+  $cars = $list->fetchAll(PDO::FETCH_OBJ);
+}
 
 // URL of this listing with some parameters changed (null removes one).
 function listing_url(array $filters, string $sort, array $changes = []): string
@@ -87,6 +106,7 @@ if ($filters['type'] !== '') $activeChips[] = [$filters['type'], 'type'];
 if ($filters['brand'] !== '') $activeChips[] = [$brandNames[$filters['brand']], 'brand'];
 if ($filters['fueltype'] !== '') $activeChips[] = [$filters['fueltype'], 'fueltype'];
 if ($filters['max'] !== '') $activeChips[] = ['Up to ' . format_price($filters['max']), 'max'];
+if ($filters['trip'] !== '') $activeChips[] = ['Best match for "' . mb_strimwidth($filters['trip'], 0, 40, '…') . '"', 'trip'];
 
 $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filters['type'] !== '' ? $filters['type'] . ' cars' : 'All cars');
 ?>
@@ -184,7 +204,7 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
 
           <div class="r-listing__results">
             <div class="r-toolbar">
-              <p class="r-toolbar__count" role="status"><strong><?php echo $total; ?></strong> <?php echo $total === 1 ? 'car' : 'cars'; ?> available</p>
+              <p class="r-toolbar__count" role="status"><strong><?php echo $total; ?></strong> <?php echo $total === 1 ? 'car' : 'cars'; ?> available<?php echo $matchScores ? ', best match first' : ''; ?></p>
               <form class="r-toolbar__sort" action="car-listing" method="get">
                 <?php foreach ($filters as $key => $value) {
                   if ($value !== '') { ?><input type="hidden" name="<?php echo $key; ?>" value="<?php echo htmlentities((string)$value); ?>"><?php }
@@ -210,7 +230,10 @@ $heading = $filters['q'] !== '' ? 'Results for "' . $filters['q'] . '"' : ($filt
             <?php if ($cars) { ?>
               <div class="r-grid r-grid--cards">
                 <?php foreach ($cars as $car) {
-                  echo car_card($car, ['heading' => 'h2', 'sizes' => '(min-width: 1200px) 300px, (min-width: 768px) 45vw, 100vw']);
+                  $match = $matchScores[$car->id] ?? null;
+                  echo car_card($car, ['heading' => 'h2', 'sizes' => '(min-width: 1200px) 300px, (min-width: 768px) 45vw, 100vw',
+                    'badge' => $match && $match['percent'] !== null ? $match['percent'] . '% match' : '',
+                    'reasons' => $match ? array_slice($match['reasons'], 0, 3) : []]);
                 } ?>
               </div>
 

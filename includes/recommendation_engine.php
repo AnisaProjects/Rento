@@ -1,368 +1,200 @@
 <?php
 /**
- * Car Recommendation Engine
- * Implements content-based filtering with K-Means clustering
+ * Car recommendations (Find My Car, the car-listing smart search, api/recommend.php).
+ *
+ * Read-only: nothing is written to the database. Each active, self-drive car gets a real
+ * weighted score from the criteria the visitor gave, and a reason for every one:
+ *
+ *   type 30 · seats 20 · budget 20 · trip type 10 · fuel 10 · past rentals 10 (logged-in, with history)
+ *
+ * Only criteria that were actually given count, so the match % is the share of the weights
+ * the car earned: 100% = fits everything that was asked. Cars that can't work are left out
+ * (too few seats, booked on the dates, more than 10% over budget). Driver-only cars are
+ * returned separately as "With driver: request" suggestions.
+ *
+ *   $engine = new CarRecommendationEngine($dbh);
+ *   $result = $engine->recommend(['type' => 'SUV', 'budget' => 3000, 'people' => 6, 'tripType' => 'mountain',
+ *                                 'fuel' => null, 'from' => '2026-10-14', 'to' => '2026-10-16'], $userEmail);
+ *   $result['matches']      [['car' => obj, 'score' => 0.87, 'percent' => 87, 'price' => ..., 'reasons' => [...]], ...]
+ *   $result['withDriver']   driver-only cars that fit the type and seats
  */
+class CarRecommendationEngine
+{
+    const WEIGHTS = ['type' => 30, 'seats' => 20, 'budget' => 20, 'tripType' => 10, 'fuel' => 10, 'history' => 10];
+    const OVER_BUDGET_TOLERANCE = 0.10;
+    // How well each car type suits another requested type (1 = exact).
+    const TYPE_SIMILARITY = [
+        'SUV' => ['Crossover' => 0.7, 'MUV' => 0.6, 'Pickup' => 0.5],
+        'Sedan' => ['Hatchback' => 0.4, 'Crossover' => 0.4, 'Coupe' => 0.3],
+        'Hatchback' => ['Crossover' => 0.5, 'Sedan' => 0.4],
+        'MUV' => ['SUV' => 0.7, 'Van' => 0.5],
+        'Crossover' => ['SUV' => 0.7, 'Hatchback' => 0.5],
+    ];
+    // How well each car type suits a kind of trip.
+    const TRIP_SUITABILITY = [
+        'mountain' => ['SUV' => 1, 'Pickup' => 1, 'Crossover' => 0.8, 'MUV' => 0.7, 'Van' => 0.5, 'Sedan' => 0.3, 'Hatchback' => 0.2],
+        'highway' => ['Sedan' => 1, 'SUV' => 1, 'MUV' => 1, 'Crossover' => 0.8, 'Hatchback' => 0.6, 'Van' => 0.7],
+        'city' => ['Hatchback' => 1, 'Crossover' => 0.8, 'Sedan' => 0.8, 'SUV' => 0.5, 'MUV' => 0.4, 'Van' => 0.3],
+    ];
+    const TRIP_LABELS = ['mountain' => 'mountain and rough roads', 'highway' => 'long highway drives', 'city' => 'city driving'];
 
-class CarRecommendationEngine {
-    private $dbh;
-    
-    public function __construct($database) {
-        $this->dbh = $database;
+    private PDO $dbh;
+
+    public function __construct(PDO $dbh)
+    {
+        $this->dbh = $dbh;
     }
-    
-    /**
-     * Get car recommendations based on user preferences
-     */
-    public function getRecommendations($budget, $carType, $userEmail = null) {
-        // Get user's past rentals for personalization
-        $pastRentals = $this->getUserPastRentals($userEmail);
-        
-        // Get all available cars
-        $allCars = $this->getAllCars();
-        
-        // Classify cars by type if not already classified
-        $this->classifyCarsByType($allCars);
-        
-        // Filter cars by budget and type
-        $filteredCars = $this->filterCarsByPreferences($allCars, $budget, $carType);
-        
-        // Apply content-based filtering
-        $recommendations = $this->contentBasedFiltering($filteredCars, $pastRentals);
-        
-        // Apply K-Means clustering for better grouping
-        $clusteredRecommendations = $this->applyKMeansClustering($recommendations);
-        
-        return $clusteredRecommendations;
+
+    // Active cars (self-drive and driver-only).
+    private function cars(): array
+    {
+        return $this->dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.FuelType, v.ModelYear, v.SeatingCapacity, v.Vimage1,
+            v.CarType, v.DriverOnly, br.BrandName FROM tblvehicles v LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand
+            WHERE v.IsActive = 1 ORDER BY v.id")->fetchAll(PDO::FETCH_OBJ);
     }
-    
-    /**
-     * Preferences learned from a user's confirmed rentals (empty values for guests)
-     */
-    public function getUserPreferences($userEmail) {
-        return $this->calculateUserPreferences($this->getUserPastRentals($userEmail));
+
+    /** Types and brands of the user's confirmed past rentals: ['types' => [type => n], 'brands' => [brand => n], 'count' => n]. */
+    public function getUserPreferences(?string $userEmail): array
+    {
+        $prefs = ['types' => [], 'brands' => [], 'count' => 0];
+        if (!$userEmail) {
+            return $prefs;
+        }
+        $query = $this->dbh->prepare("SELECT v.CarType, br.BrandName FROM tblbooking b JOIN tblvehicles v ON v.id = b.VehicleId
+            LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand WHERE b.userEmail = :email AND b.Status = 1");
+        $query->execute([':email' => $userEmail]);
+        foreach ($query->fetchAll(PDO::FETCH_OBJ) as $row) {
+            $prefs['count']++;
+            if ($row->CarType) $prefs['types'][$row->CarType] = ($prefs['types'][$row->CarType] ?? 0) + 1;
+            if ($row->BrandName) $prefs['brands'][$row->BrandName] = ($prefs['brands'][$row->BrandName] ?? 0) + 1;
+        }
+        return $prefs;
     }
-    
+
+    // Daily price for the trip: the smart price on the dates (average), else the base price.
+    private function dailyPrice(object $car, ?string $from, ?string $to): array
+    {
+        if ($from && $to && function_exists('public_quote')) {
+            $quote = public_quote($this->dbh, $car, $from, $to);
+            if ($quote['ok']) {
+                return [(int)round($quote['total'] / max(1, $quote['rental_days'])), $quote['total'], $quote['available'], $quote];
+            }
+        }
+        return [(int)$car->PricePerDay, null, true, null];
+    }
+
     /**
-     * Preference values used when there is no rental history
+     * $trip: type ('Any' or a car type), budget (Rs per day), people, fuel, tripType, from, to.
+     * Returns ['matches' => [...], 'withDriver' => [...], 'criteria' => [...], 'excluded' => n].
      */
-    private function emptyPreferences() {
+    public function recommend(array $trip, ?string $userEmail = null, int $limit = 12): array
+    {
+        $type = !empty($trip['type']) && $trip['type'] !== 'Any' ? (string)$trip['type'] : null;
+        $budget = !empty($trip['budget']) ? (int)$trip['budget'] : null;
+        $people = !empty($trip['people']) ? (int)$trip['people'] : null;
+        $fuel = !empty($trip['fuel']) ? (string)$trip['fuel'] : null;
+        $tripType = isset(self::TRIP_SUITABILITY[$trip['tripType'] ?? '']) ? $trip['tripType'] : null;
+        $from = $trip['from'] ?? null;
+        $to = $trip['to'] ?? null;
+        $prefs = $this->getUserPreferences($userEmail);
+
+        $matches = [];
+        $withDriver = [];
+        $excluded = 0;
+        foreach ($this->cars() as $car) {
+            $carType = (string)$car->CarType;
+            $seats = (int)$car->SeatingCapacity;
+            [$price, $tripTotal, $available, $quote] = $this->dailyPrice($car, $from, $to);
+            // Hard limits: it has to fit, be free, and be close to the budget.
+            if ($people && $seats < $people) { $excluded++; continue; }
+            if ($from && $to && !$available) { $excluded++; continue; }
+            if ($budget && $price > $budget * (1 + self::OVER_BUDGET_TOLERANCE)) { $excluded++; continue; }
+
+            $earned = 0.0;
+            $possible = 0.0;
+            $reasons = [];
+            $add = function (string $criterion, float $score, ?string $reason) use (&$earned, &$possible, &$reasons) {
+                $weight = self::WEIGHTS[$criterion];
+                $possible += $weight;
+                $earned += $weight * max(0, min(1, $score));
+                if ($reason !== null) $reasons[] = $reason;
+            };
+
+            if ($type) {
+                $similarity = $carType === $type ? 1.0 : (self::TYPE_SIMILARITY[$type][$carType] ?? 0.0);
+                $add('type', $similarity, $similarity >= 1 ? "The $type you asked for"
+                    : ($similarity > 0 ? "$carType, close to the $type you asked for" : null));
+            }
+            if ($people) {
+                $spare = $seats - $people;
+                $add('seats', $spare <= 2 ? 1.0 : 0.8, "$seats seats for your $people " . ($people === 1 ? 'traveller' : 'travellers'));
+            }
+            if ($budget) {
+                $priceText = format_price($price) . '/day' . ($tripTotal !== null ? ' on your dates' : '');
+                $add('budget', $price <= $budget ? 1.0 : 0.4, $price <= $budget
+                    ? "$priceText, within your " . format_price($budget) . ' budget'
+                    : "$priceText, slightly over your " . format_price($budget) . ' budget');
+            }
+            if ($tripType) {
+                $suit = self::TRIP_SUITABILITY[$tripType][$carType] ?? 0.5;
+                $add('tripType', $suit, $suit >= 0.8 ? 'Good for ' . self::TRIP_LABELS[$tripType] : null);
+            }
+            if ($fuel) {
+                $add('fuel', strcasecmp((string)$car->FuelType, $fuel) === 0 ? 1.0 : 0.0,
+                    strcasecmp((string)$car->FuelType, $fuel) === 0 ? $car->FuelType . ', as you asked' : null);
+            }
+            if ($prefs['count'] > 0) {
+                $typeTimes = $prefs['types'][$carType] ?? 0;
+                $brandTimes = $prefs['brands'][(string)$car->BrandName] ?? 0;
+                $history = min(1.0, ($typeTimes ? 0.7 : 0) + ($brandTimes ? 0.3 : 0));
+                $add('history', $history, $typeTimes ? "You've rented a $carType before" : ($brandTimes ? "You've rented a {$car->BrandName} before" : null));
+            }
+            if ($from && $to) {
+                $reasons[] = 'Free on your dates';
+            }
+            $score = $possible > 0 ? $earned / $possible : null;
+            $entry = [
+                'car' => $car,
+                'score' => $score,
+                'percent' => $score !== null ? (int)round($score * 100) : null,
+                'price' => $price,
+                'tripTotal' => $tripTotal,
+                'quote' => $quote,
+                'reasons' => $reasons,
+            ];
+            if ((int)$car->DriverOnly) {
+                $withDriver[] = $entry;
+            } elseif ($type === null || $score === null || $score > 0) {
+                $matches[] = $entry;
+            }
+        }
+        $sort = function ($a, $b) {
+            // Best score first; the cheaper car first when scores are equal.
+            return [($b['score'] ?? 0), $a['price']] <=> [($a['score'] ?? 0), $b['price']];
+        };
+        usort($matches, $sort);
+        usort($withDriver, $sort);
+        // With a type asked for, cars that share nothing with it are not "matches".
+        if ($type) {
+            $matches = array_values(array_filter($matches, fn($m) => $m['score'] === null || $m['score'] >= 0.35));
+        }
         return [
-            'avgPrice' => 0,
-            'preferredBrands' => [],
-            'preferredFeatures' => [],
-            'avgSeating' => 0
+            'matches' => array_slice($matches, 0, $limit),
+            'withDriver' => array_slice($withDriver, 0, 3),
+            'criteria' => array_filter(['type' => $type, 'budget' => $budget, 'people' => $people, 'fuel' => $fuel,
+                'tripType' => $tripType, 'from' => $from, 'to' => $to, 'history' => $prefs['count'] ?: null]),
+            'excluded' => $excluded,
         ];
     }
-    
-    /**
-     * Get user's past rental history
-     */
-    private function getUserPastRentals($userEmail) {
-        if (!$userEmail) return [];
-        
-        $sql = "SELECT v.*, br.BrandName, b.FromDate, b.ToDate 
-                FROM tblbooking b 
-                JOIN tblvehicles v ON b.VehicleId = v.id 
-                LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand 
-                WHERE b.userEmail = :email AND b.Status = 1
-                ORDER BY b.PostingDate DESC";
-        
-        $query = $this->dbh->prepare($sql);
-        $query->bindParam(':email', $userEmail, PDO::PARAM_STR);
-        $query->execute();
-        
-        return $query->fetchAll(PDO::FETCH_OBJ);
-    }
-    
-    /**
-     * Get all available cars
-     */
-    private function getAllCars() {
-        $sql = "SELECT v.*, b.BrandName 
-                FROM tblvehicles v 
-                LEFT JOIN tblbrands b ON v.VehiclesBrand = b.id 
-                WHERE v.id IS NOT NULL AND v.IsActive = 1";
-        
-        $query = $this->dbh->prepare($sql);
-        $query->execute();
-        
-        return $query->fetchAll(PDO::FETCH_OBJ);
-    }
-    
-    /**
-     * Classify cars by type based on features
-     */
-    private function classifyCarsByType($cars) {
-        foreach ($cars as $car) {
-            // Never overwrite a type set in the admin; only guess one for cars without it.
-            if (trim((string)($car->CarType ?? '')) !== '') {
-                continue;
-            }
-            $carType = $this->determineCarType($car);
-            $car->CarType = $carType;
 
-            // Update car type in database if not set
-            $updateSql = "UPDATE tblvehicles SET CarType = :carType WHERE id = :id";
-            $updateQuery = $this->dbh->prepare($updateSql);
-            $updateQuery->bindParam(':carType', $carType, PDO::PARAM_STR);
-            $updateQuery->bindParam(':id', $car->id, PDO::PARAM_INT);
-            $updateQuery->execute();
+    /** Scores for a given list of cars (the car-listing smart search), keyed by car id. */
+    public function scoreCars(array $cars, array $trip, ?string $userEmail = null): array
+    {
+        $all = $this->recommend($trip, $userEmail, 1000);
+        $scores = [];
+        foreach (array_merge($all['matches'], $all['withDriver']) as $m) {
+            $scores[(int)$m['car']->id] = $m;
         }
-    }
-    
-    /**
-     * Determine car type based on features
-     */
-    private function determineCarType($car) {
-        $seatingCapacity = $car->SeatingCapacity;
-        $price = $car->PricePerDay;
-        $brand = strtolower($car->BrandName ?? '');
-        
-        // SUV characteristics
-        if ($seatingCapacity >= 7 || 
-            strpos(strtolower($car->VehiclesTitle), 'suv') !== false ||
-            strpos(strtolower($car->VehiclesTitle), 'fortuner') !== false ||
-            strpos(strtolower($car->VehiclesTitle), 'q8') !== false) {
-            return 'SUV';
-        }
-        
-        // Sedan characteristics
-        if ($seatingCapacity == 5 && $price >= 800 ||
-            strpos(strtolower($car->VehiclesTitle), 'sedan') !== false ||
-            strpos(strtolower($car->VehiclesTitle), 'series') !== false) {
-            return 'Sedan';
-        }
-        
-        // Hatchback characteristics
-        if ($seatingCapacity <= 5 && $price <= 600 ||
-            strpos(strtolower($car->VehiclesTitle), 'hatch') !== false ||
-            strpos(strtolower($car->VehiclesTitle), 'wagon') !== false) {
-            return 'Hatchback';
-        }
-        
-        // Default classification
-        return 'Sedan';
-    }
-    
-    /**
-     * Filter cars by user preferences
-     */
-    private function filterCarsByPreferences($cars, $budget, $carType) {
-        $filtered = [];
-        
-        foreach ($cars as $car) {
-            // Check budget constraint
-            if ($car->PricePerDay <= $budget) {
-                // Check car type
-                $carTypeFromDB = $this->getCarType($car->id);
-                if ($carTypeFromDB == $carType || $carType == 'Any') {
-                    $filtered[] = $car;
-                }
-            }
-        }
-        
-        return $filtered;
-    }
-    
-    /**
-     * Get car type from database
-     */
-    private function getCarType($carId) {
-        $sql = "SELECT CarType FROM tblvehicles WHERE id = :id";
-        $query = $this->dbh->prepare($sql);
-        $query->bindParam(':id', $carId, PDO::PARAM_INT);
-        $query->execute();
-        
-        $result = $query->fetch(PDO::FETCH_OBJ);
-        return $result ? $result->CarType : 'Sedan';
-    }
-    
-    /**
-     * Apply content-based filtering
-     */
-    private function contentBasedFiltering($cars, $pastRentals) {
-        if (empty($pastRentals)) {
-            return $cars;
-        }
-        
-        // Calculate user preferences from past rentals
-        $userPreferences = $this->calculateUserPreferences($pastRentals);
-        
-        // Score cars based on user preferences
-        $scoredCars = [];
-        foreach ($cars as $car) {
-            $score = $this->calculateCarScore($car, $userPreferences);
-            $car->recommendationScore = $score;
-            $scoredCars[] = $car;
-        }
-        
-        // Sort by recommendation score
-        usort($scoredCars, function($a, $b) {
-            return $b->recommendationScore <=> $a->recommendationScore;
-        });
-        
-        return $scoredCars;
-    }
-    
-    /**
-     * Calculate user preferences from past rentals
-     */
-    private function calculateUserPreferences($pastRentals) {
-        $preferences = $this->emptyPreferences();
-        
-        $totalPrice = 0;
-        $totalSeating = 0;
-        $brandCounts = [];
-        $featureCounts = [];
-        
-        foreach ($pastRentals as $rental) {
-            $totalPrice += $rental->PricePerDay;
-            $totalSeating += $rental->SeatingCapacity;
-            
-            // Count brand preferences
-            if ($rental->BrandName) {
-                $brandCounts[$rental->BrandName] = ($brandCounts[$rental->BrandName] ?? 0) + 1;
-            }
-            
-            // Count feature preferences
-            $features = $this->getCarFeatures($rental);
-            foreach ($features as $feature) {
-                $featureCounts[$feature] = ($featureCounts[$feature] ?? 0) + 1;
-            }
-        }
-        
-        $count = count($pastRentals);
-        if ($count > 0) {
-            $preferences['avgPrice'] = $totalPrice / $count;
-            $preferences['avgSeating'] = $totalSeating / $count;
-            $preferences['preferredBrands'] = array_keys($brandCounts);
-            $preferences['preferredFeatures'] = array_keys($featureCounts);
-        }
-        
-        return $preferences;
-    }
-    
-    /**
-     * Get car features as array
-     */
-    private function getCarFeatures($car) {
-        $features = [];
-        
-        if ($car->AirConditioner) $features[] = 'AirConditioner';
-        if ($car->PowerDoorLocks) $features[] = 'PowerDoorLocks';
-        if ($car->AntiLockBrakingSystem) $features[] = 'AntiLockBrakingSystem';
-        if ($car->BrakeAssist) $features[] = 'BrakeAssist';
-        if ($car->PowerSteering) $features[] = 'PowerSteering';
-        if ($car->DriverAirbag) $features[] = 'DriverAirbag';
-        if ($car->PassengerAirbag) $features[] = 'PassengerAirbag';
-        if ($car->PowerWindows) $features[] = 'PowerWindows';
-        if ($car->CDPlayer) $features[] = 'CDPlayer';
-        if ($car->CentralLocking) $features[] = 'CentralLocking';
-        if ($car->CrashSensor) $features[] = 'CrashSensor';
-        if ($car->LeatherSeats) $features[] = 'LeatherSeats';
-        
-        return $features;
-    }
-    
-    /**
-     * Calculate car score based on user preferences
-     */
-    private function calculateCarScore($car, $userPreferences) {
-        $score = 0;
-        
-        // Price similarity (closer to user's average preferred price gets higher score)
-        if ($userPreferences['avgPrice'] > 0) {
-            $priceDiff = abs($car->PricePerDay - $userPreferences['avgPrice']);
-            $maxPrice = max($car->PricePerDay, $userPreferences['avgPrice']);
-            $priceScore = 1 - ($priceDiff / $maxPrice);
-            $score += $priceScore * 0.3;
-        }
-        
-        // Brand preference
-        if (in_array($car->BrandName, $userPreferences['preferredBrands'])) {
-            $score += 0.2;
-        }
-        
-        // Feature matching
-        $carFeatures = $this->getCarFeatures($car);
-        $matchingFeatures = array_intersect($carFeatures, $userPreferences['preferredFeatures']);
-        $featureScore = count($matchingFeatures) / max(count($userPreferences['preferredFeatures']), 1);
-        $score += $featureScore * 0.3;
-        
-        // Seating capacity similarity
-        if ($userPreferences['avgSeating'] > 0) {
-            $seatingDiff = abs($car->SeatingCapacity - $userPreferences['avgSeating']);
-            $seatingScore = 1 - ($seatingDiff / max($car->SeatingCapacity, $userPreferences['avgSeating']));
-            $score += $seatingScore * 0.2;
-        }
-        
-        return $score;
-    }
-    
-    /**
-     * Apply K-Means clustering to group similar recommendations
-     */
-    private function applyKMeansClustering($cars) {
-        if (count($cars) <= 3) {
-            return $cars;
-        }
-        
-        // Simple clustering based on price ranges
-        $clusters = [
-            'budget' => [],
-            'mid_range' => [],
-            'premium' => []
-        ];
-        
-        foreach ($cars as $car) {
-            if ($car->PricePerDay <= 500) {
-                $clusters['budget'][] = $car;
-            } elseif ($car->PricePerDay <= 1500) {
-                $clusters['mid_range'][] = $car;
-            } else {
-                $clusters['premium'][] = $car;
-            }
-        }
-        
-        // Return top recommendations from each cluster
-        $result = [];
-        foreach ($clusters as $cluster) {
-            $result = array_merge($result, array_slice($cluster, 0, 2));
-        }
-        
-        return array_slice($result, 0, 6); // Return top 6 recommendations
-    }
-    
-    /**
-     * Get recommendation explanation
-     */
-    public function getRecommendationExplanation($car, $userPreferences) {
-        $userPreferences = array_merge($this->emptyPreferences(), $userPreferences ?: []);
-        $explanations = [];
-        
-        if ($userPreferences['avgPrice'] > 0) {
-            $priceDiff = $car->PricePerDay - $userPreferences['avgPrice'];
-            if (abs($priceDiff) < 200) {
-                $explanations[] = "Price matches your usual budget range";
-            } elseif ($priceDiff < 0) {
-                $explanations[] = "Great value - below your usual budget";
-            } else {
-                $explanations[] = "Premium option - slightly above your usual budget";
-            }
-        }
-        
-        if (in_array($car->BrandName, $userPreferences['preferredBrands'])) {
-            $explanations[] = "From a brand you've rented before";
-        }
-        
-        $carFeatures = $this->getCarFeatures($car);
-        $matchingFeatures = array_intersect($carFeatures, $userPreferences['preferredFeatures']);
-        if (count($matchingFeatures) > 0) {
-            $explanations[] = "Has features you prefer: " . implode(', ', $matchingFeatures);
-        }
-        
-        return $explanations;
+        return array_intersect_key($scores, array_flip(array_map(fn($c) => (int)$c->id, $cars)));
     }
 }
-?>

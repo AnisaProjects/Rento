@@ -40,7 +40,8 @@
     if (!result.budget && /(cheap|cheapest|budget|low cost|affordable|economy)/.test(text)) { result.budget = 1000; result.notes.push('a low budget'); }
     if (!result.budget && /(luxury|premium|best car|top end)/.test(text)) { result.budget = 5000; result.notes.push('a premium car'); }
 
-    if (/(cng)/.test(text)) result.fuel = 'CNG';
+    if (/electric/.test(text) || hasWord(text, 'ev')) result.fuel = 'Electric';
+    else if (/(cng)/.test(text)) result.fuel = 'CNG';
     else if (/(diesel)/.test(text)) result.fuel = 'Diesel';
     else if (/(petrol)/.test(text)) result.fuel = 'Petrol';
 
@@ -151,6 +152,8 @@
       if (r.brand) params.set('brand', r.brand.id);
       if (r.fuel) params.set('fueltype', r.fuel);
       if (r.max) params.set('max', r.max);
+      // The description itself: the listing ranks the cars by match score with it.
+      if (params.toString()) params.set('trip', input.value.trim());
       if (!params.toString()) return; // plain keyword search
       event.preventDefault();
       var go = function () { window.location.href = form.getAttribute('action') + '?' + params.toString(); };

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/security.php';
 include('includes/config.php');
 include('includes/recommendation_engine.php');
+require_once __DIR__ . '/includes/trip-parser.php';
 
 $recommendations = [];
 $userEmail = $_SESSION['login'] ?? null;
@@ -10,6 +11,10 @@ $budget = 1000;
 $carType = 'Any';
 $trip = '';
 $searched = isset($_POST['getRecommendations']);
+$pickupDate = '';
+$returnDate = '';
+$withDriver = [];
+$understood = [];
 
 if ($searched) {
   $budget = max(200, min(5000, intval($_POST['budget'] ?? 1000)));
@@ -17,9 +22,21 @@ if ($searched) {
   // Optional plain-language description; the browser turns it into the budget and car type above.
   $trip = is_string($_POST['trip'] ?? null) ? mb_substr(trim($_POST['trip']), 0, 200) : '';
 
+  // Optional dates (new fields pickupdate / returndate): availability and the price on those days.
+  $isDate = fn($d) => is_string($d) && ($x = DateTime::createFromFormat('!Y-m-d', $d)) && $x->format('Y-m-d') === $d;
+  $pickupDate = $isDate($_POST['pickupdate'] ?? null) && $_POST['pickupdate'] >= date('Y-m-d') ? $_POST['pickupdate'] : '';
+  $returnDate = $pickupDate && $isDate($_POST['returndate'] ?? null) && $_POST['returndate'] >= $pickupDate ? $_POST['returndate'] : '';
+  if ($pickupDate && !$returnDate) $returnDate = $pickupDate;
+
+  // The form's budget and type win; the trip text adds travellers, fuel and the kind of road.
+  $understood = trip_understand($trip);
   $recommendationEngine = new CarRecommendationEngine($dbh);
-  $recommendations = array_values($recommendationEngine->getRecommendations($budget, $carType, $userEmail));
-  $userPreferences = $recommendationEngine->getUserPreferences($userEmail);
+  $result = $recommendationEngine->recommend([
+    'type' => $carType, 'budget' => $budget, 'people' => $understood['people'], 'fuel' => $understood['fuel'],
+    'tripType' => $understood['tripType'], 'from' => $pickupDate ?: null, 'to' => $returnDate ?: null,
+  ], $userEmail);
+  $recommendations = $result['matches'];
+  $withDriver = $result['withDriver'];
 }
 $fleetCount = (int)$dbh->query("SELECT COUNT(*) FROM tblvehicles WHERE IsActive = 1")->fetchColumn();
 // Example prompts: admin -> Site content -> Other pages.
@@ -74,7 +91,7 @@ $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 
           </div>
 
           <details class="r-ai-tune" <?php echo $searched ? 'open' : ''; ?>>
-            <summary><i class="fa fa-sliders" aria-hidden="true"></i>Fine-tune budget and car type</summary>
+            <summary><i class="fa fa-sliders" aria-hidden="true"></i>Fine-tune budget, car type and dates</summary>
             <div class="r-ai-tune__body">
               <div class="r-field">
                 <label class="r-label" for="budget">Budget per day: <output id="budgetValue" for="budget"><?php echo format_price($budget); ?></output></label>
@@ -90,6 +107,16 @@ $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 
                   <?php } ?>
                 </div>
               </fieldset>
+              <div class="r-form-row r-ai-tune__dates">
+                <div class="r-field">
+                  <label class="r-label" for="pickupdate">Pickup date <span class="r-hint">(optional)</span></label>
+                  <input type="date" class="r-input" id="pickupdate" name="pickupdate" min="<?php echo date('Y-m-d'); ?>" value="<?php echo htmlentities($pickupDate); ?>">
+                </div>
+                <div class="r-field">
+                  <label class="r-label" for="returndate">Return date</label>
+                  <input type="date" class="r-input" id="returndate" name="returndate" min="<?php echo date('Y-m-d'); ?>" value="<?php echo htmlentities($returnDate); ?>">
+                </div>
+              </div>
             </div>
           </details>
         </form>
@@ -121,30 +148,39 @@ $examples = array_map(fn($n) => content_raw('findcar_example_' . $n), [1, 2, 3, 
             <ul class="r-chips" aria-label="Search used">
               <li><span class="r-chip"><i class="fa fa-tag" aria-hidden="true"></i>Up to <?php echo format_price_per_day($budget); ?></span></li>
               <li><span class="r-chip"><i class="fa fa-car" aria-hidden="true"></i><?php echo htmlentities($carTypes[$carType]); ?></span></li>
+              <?php if (!empty($understood['people'])) { ?><li><span class="r-chip"><i class="fa fa-user-group" aria-hidden="true"></i><?php echo (int)$understood['people']; ?> travellers</span></li><?php } ?>
+              <?php if (!empty($understood['fuel'])) { ?><li><span class="r-chip"><i class="fa fa-gas-pump" aria-hidden="true"></i><?php echo htmlentities($understood['fuel']); ?></span></li><?php } ?>
+              <?php if ($pickupDate) { ?><li><span class="r-chip"><i class="fa fa-calendar" aria-hidden="true"></i><?php echo date('j M', strtotime($pickupDate)) . ($returnDate !== $pickupDate ? ' – ' . date('j M', strtotime($returnDate)) : ''); ?></span></li><?php } ?>
             </ul>
           </div>
 
           <?php if ($recommendations) { ?>
             <div class="r-grid r-grid--cards r-ai-results">
-              <?php foreach ($recommendations as $i => $car) {
-                $reasons = [];
-                if ((int)$car->PricePerDay <= $budget) {
-                  $reasons[] = 'Within your budget of ' . format_price_per_day($budget);
-                }
-                if ($carType !== 'Any' && ($car->CarType ?? '') === $carType) {
-                  $reasons[] = 'The ' . $carType . ' you asked for';
-                }
-                foreach ($recommendationEngine->getRecommendationExplanation($car, $userPreferences) as $explanation) {
-                  $reasons[] = $explanation;
-                }
-                // A match % only when there is a real score (from the user's rental history).
-                $badge = isset($car->recommendationScore) ? round($car->recommendationScore * 100) . '% match' : ($i === 0 ? 'Best match' : '');
-                echo '<div class="r-ai-result" style="--i:' . min($i, 8) . '">' . car_card($car, ['heading' => 'h3', 'badge' => $badge, 'reasons' => array_slice($reasons, 0, 3)]) . '</div>';
+              <?php foreach ($recommendations as $i => $match) {
+                // Show the price on the chosen dates (smart price) on the card.
+                $shown = clone $match['car'];
+                $shown->PricePerDay = $match['price'];
+                // The match % is the car's real weighted score for what was asked (see the engine).
+                $badge = $match['percent'] !== null ? $match['percent'] . '% match' : ($i === 0 ? 'Best match' : '');
+                echo '<div class="r-ai-result" style="--i:' . min($i, 8) . '">' . car_card($shown, ['heading' => 'h3', 'badge' => $badge, 'reasons' => array_slice($match['reasons'], 0, 4)]) . '</div>';
               } ?>
             </div>
           <?php } else {
-            echo empty_state('fa-magnifying-glass', 'No cars fit that budget and type', 'Try a higher budget or "Any type" under Fine-tune. You can also browse every car.', 'Browse all cars', 'car-listing');
+            echo empty_state('fa-magnifying-glass', 'No cars fit that budget and type', 'Try a higher budget, "Any type" or other dates under Fine-tune. You can also browse every car.', 'Browse all cars', 'car-listing');
           } ?>
+
+          <?php if ($withDriver) { ?>
+            <div class="r-section-head r-section-head--start mt-5">
+              <span class="r-eyebrow">With driver</span>
+              <h2 class="r-section-title">Also available with a driver</h2>
+              <p class="r-section-lead">These cars are only rented with one of our drivers. Send a request on the car page.</p>
+            </div>
+            <div class="r-grid r-grid--cards">
+              <?php foreach ($withDriver as $match) {
+                echo car_card($match['car'], ['heading' => 'h3', 'badge' => 'With driver — request', 'reasons' => array_slice($match['reasons'], 0, 3)]);
+              } ?>
+            </div>
+          <?php } ?>
         </div>
       </section>
     <?php } ?>
