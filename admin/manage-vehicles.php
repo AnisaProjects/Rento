@@ -1,168 +1,88 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
-error_reporting(0);
-include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
+require_once __DIR__ . '/includes/layout.php';
+admin_require_login();
+
+if (isset($_POST['del'])) {
+  $delid = intval($_POST['del']);
+  // Vehicles with bookings are kept so the booking history keeps its vehicle.
+  $query = $dbh->prepare("SELECT COUNT(*) FROM tblbooking WHERE VehicleId = :id");
+  $query->bindParam(':id', $delid, PDO::PARAM_INT);
+  $query->execute();
+  $bookingCount = (int)$query->fetchColumn();
+  if ($bookingCount > 0) {
+    flash_set('error', "This vehicle has $bookingCount booking(s), so it can't be deleted.");
+  } else {
+    $query = $dbh->prepare("DELETE FROM tblvehicles WHERE id = :delid");
+    $query->bindParam(':delid', $delid, PDO::PARAM_INT);
+    $query->execute();
+    flash_set($query->rowCount() ? 'success' : 'error', $query->rowCount() ? 'Vehicle deleted.' : 'That vehicle no longer exists.');
+  }
+  redirect_to(current_url());
 }
-else{
 
-if(isset($_POST['del']))
-	{
-$delid=intval($_POST['del']);
-$sql = "delete from tblvehicles  WHERE  id=:delid";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':delid',$delid, PDO::PARAM_STR);
-$query -> execute();
-$msg="Vehicle  record deleted successfully";
-}
+$vehicles = $dbh->query("SELECT v.id, v.VehiclesTitle, v.PricePerDay, v.FuelType, v.ModelYear, v.SeatingCapacity, v.CarType, v.Vimage1,
+    br.BrandName, (SELECT COUNT(*) FROM tblbooking b WHERE b.VehicleId = v.id) AS bookings
+  FROM tblvehicles v LEFT JOIN tblbrands br ON br.id = v.VehiclesBrand ORDER BY v.id DESC")->fetchAll(PDO::FETCH_OBJ);
 
-
- ?>
-
-<!doctype html>
-<html lang="en" class="no-js">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<meta name="theme-color" content="#3e454c">
-	
-	<title>Car Rental Portal |Admin Manage Vehicles   </title>
-
-	<!-- Font awesome -->
-	<link rel="stylesheet" href="css/font-awesome.min.css">
-	<!-- Sandstone Bootstrap CSS -->
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<!-- Bootstrap Datatables -->
-	<link rel="stylesheet" href="css/dataTables.bootstrap.min.css">
-	<!-- Bootstrap social button library -->
-	<link rel="stylesheet" href="css/bootstrap-social.css">
-	<!-- Bootstrap select -->
-	<link rel="stylesheet" href="css/bootstrap-select.css">
-	<!-- Bootstrap file input -->
-	<link rel="stylesheet" href="css/fileinput.min.css">
-	<!-- Awesome Bootstrap checkbox -->
-	<link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
-	<!-- Admin Stye -->
-	<link rel="stylesheet" href="css/style.css">
-  <style>
-		.errorWrap {
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #dd3d36;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-.succWrap{
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #5cb85c;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-		</style>
-
-</head>
-
-<body>
-	<?php include('includes/header.php');?>
-
-	<div class="ts-main-content">
-		<?php include('includes/leftbar.php');?>
-		<div class="content-wrapper">
-			<div class="container-fluid">
-
-				<div class="row">
-					<div class="col-md-12">
-
-						<h2 class="page-title">Manage Vehicles</h2>
-
-						<!-- Zero Configuration Table -->
-						<div class="panel panel-default">
-							<div class="panel-heading">Vehicle Details</div>
-							<div class="panel-body">
-							<?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php } 
-				else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
-								<table id="zctb" class="display table table-striped table-bordered table-hover" cellspacing="0" width="100%">
-									<thead>
-										<tr>
-										<th>#</th>
-											<th>Vehicle Title</th>
-											<th>Brand </th>
-											<th>Price Per day</th>
-											<th>Fuel Type</th>
-											<th>Model Year</th>
-											<th>Action</th>
-										</tr>
-									</thead>
-									<tfoot>
-										<tr>
-										<th>#</th>
-										<th>Vehicle Title</th>
-											<th>Brand </th>
-											<th>Price Per day</th>
-											<th>Fuel Type</th>
-											<th>Model Year</th>
-											<th>Action</th>
-										</tr>
-									</tfoot>
-									<tbody>
-
-<?php $sql = "SELECT tblvehicles.VehiclesTitle,tblbrands.BrandName,tblvehicles.PricePerDay,tblvehicles.FuelType,tblvehicles.ModelYear,tblvehicles.id from tblvehicles join tblbrands on tblbrands.id=tblvehicles.VehiclesBrand";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{				?>	
-										<tr>
-											<td><?php echo htmlentities($cnt);?></td>
-											<td><?php echo htmlentities($result->VehiclesTitle);?></td>
-											<td><?php echo htmlentities($result->BrandName);?></td>
-											<td><?php echo htmlentities($result->PricePerDay);?></td>
-											<td><?php echo htmlentities($result->FuelType);?></td>
-												<td><?php echo htmlentities($result->ModelYear);?></td>
-		<td><a href="edit-vehicle.php?id=<?php echo htmlentities($result->id);?>"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
-<form method="post" class="inline-action" onsubmit="return confirm('Do you want to delete');"><?php echo csrf_field(); ?><input type="hidden" name="del" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"><i class="fa fa-close"></i></button></form></td>
-										</tr>
-										<?php $cnt=$cnt+1; }} ?>
-										
-									</tbody>
-								</table>
-
-						
-
-							</div>
-						</div>
-
-					
-
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-	<!-- Loading Scripts -->
-	<script src="js/jquery.min.js"></script>
-	<script src="js/bootstrap-select.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/jquery.dataTables.min.js"></script>
-	<script src="js/dataTables.bootstrap.min.js"></script>
-	<script src="js/Chart.min.js"></script>
-	<script src="js/fileinput.js"></script>
-	<script src="js/chartData.js"></script>
-	<script src="js/main.js"></script>
-</body>
-</html>
-<?php } ?>
+admin_page_start('Manage Vehicles', 'manage-vehicles.php', [['Vehicles', 'manage-vehicles.php']], [
+  'libs' => ['datatables'],
+  'lead' => count($vehicles) . ' vehicles in the fleet.',
+  'actions' => '<a class="btn btn-primary" href="post-avehical.php"><i class="fa fa-plus" aria-hidden="true"></i>Post a vehicle</a>',
+]);
+?>
+<section class="a-card">
+  <div class="a-table-wrap">
+    <table class="table a-table" data-a-table data-search-placeholder="Search vehicles" data-empty="No vehicles yet" data-order='[[0,"desc"]]'>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th data-priority="1">Vehicle</th>
+          <th>Brand</th>
+          <th data-priority="2">Price per day</th>
+          <th>Fuel</th>
+          <th>Seats</th>
+          <th>Year</th>
+          <th>Bookings</th>
+          <th class="no-sort" data-priority="1">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($vehicles as $v) {
+          $name = vehicle_display_name($v->BrandName, $v->VehiclesTitle); ?>
+          <tr>
+            <td class="a-muted"><?php echo (int)$v->id; ?></td>
+            <td>
+              <div class="a-vehicle-cell">
+                <?php echo admin_vehicle_thumb($v->Vimage1); ?>
+                <div>
+                  <a class="a-strong text-decoration-none" href="edit-vehicle.php?id=<?php echo (int)$v->id; ?>"><?php echo h($v->VehiclesTitle); ?></a>
+                  <div class="a-muted"><?php echo h($v->CarType ?: 'No type set'); ?></div>
+                </div>
+              </div>
+            </td>
+            <td><?php echo $v->BrandName !== null ? h($v->BrandName) : admin_badge('No brand', 'danger'); ?></td>
+            <td data-order="<?php echo (int)$v->PricePerDay; ?>"><span class="a-money"><?php echo format_price($v->PricePerDay); ?></span></td>
+            <td><?php echo h($v->FuelType); ?></td>
+            <td><?php echo (int)$v->SeatingCapacity; ?></td>
+            <td><?php echo h($v->ModelYear); ?></td>
+            <td><?php echo (int)$v->bookings; ?></td>
+            <td>
+              <div class="a-actions">
+                <?php echo admin_icon_link('../' . vehicle_url($v->id, $v->BrandName, $v->VehiclesTitle), 'fa-eye', 'View on website'); ?>
+                <?php echo admin_icon_link('edit-vehicle.php?id=' . (int)$v->id, 'fa-pen', 'Edit vehicle', 'primary'); ?>
+                <?php echo admin_icon_link('edit-vehicle.php?id=' . (int)$v->id . '#images', 'fa-images', 'Manage images'); ?>
+                <?php if ((int)$v->bookings > 0) { ?>
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Has bookings, so it can't be deleted"><button type="button" class="a-icon-btn" disabled aria-label="Delete (not possible: has bookings)"><i class="fa fa-trash" aria-hidden="true"></i></button></span>
+                <?php } else {
+                  echo admin_action_button(['del' => $v->id], 'fa-trash', 'Delete vehicle', 'danger', 'Delete ' . $name . '? This can\'t be undone.');
+                } ?>
+              </div>
+            </td>
+          </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+  </div>
+</section>
+<?php admin_page_end(); ?>

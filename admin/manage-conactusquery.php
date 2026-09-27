@@ -1,176 +1,62 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
-error_reporting(0);
-include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
-}
-else{
-if(isset($_POST['eid']))
-	{
-$eid=intval($_POST['eid']);
-$status=1;
-$sql = "UPDATE tblcontactusquery SET status=:status WHERE  id=:eid";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':status',$status, PDO::PARAM_STR);
-$query-> bindParam(':eid',$eid, PDO::PARAM_STR);
-$query -> execute();
+require_once __DIR__ . '/includes/layout.php';
+admin_require_login();
 
-
+if (isset($_POST['eid'])) {
+  $eid = intval($_POST['eid']);
+  $status = 1;
+  $query = $dbh->prepare("UPDATE tblcontactusquery SET status = :status WHERE id = :eid");
+  $query->bindParam(':status', $status, PDO::PARAM_INT);
+  $query->bindParam(':eid', $eid, PDO::PARAM_INT);
+  $query->execute();
+  flash_set('success', 'Query marked as read.');
+  redirect_to(current_url());
 }
 
+$queries = $dbh->query("SELECT * FROM tblcontactusquery ORDER BY PostingDate DESC")->fetchAll(PDO::FETCH_OBJ);
+$unread = count(array_filter($queries, fn($q) => (int)$q->status !== 1));
 
-
- ?>
-
-<!doctype html>
-<html lang="en" class="no-js">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<meta name="theme-color" content="#3e454c">
-	
-	<title>Car Rental Portal |Admin Manage Queries   </title>
-
-	<!-- Font awesome -->
-	<link rel="stylesheet" href="css/font-awesome.min.css">
-	<!-- Sandstone Bootstrap CSS -->
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<!-- Bootstrap Datatables -->
-	<link rel="stylesheet" href="css/dataTables.bootstrap.min.css">
-	<!-- Bootstrap social button library -->
-	<link rel="stylesheet" href="css/bootstrap-social.css">
-	<!-- Bootstrap select -->
-	<link rel="stylesheet" href="css/bootstrap-select.css">
-	<!-- Bootstrap file input -->
-	<link rel="stylesheet" href="css/fileinput.min.css">
-	<!-- Awesome Bootstrap checkbox -->
-	<link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
-	<!-- Admin Stye -->
-	<link rel="stylesheet" href="css/style.css">
-  <style>
-		.errorWrap {
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #dd3d36;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-.succWrap{
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #5cb85c;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-		</style>
-
-</head>
-
-<body>
-	<?php include('includes/header.php');?>
-
-	<div class="ts-main-content">
-		<?php include('includes/leftbar.php');?>
-		<div class="content-wrapper">
-			<div class="container-fluid">
-
-				<div class="row">
-					<div class="col-md-12">
-
-						<h2 class="page-title">Manage Contact Us Queries</h2>
-
-						<!-- Zero Configuration Table -->
-						<div class="panel panel-default">
-							<div class="panel-heading">User queries</div>
-							<div class="panel-body">
-					
-								<table id="zctb" class="display table table-striped table-bordered table-hover" cellspacing="0" width="100%">
-									<thead>
-										<tr>
-										<th>#</th>
-											<th>Name</th>
-											<th>Email</th>
-											<th>Contact No</th>
-											<th>Message</th>
-											<th>Posting date</th>
-											<th>Action</th>
-										</tr>
-									</thead>
-									<tfoot>
-										<tr>
-										<th>#</th>
-											<th>Name</th>
-											<th>Email</th>
-											<th>Contact No</th>
-											<th>Message</th>
-											<th>Posting date</th>
-											<th>Action</th>
-										</tr>
-									</tfoot>
-									<tbody>
-
-									<?php $sql = "SELECT * from  tblcontactusquery ";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{				?>	
-										<tr>
-											<td><?php echo htmlentities($cnt);?></td>
-											<td><?php echo htmlentities($result->name);?></td>
-											<td><?php echo htmlentities($result->EmailId);?></td>
-											<td><?php echo htmlentities($result->ContactNumber);?></td>
-											<td><?php echo htmlentities($result->Message);?></td>
-											<td><?php echo htmlentities($result->PostingDate);?></td>
-																<?php if($result->status==1)
-{
-	?><td>Read</td>
-<?php } else {?>
-
-<td><form method="post" class="inline-action" onsubmit="return confirm('Do you really want to read');"><?php echo csrf_field(); ?><input type="hidden" name="eid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action">Pending</button></form>
-</td>
-<?php } ?>
-										</tr>
-										<?php $cnt=$cnt+1; }} ?>
-										
-									</tbody>
-								</table>
-
-						
-
-							</div>
-						</div>
-
-					
-
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-	<!-- Loading Scripts -->
-	<script src="js/jquery.min.js"></script>
-	<script src="js/bootstrap-select.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/jquery.dataTables.min.js"></script>
-	<script src="js/dataTables.bootstrap.min.js"></script>
-	<script src="js/Chart.min.js"></script>
-	<script src="js/fileinput.js"></script>
-	<script src="js/chartData.js"></script>
-	<script src="js/main.js"></script>
-</body>
-</html>
-<?php } ?>
+admin_page_start('Contact Us Queries', 'manage-conactusquery.php', [], [
+  'libs' => ['datatables'],
+  'lead' => count($queries) . ' messages from the contact form' . ($unread ? ", $unread unread." : ', all read.'),
+]);
+?>
+<section class="a-card">
+  <div class="a-table-wrap">
+    <table class="table a-table" data-a-table data-search-placeholder="Search queries" data-empty="No queries yet" data-order='[[4,"desc"]]'>
+      <thead>
+        <tr>
+          <th data-priority="1">From</th>
+          <th>Phone</th>
+          <th data-priority="3">Message</th>
+          <th data-priority="2">Status</th>
+          <th>Received</th>
+          <th class="no-sort" data-priority="1">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($queries as $q) {
+          $isRead = (int)$q->status === 1; ?>
+          <tr>
+            <td>
+              <span class="a-strong d-block"><?php echo h($q->name); ?></span>
+              <span class="a-muted"><?php echo h($q->EmailId); ?></span>
+            </td>
+            <td><?php echo h($q->ContactNumber); ?></td>
+            <td><span class="a-clip" title="<?php echo h($q->Message); ?>"><?php echo h($q->Message); ?></span></td>
+            <td data-order="<?php echo $isRead ? 1 : 0; ?>"><?php echo $isRead ? admin_badge('Read', 'neutral', 'fa-envelope-open') : admin_badge('Unread', 'primary', 'fa-envelope'); ?></td>
+            <?php echo admin_date_cell($q->PostingDate, true); ?>
+            <td>
+              <div class="a-actions">
+                <?php echo admin_icon_link('mailto:' . $q->EmailId . '?subject=' . rawurlencode('Re: your message to Rento'), 'fa-reply', 'Reply by email'); ?>
+                <?php if (!$isRead) echo admin_action_button(['eid' => $q->id], 'fa-check', 'Mark as read', 'success'); ?>
+              </div>
+            </td>
+          </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+  </div>
+</section>
+<?php admin_page_end(); ?>

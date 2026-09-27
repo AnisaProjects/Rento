@@ -157,8 +157,8 @@ admin_page_start('Dashboard', 'dashboard.php', [], [
           <li>
             <span class="a-activity__icon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
             <div class="a-activity__main">
-              <a class="a-activity__title" href="bookig-details.php?bid=<?php echo (int)$b->id; ?>">#<?php echo htmlentities($b->BookingNumber); ?> · <?php echo htmlentities($b->VehiclesTitle ?? 'Removed vehicle'); ?></a>
-              <span class="a-activity__meta"><?php echo htmlentities($b->FullName ?? $b->userEmail); ?> · <?php echo admin_date($b->PostingDate); ?></span>
+              <a class="a-activity__title" href="bookig-details.php?bid=<?php echo (int)$b->id; ?>">#<?php echo h($b->BookingNumber); ?> · <?php echo h($b->VehiclesTitle ?? 'Removed vehicle'); ?></a>
+              <span class="a-activity__meta"><?php echo h($b->FullName ?? $b->userEmail); ?> · <?php echo admin_date($b->PostingDate); ?></span>
             </div>
             <?php echo admin_booking_badge($b->Status); ?>
           </li>
@@ -177,8 +177,8 @@ admin_page_start('Dashboard', 'dashboard.php', [], [
           <li>
             <span class="a-activity__icon"><i class="fa fa-message" aria-hidden="true"></i></span>
             <div class="a-activity__main">
-              <span class="a-activity__title"><?php echo htmlentities($q->name); ?></span>
-              <span class="a-activity__meta"><?php echo htmlentities(mb_strimwidth((string)$q->Message, 0, 60, '…')); ?> · <?php echo admin_date($q->PostingDate); ?></span>
+              <span class="a-activity__title"><?php echo h($q->name); ?></span>
+              <span class="a-activity__meta"><?php echo h(mb_strimwidth((string)$q->Message, 0, 60, '…')); ?> · <?php echo admin_date($q->PostingDate); ?></span>
             </div>
             <?php echo (int)$q->status === 1 ? admin_badge('Read') : admin_badge('Unread', 'primary'); ?>
           </li>
@@ -195,10 +195,10 @@ admin_page_start('Dashboard', 'dashboard.php', [], [
       <ul class="a-activity">
         <?php foreach ($recentUsers as $u) { ?>
           <li>
-            <span class="a-activity__icon"><?php echo htmlentities(initials((string)$u->FullName)); ?></span>
+            <span class="a-activity__icon"><?php echo h(initials((string)$u->FullName)); ?></span>
             <div class="a-activity__main">
-              <span class="a-activity__title"><?php echo htmlentities($u->FullName); ?></span>
-              <span class="a-activity__meta"><?php echo htmlentities($u->EmailId); ?> · <?php echo admin_date($u->RegDate); ?></span>
+              <span class="a-activity__title"><?php echo h($u->FullName); ?></span>
+              <span class="a-activity__meta"><?php echo h($u->EmailId); ?> · <?php echo admin_date($u->RegDate); ?></span>
             </div>
           </li>
         <?php } ?>

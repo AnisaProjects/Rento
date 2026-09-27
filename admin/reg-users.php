@@ -1,193 +1,110 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
-error_reporting(0);
-include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
+require_once __DIR__ . '/includes/layout.php';
+admin_require_login();
+
+if (isset($_POST['del'])) {
+  $id = intval($_POST['del']);
+  $query = $dbh->prepare("SELECT id, FullName, EmailId FROM tblusers WHERE id = :id");
+  $query->bindParam(':id', $id, PDO::PARAM_INT);
+  $query->execute();
+  $user = $query->fetch(PDO::FETCH_OBJ);
+  // Users with bookings are kept so the booking history keeps its customer details.
+  $query = $dbh->prepare("SELECT COUNT(*) FROM tblbooking WHERE userEmail = :email");
+  $query->bindValue(':email', $user->EmailId ?? '', PDO::PARAM_STR);
+  $query->execute();
+  $bookingCount = (int)$query->fetchColumn();
+  if (!$user) {
+    flash_set('error', 'That user no longer exists.');
+  } elseif ($bookingCount > 0) {
+    flash_set('error', "This user has $bookingCount booking(s) and cannot be deleted.");
+  } else {
+    // Asked in the delete dialog: keep the user's testimonials, or delete them too.
+    $removeTestimonials = ($_POST['testimonials'] ?? 'keep') === 'delete';
+    $dbh->beginTransaction();
+    if ($removeTestimonials) {
+      $query = $dbh->prepare("DELETE FROM tbltestimonial WHERE UserEmail = :email");
+      $query->bindParam(':email', $user->EmailId, PDO::PARAM_STR);
+      $query->execute();
+      $removedTestimonials = $query->rowCount();
+    }
+    $query = $dbh->prepare("DELETE FROM tblpasswordresets WHERE UserId = :id AND AccountType = 'user'");
+    $query->bindParam(':id', $id, PDO::PARAM_INT);
+    $query->execute();
+    $query = $dbh->prepare("DELETE FROM tblusers WHERE id = :id");
+    $query->bindParam(':id', $id, PDO::PARAM_INT);
+    $query->execute();
+    $dbh->commit();
+    flash_set('success', 'User ' . $user->FullName . ' deleted' . ($removeTestimonials ? ", with $removedTestimonials testimonial(s)." : '; their testimonials were kept.'));
+  }
+  redirect_to(current_url());
 }
-else{
-if(isset($_POST['del']))
-{
-$id=intval($_POST['del']);
-// Users with bookings are kept so the booking history keeps its customer details.
-$sql = "SELECT COUNT(*) FROM tblbooking WHERE userEmail=(SELECT EmailId FROM tblusers WHERE id=:id)";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':id',$id, PDO::PARAM_INT);
-$query -> execute();
-$bookingCount=(int)$query->fetchColumn();
-if($bookingCount > 0)
-{
-$error="This user has ".$bookingCount." booking(s) and cannot be deleted.";
-}
-else
-{
-$sql = "DELETE FROM tblpasswordresets WHERE UserId=:id";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':id',$id, PDO::PARAM_INT);
-$query -> execute();
-$sql = "DELETE FROM tblusers WHERE id=:id";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':id',$id, PDO::PARAM_INT);
-$query -> execute();
-$msg = $query->rowCount() > 0 ? "User deleted successfully" : "";
-}
-}
 
+$users = $dbh->query("SELECT u.*,
+    (SELECT COUNT(*) FROM tblbooking b WHERE b.userEmail = u.EmailId) AS bookings,
+    (SELECT COUNT(*) FROM tbltestimonial t WHERE t.UserEmail = u.EmailId) AS testimonials
+  FROM tblusers u ORDER BY u.RegDate DESC")->fetchAll(PDO::FETCH_OBJ);
 
+$deleteChoice = '<fieldset class="mt-3"><legend class="form-label">Their testimonials</legend>'
+  . '<div class="form-check"><input class="form-check-input" type="radio" name="testimonials" id="t-keep" value="keep" checked>'
+  . '<label class="form-check-label" for="t-keep">Keep them (they stay listed under Testimonials)</label></div>'
+  . '<div class="form-check"><input class="form-check-input" type="radio" name="testimonials" id="t-delete" value="delete">'
+  . '<label class="form-check-label" for="t-delete">Delete them too</label></div></fieldset>';
 
- ?>
-
-<!doctype html>
-<html lang="en" class="no-js">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<meta name="theme-color" content="#3e454c">
-	
-	<title>Car Rental Portal |Admin Manage testimonials   </title>
-
-	<!-- Font awesome -->
-	<link rel="stylesheet" href="css/font-awesome.min.css">
-	<!-- Sandstone Bootstrap CSS -->
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<!-- Bootstrap Datatables -->
-	<link rel="stylesheet" href="css/dataTables.bootstrap.min.css">
-	<!-- Bootstrap social button library -->
-	<link rel="stylesheet" href="css/bootstrap-social.css">
-	<!-- Bootstrap select -->
-	<link rel="stylesheet" href="css/bootstrap-select.css">
-	<!-- Bootstrap file input -->
-	<link rel="stylesheet" href="css/fileinput.min.css">
-	<!-- Awesome Bootstrap checkbox -->
-	<link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
-	<!-- Admin Stye -->
-	<link rel="stylesheet" href="css/style.css">
-  <style>
-		.errorWrap {
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #dd3d36;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-.succWrap{
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #5cb85c;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-		</style>
-
-</head>
-
-<body>
-	<?php include('includes/header.php');?>
-
-	<div class="ts-main-content">
-		<?php include('includes/leftbar.php');?>
-		<div class="content-wrapper">
-			<div class="container-fluid">
-
-				<div class="row">
-					<div class="col-md-12">
-
-						<h2 class="page-title">Registered Users</h2>
-
-						<!-- Zero Configuration Table -->
-						<div class="panel panel-default">
-							<div class="panel-heading">Reg Users</div>
-							<div class="panel-body">
-							<?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php } 
-				else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
-								<table id="zctb" class="display table table-striped table-bordered table-hover" cellspacing="0" width="100%">
-									<thead>
-										<tr>
-										<th>#</th>
-												<th> Name</th>
-											<th>Email </th>
-											<th>Contact no</th>
-										<th>DOB</th>
-										<th>Address</th>
-										<th>City</th>
-										<th>Country</th>
-										<th>Reg Date</th>
-										<th>Action</th>
-										</tr>
-									</thead>
-									<tfoot>
-										<tr>
-										<th>#</th>
-											<th> Name</th>
-											<th>Email </th>
-											<th>Contact no</th>
-										<th>DOB</th>
-										<th>Address</th>
-										<th>City</th>
-										<th>Country</th>
-										<th>Reg Date</th>
-										<th>Action</th>
-										</tr>
-									</tfoot>
-									<tbody>
-
-									<?php $sql = "SELECT * from  tblusers ";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{				?>	
-										<tr>
-											<td><?php echo htmlentities($cnt);?></td>
-											<td><?php echo htmlentities($result->FullName);?></td>
-											<td><?php echo htmlentities($result->EmailId);?></td>
-											<td><?php echo htmlentities($result->ContactNo);?></td>
-	<td><?php echo htmlentities($result->dob);?></td>
-											<td><?php echo htmlentities($result->Address);?></td>
-											<td><?php echo htmlentities($result->City);?></td>
-											<td><?php echo htmlentities($result->Country);?></td>
-											<td><?php echo htmlentities($result->RegDate);?></td>
-											<td><form method="post" class="inline-action" onsubmit="return confirm('Do you want to delete this user');"><?php echo csrf_field(); ?><input type="hidden" name="del" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"><i class="fa fa-close"></i></button></form></td>
-										</tr>
-										<?php $cnt=$cnt+1; }} ?>
-										
-									</tbody>
-								</table>
-
-						
-
-							</div>
-						</div>
-
-					
-
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-	<!-- Loading Scripts -->
-	<script src="js/jquery.min.js"></script>
-	<script src="js/bootstrap-select.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/jquery.dataTables.min.js"></script>
-	<script src="js/dataTables.bootstrap.min.js"></script>
-	<script src="js/Chart.min.js"></script>
-	<script src="js/fileinput.js"></script>
-	<script src="js/chartData.js"></script>
-	<script src="js/main.js"></script>
-</body>
-</html>
-<?php } ?>
+admin_page_start('Registered Users', 'reg-users.php', [], [
+  'libs' => ['datatables'],
+  'lead' => count($users) . ' customer accounts.',
+]);
+?>
+<section class="a-card">
+  <div class="a-table-wrap">
+    <table class="table a-table" data-a-table data-search-placeholder="Search users" data-empty="No users yet" data-order='[[5,"desc"]]'>
+      <thead>
+        <tr>
+          <th data-priority="1">Name</th>
+          <th data-priority="2">Email</th>
+          <th>Phone</th>
+          <th>City</th>
+          <th>Bookings</th>
+          <th>Registered</th>
+          <th>Date of birth</th>
+          <th>Address</th>
+          <th>Country</th>
+          <th class="no-sort" data-priority="1">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($users as $u) { ?>
+          <tr>
+            <td>
+              <div class="a-vehicle-cell">
+                <span class="a-customer__avatar" style="flex-basis:36px;height:36px;font-size:.8rem" aria-hidden="true"><?php echo h(initials($u->FullName)); ?></span>
+                <span class="a-strong"><?php echo h($u->FullName); ?></span>
+              </div>
+            </td>
+            <td><a href="mailto:<?php echo h($u->EmailId); ?>"><?php echo h($u->EmailId); ?></a></td>
+            <td><?php echo h($u->ContactNo); ?></td>
+            <td><?php echo h($u->City); ?></td>
+            <td><?php echo (int)$u->bookings ? admin_badge((int)$u->bookings . ' booking' . ((int)$u->bookings === 1 ? '' : 's'), 'info') : '<span class="a-muted">None</span>'; ?></td>
+            <?php echo admin_date_cell($u->RegDate); ?>
+            <td><?php echo h($u->dob); ?></td>
+            <td><?php echo h($u->Address); ?></td>
+            <td><?php echo h($u->Country); ?></td>
+            <td>
+              <div class="a-actions">
+                <?php echo admin_icon_link('mailto:' . $u->EmailId, 'fa-envelope', 'Email ' . $u->FullName); ?>
+                <?php if ((int)$u->bookings > 0) { ?>
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Has bookings, so the account is kept"><button type="button" class="a-icon-btn" disabled aria-label="Delete (not possible: has bookings)"><i class="fa fa-trash" aria-hidden="true"></i></button></span>
+                <?php } else {
+                  $message = 'Delete the account of ' . $u->FullName . ' (' . $u->EmailId . ')? This can\'t be undone.';
+                  echo admin_action_button(['del' => $u->id], 'fa-trash', 'Delete user', 'danger', $message, (int)$u->testimonials > 0 ? str_replace('<legend class="form-label">Their testimonials', '<legend class="form-label">Their ' . (int)$u->testimonials . ' testimonial(s)', $deleteChoice) : '');
+                } ?>
+              </div>
+            </td>
+          </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+  </div>
+</section>
+<?php admin_page_end(); ?>

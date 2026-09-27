@@ -1,188 +1,65 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
-error_reporting(0);
-include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
-}
-else{
-if(isset($_POST['eid']))
-	{
-$eid=intval($_POST['eid']);
-$status="0";
-$sql = "UPDATE tbltestimonial SET status=:status WHERE  id=:eid";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':status',$status, PDO::PARAM_STR);
-$query-> bindParam(':eid',$eid, PDO::PARAM_STR);
-$query -> execute();
+require_once __DIR__ . '/includes/layout.php';
+admin_require_login();
 
-$msg="Testimonial Successfully Inacrive";
+// eid = hide from the website (status 0); aeid = show on the website (status 1).
+foreach (['eid' => 0, 'aeid' => 1] as $field => $status) {
+  if (isset($_POST[$field])) {
+    $id = intval($_POST[$field]);
+    $query = $dbh->prepare("UPDATE tbltestimonial SET status = :status WHERE id = :id");
+    $query->bindParam(':status', $status, PDO::PARAM_INT);
+    $query->bindParam(':id', $id, PDO::PARAM_INT);
+    $query->execute();
+    flash_set('success', $status ? 'Testimonial approved: it now shows on the website.' : 'Testimonial hidden from the website.');
+    redirect_to(current_url());
+  }
 }
 
+// LEFT JOIN: testimonials kept after their author's account was deleted still appear here.
+$testimonials = $dbh->query("SELECT t.id, t.UserEmail, t.Testimonial, t.PostingDate, t.status, u.FullName
+  FROM tbltestimonial t LEFT JOIN tblusers u ON u.EmailId = t.UserEmail ORDER BY t.PostingDate DESC")->fetchAll(PDO::FETCH_OBJ);
+$shown = count(array_filter($testimonials, fn($t) => (int)$t->status === 1));
 
-if(isset($_POST['aeid']))
-	{
-$aeid=intval($_POST['aeid']);
-$status=1;
-
-$sql = "UPDATE tbltestimonial SET status=:status WHERE  id=:aeid";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':status',$status, PDO::PARAM_STR);
-$query-> bindParam(':aeid',$aeid, PDO::PARAM_STR);
-$query -> execute();
-
-$msg="Testimonial Successfully Active";
-}
-
-
- ?>
-
-<!doctype html>
-<html lang="en" class="no-js">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<meta name="theme-color" content="#3e454c">
-	
-	<title>Car Rental Portal |Admin Manage testimonials   </title>
-
-	<!-- Font awesome -->
-	<link rel="stylesheet" href="css/font-awesome.min.css">
-	<!-- Sandstone Bootstrap CSS -->
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<!-- Bootstrap Datatables -->
-	<link rel="stylesheet" href="css/dataTables.bootstrap.min.css">
-	<!-- Bootstrap social button library -->
-	<link rel="stylesheet" href="css/bootstrap-social.css">
-	<!-- Bootstrap select -->
-	<link rel="stylesheet" href="css/bootstrap-select.css">
-	<!-- Bootstrap file input -->
-	<link rel="stylesheet" href="css/fileinput.min.css">
-	<!-- Awesome Bootstrap checkbox -->
-	<link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
-	<!-- Admin Stye -->
-	<link rel="stylesheet" href="css/style.css">
-  <style>
-		.errorWrap {
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #dd3d36;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-.succWrap{
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #5cb85c;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-		</style>
-
-</head>
-
-<body>
-	<?php include('includes/header.php');?>
-
-	<div class="ts-main-content">
-		<?php include('includes/leftbar.php');?>
-		<div class="content-wrapper">
-			<div class="container-fluid">
-
-				<div class="row">
-					<div class="col-md-12">
-
-						<h2 class="page-title">Manage Testimonials</h2>
-
-						<!-- Zero Configuration Table -->
-						<div class="panel panel-default">
-							<div class="panel-heading">User Testimonials</div>
-							<div class="panel-body">
-							<?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php } 
-				else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
-								<table id="zctb" class="display table table-striped table-bordered table-hover" cellspacing="0" width="100%">
-									<thead>
-										<tr>
-										<th>#</th>
-											<th>Name</th>
-											<th>Email</th>
-											<th>Testimonials</th>
-											<th>Posting date</th>
-											<th>Action</th>
-										</tr>
-									</thead>
-									<tfoot>
-										<tr>
-										<th>#</th>
-											<th>Name</th>
-											<th>Email</th>
-											<th>Testimonials</th>
-											<th>Posting date</th>
-											<th>Action</th>
-										</tr>
-									</tfoot>
-									<tbody>
-
-									<?php $sql = "SELECT tblusers.FullName,tbltestimonial.UserEmail,tbltestimonial.Testimonial,tbltestimonial.PostingDate,tbltestimonial.status,tbltestimonial.id from tbltestimonial join tblusers on tblusers.Emailid=tbltestimonial.UserEmail";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{				?>	
-										<tr>
-											<td><?php echo htmlentities($cnt);?></td>
-											<td><?php echo htmlentities($result->FullName);?></td>
-											<td><?php echo htmlentities($result->UserEmail);?></td>
-											<td><?php echo htmlentities($result->Testimonial);?></td>
-											<td><?php echo htmlentities($result->PostingDate);?></td>
-										<td><?php if($result->status=="" || $result->status==0)
-{
-	?><form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Active');"><?php echo csrf_field(); ?><input type="hidden" name="aeid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"> Inactive</button></form>
-<?php } else {?>
-
-<form method="post" class="inline-action" onsubmit="return confirm('Do you really want to Inactive');"><?php echo csrf_field(); ?><input type="hidden" name="eid" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"> Active</button></form>
-</td>
-<?php } ?></td>
-										</tr>
-										<?php $cnt=$cnt+1; }} ?>
-										
-									</tbody>
-								</table>
-
-						
-
-							</div>
-						</div>
-
-					
-
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-	<!-- Loading Scripts -->
-	<script src="js/jquery.min.js"></script>
-	<script src="js/bootstrap-select.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/jquery.dataTables.min.js"></script>
-	<script src="js/dataTables.bootstrap.min.js"></script>
-	<script src="js/Chart.min.js"></script>
-	<script src="js/fileinput.js"></script>
-	<script src="js/chartData.js"></script>
-	<script src="js/main.js"></script>
-</body>
-</html>
-<?php } ?>
+admin_page_start('Manage Testimonials', 'testimonials.php', [], [
+  'libs' => ['datatables'],
+  'lead' => count($testimonials) . ' testimonials, ' . $shown . ' shown on the website.',
+]);
+?>
+<section class="a-card">
+  <div class="a-table-wrap">
+    <table class="table a-table" data-a-table data-search-placeholder="Search testimonials" data-empty="No testimonials yet" data-order='[[3,"desc"]]'>
+      <thead>
+        <tr>
+          <th data-priority="1">Customer</th>
+          <th data-priority="3">Testimonial</th>
+          <th data-priority="2">Status</th>
+          <th>Posted</th>
+          <th class="no-sort" data-priority="1">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($testimonials as $t) {
+          $isShown = (int)$t->status === 1; ?>
+          <tr>
+            <td>
+              <span class="a-strong d-block"><?php echo $t->FullName !== null ? h($t->FullName) : 'Deleted account'; ?></span>
+              <span class="a-muted"><?php echo h($t->UserEmail); ?></span>
+            </td>
+            <td><span class="a-clip" title="<?php echo h($t->Testimonial); ?>"><?php echo h($t->Testimonial); ?></span></td>
+            <td data-order="<?php echo $isShown ? 1 : 0; ?>"><?php echo $isShown ? admin_badge('Shown on website', 'success', 'fa-eye') : admin_badge('Hidden', 'neutral', 'fa-eye-slash'); ?></td>
+            <?php echo admin_date_cell($t->PostingDate, true); ?>
+            <td>
+              <div class="a-actions">
+                <?php echo $isShown
+                  ? admin_action_button(['eid' => $t->id], 'fa-eye-slash', 'Hide from website', '', 'This testimonial will no longer show on the website.')
+                  : admin_action_button(['aeid' => $t->id], 'fa-check', 'Approve and show', 'success'); ?>
+              </div>
+            </td>
+          </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+  </div>
+</section>
+<?php admin_page_end(); ?>

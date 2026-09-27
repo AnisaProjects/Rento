@@ -956,9 +956,25 @@ table.dataTable > tbody > tr.child span.dtr-title {
   color: var(--rento-gray-500);
 }
 
-table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control::before {
-  border-color: var(--rento-ink-700);
-  color: var(--rento-ink-700);
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control {
+  white-space: nowrap;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control > * {
+  display: inline-flex;
+  vertical-align: middle;
+  white-space: normal;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control > span.d-block,
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control > .a-muted {
+  display: inline-block !important;
+}
+
+div.dt-container .dt-search input,
+div.dt-container .dt-length select {
+  border-color: var(--rento-gray-200);
+  background-color: #fff;
 }
 
 /* ---------- 6. Badges ---------- */

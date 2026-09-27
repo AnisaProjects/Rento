@@ -45,6 +45,12 @@ const ADMIN_MENU = [
     ['Contact Info', 'fa-address-card', 'update-contactinfo.php'],
 ];
 
+// HTML-escapes any value (null-safe; database columns are often NULL).
+function h($value): string
+{
+    return htmlentities((string)$value, ENT_QUOTES);
+}
+
 // Sends visitors who are not logged in to the admin login page.
 function admin_require_login(): void
 {
@@ -85,7 +91,7 @@ function admin_page_start(string $title, string $active, array $crumbs = [], arr
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#101114">
-<title><?php echo htmlentities($title); ?> | Rento Admin</title>
+<title><?php echo h($title); ?> | Rento Admin</title>
 <script>try { if (localStorage.getItem('rento-admin-collapsed') === '1') document.documentElement.classList.add('a-collapsed'); } catch (e) {}</script>
 <link rel="icon" type="image/png" href="../assets/images/favicon-icon/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,12 +100,12 @@ function admin_page_start(string $title, string $active, array $crumbs = [], arr
 <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="../assets/vendor/fontawesome/css/all.min.css">
 <?php foreach ($GLOBALS['adminLibs'] as $lib) { foreach (ADMIN_LIBS[$lib]['css'] ?? [] as $href) { ?>
-<link rel="stylesheet" href="<?php echo htmlentities($href); ?>">
+<link rel="stylesheet" href="<?php echo h($href); ?>">
 <?php } } ?>
 <link rel="stylesheet" href="../assets/css/tokens.css">
 <link rel="stylesheet" href="css/admin.css">
 </head>
-<body class="a-body <?php echo htmlentities($opts['bodyClass'] ?? ''); ?>">
+<body class="a-body <?php echo h($opts['bodyClass'] ?? ''); ?>">
 <a class="a-skip" href="#a-main">Skip to content</a>
 <div class="a-shell">
 <?php include __DIR__ . '/leftbar.php'; ?>
@@ -112,13 +118,13 @@ function admin_page_start(string $title, string $active, array $crumbs = [], arr
         <ol class="a-breadcrumb">
           <li><a href="dashboard.php">Dashboard</a></li>
           <?php foreach ($crumbs as [$label, $url]) { ?>
-            <li><a href="<?php echo htmlentities($url); ?>"><?php echo htmlentities($label); ?></a></li>
+            <li><a href="<?php echo h($url); ?>"><?php echo h($label); ?></a></li>
           <?php } ?>
-          <li aria-current="page"><?php echo htmlentities($title); ?></li>
+          <li aria-current="page"><?php echo h($title); ?></li>
         </ol>
       </nav><?php } ?>
-      <h1 class="a-page-title"><?php echo htmlentities($title); ?></h1>
-      <?php if (!empty($opts['lead'])) { ?><p class="a-page-lead"><?php echo htmlentities($opts['lead']); ?></p><?php } ?>
+      <h1 class="a-page-title"><?php echo h($title); ?></h1>
+      <?php if (!empty($opts['lead'])) { ?><p class="a-page-lead"><?php echo h($opts['lead']); ?></p><?php } ?>
     </div>
     <?php if (!empty($opts['actions'])) { ?><div class="a-page-actions"><?php echo $opts['actions']; ?></div><?php } ?>
   </div>
@@ -152,7 +158,7 @@ function admin_page_end(string $inlineScript = ''): void
 <script src="../assets/vendor/jquery/jquery.min.js"></script>
 <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <?php foreach ($GLOBALS['adminLibs'] ?? [] as $lib) { foreach (ADMIN_LIBS[$lib]['js'] ?? [] as $src) { ?>
-<script src="<?php echo htmlentities($src); ?>"></script>
+<script src="<?php echo h($src); ?>"></script>
 <?php } } ?>
 <script src="js/admin.js"></script>
 <?php if ($inlineScript !== '') { ?><script><?php echo $inlineScript; ?></script><?php } ?>
@@ -165,7 +171,7 @@ function admin_page_end(string $inlineScript = ''): void
 function admin_badge(string $label, string $variant = 'neutral', string $icon = ''): string
 {
     $iconHtml = $icon !== '' ? '<i class="fa ' . $icon . '" aria-hidden="true"></i>' : '';
-    return '<span class="a-badge a-badge--' . $variant . '">' . $iconHtml . htmlentities($label) . '</span>';
+    return '<span class="a-badge a-badge--' . $variant . '">' . $iconHtml . h($label) . '</span>';
 }
 
 // Booking status (0 or NULL = new, 1 = confirmed, 2 = cancelled).
@@ -181,8 +187,8 @@ function admin_booking_badge($status): string
 // Icon-only link with a tooltip.
 function admin_icon_link(string $href, string $icon, string $label, string $variant = ''): string
 {
-    return '<a class="a-icon-btn' . ($variant ? ' a-icon-btn--' . $variant : '') . '" href="' . htmlentities($href)
-        . '" data-bs-toggle="tooltip" data-bs-title="' . htmlentities($label) . '" aria-label="' . htmlentities($label) . '">'
+    return '<a class="a-icon-btn' . ($variant ? ' a-icon-btn--' . $variant : '') . '" href="' . h($href)
+        . '" data-bs-toggle="tooltip" data-bs-title="' . h($label) . '" aria-label="' . h($label) . '">'
         . '<i class="fa ' . $icon . '" aria-hidden="true"></i></a>';
 }
 
@@ -191,20 +197,20 @@ function admin_icon_link(string $href, string $icon, string $label, string $vari
 // $extraHtml: optional form controls shown inside the confirmation modal (e.g. radio choices).
 function admin_action_button(array $fields, string $icon, string $label, string $variant = '', string $confirm = '', string $extraHtml = '', string $action = ''): string
 {
-    $html = '<form method="post" class="a-inline-form"' . ($action !== '' ? ' action="' . htmlentities($action) . '"' : '');
+    $html = '<form method="post" class="a-inline-form"' . ($action !== '' ? ' action="' . h($action) . '"' : '');
     if ($confirm !== '') {
-        $html .= ' data-confirm="' . htmlentities($confirm) . '" data-confirm-title="' . htmlentities($label) . '?"'
-            . ' data-confirm-ok="' . htmlentities($label) . '"' . ($variant === 'danger' ? ' data-confirm-danger' : '');
+        $html .= ' data-confirm="' . h($confirm) . '" data-confirm-title="' . h($label) . '?"'
+            . ' data-confirm-ok="' . h($label) . '"' . ($variant === 'danger' ? ' data-confirm-danger' : '');
     }
     $html .= '>' . csrf_field();
     foreach ($fields as $name => $value) {
-        $html .= '<input type="hidden" name="' . htmlentities($name) . '" value="' . htmlentities((string)$value) . '">';
+        $html .= '<input type="hidden" name="' . h($name) . '" value="' . h((string)$value) . '">';
     }
     if ($extraHtml !== '') {
         $html .= '<template data-confirm-template>' . $extraHtml . '</template>';
     }
     $html .= '<button type="submit" class="a-icon-btn' . ($variant ? ' a-icon-btn--' . $variant : '') . '" data-bs-toggle="tooltip" data-bs-title="'
-        . htmlentities($label) . '" aria-label="' . htmlentities($label) . '"><i class="fa ' . $icon . '" aria-hidden="true"></i></button></form>';
+        . h($label) . '" aria-label="' . h($label) . '"><i class="fa ' . $icon . '" aria-hidden="true"></i></button></form>';
     return $html;
 }
 
@@ -217,7 +223,7 @@ function admin_vehicle_thumb(?string $file, string $alt = ''): string
     }
     $webp = 'img/vehicleimages/webp/' . $file . '-640.webp';
     $src = is_file(__DIR__ . '/../' . $webp) ? $webp : 'img/vehicleimages/' . $file;
-    return '<img class="a-thumb" src="' . htmlentities(str_replace('%2F', '/', rawurlencode($src))) . '" alt="' . htmlentities($alt) . '" loading="lazy" width="72" height="48">';
+    return '<img class="a-thumb" src="' . h(str_replace('%2F', '/', rawurlencode($src))) . '" alt="' . h($alt) . '" loading="lazy" width="72" height="48">';
 }
 
 // Dates as "27 Sep 2026" (and time when asked). Empty for missing values.
@@ -227,7 +233,7 @@ function admin_date(?string $value, bool $withTime = false): string
         return '';
     }
     $time = strtotime($value);
-    return $time ? date($withTime ? 'j M Y, H:i' : 'j M Y', $time) : htmlentities($value);
+    return $time ? date($withTime ? 'j M Y, H:i' : 'j M Y', $time) : h($value);
 }
 
 // Sortable date cell: shows the friendly date, sorts by the real one.

@@ -1,165 +1,72 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
-error_reporting(0);
-include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
+require_once __DIR__ . '/includes/layout.php';
+admin_require_login();
+
+if (isset($_POST['del'])) {
+  $id = intval($_POST['del']);
+  // A brand still used by vehicles is kept, so those vehicles don't lose their brand.
+  $query = $dbh->prepare("SELECT COUNT(*) FROM tblvehicles WHERE VehiclesBrand = :id");
+  $query->bindParam(':id', $id, PDO::PARAM_INT);
+  $query->execute();
+  $vehicleCount = (int)$query->fetchColumn();
+  if ($vehicleCount > 0) {
+    flash_set('error', "This brand is used by $vehicleCount vehicle(s). Change or delete those vehicles first.");
+  } else {
+    $query = $dbh->prepare("DELETE FROM tblbrands WHERE id = :id");
+    $query->bindParam(':id', $id, PDO::PARAM_INT);
+    $query->execute();
+    flash_set($query->rowCount() ? 'success' : 'error', $query->rowCount() ? 'Brand deleted.' : 'That brand no longer exists.');
+  }
+  redirect_to(current_url());
 }
-else{
-if(isset($_POST['del']))
-{
-$id=intval($_POST['del']);
-$sql = "delete from tblbrands  WHERE id=:id";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':id',$id, PDO::PARAM_STR);
-$query -> execute();
-$msg="Brand deleted successfully";
 
-}
+$brands = $dbh->query("SELECT br.id, br.BrandName, br.CreationDate, br.UpdationDate,
+    (SELECT COUNT(*) FROM tblvehicles v WHERE v.VehiclesBrand = br.id) AS vehicles
+  FROM tblbrands br ORDER BY br.BrandName")->fetchAll(PDO::FETCH_OBJ);
 
-
-
- ?>
-
-<!doctype html>
-<html lang="en" class="no-js">
-
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<meta name="theme-color" content="#3e454c">
-	
-	<title>Car Rental Portal |Admin Manage Brands   </title>
-
-	<!-- Font awesome -->
-	<link rel="stylesheet" href="css/font-awesome.min.css">
-	<!-- Sandstone Bootstrap CSS -->
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<!-- Bootstrap Datatables -->
-	<link rel="stylesheet" href="css/dataTables.bootstrap.min.css">
-	<!-- Bootstrap social button library -->
-	<link rel="stylesheet" href="css/bootstrap-social.css">
-	<!-- Bootstrap select -->
-	<link rel="stylesheet" href="css/bootstrap-select.css">
-	<!-- Bootstrap file input -->
-	<link rel="stylesheet" href="css/fileinput.min.css">
-	<!-- Awesome Bootstrap checkbox -->
-	<link rel="stylesheet" href="css/awesome-bootstrap-checkbox.css">
-	<!-- Admin Stye -->
-	<link rel="stylesheet" href="css/style.css">
-  <style>
-		.errorWrap {
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #dd3d36;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-.succWrap{
-    padding: 10px;
-    margin: 0 0 20px 0;
-    background: #fff;
-    border-left: 4px solid #5cb85c;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-		</style>
-
-</head>
-
-<body>
-	<?php include('includes/header.php');?>
-
-	<div class="ts-main-content">
-		<?php include('includes/leftbar.php');?>
-		<div class="content-wrapper">
-			<div class="container-fluid">
-
-				<div class="row">
-					<div class="col-md-12">
-
-						<h2 class="page-title">Manage Brands</h2>
-
-						<!-- Zero Configuration Table -->
-						<div class="panel panel-default">
-							<div class="panel-heading">Listed  Brands</div>
-							<div class="panel-body">
-							<?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php } 
-				else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
-								<table id="zctb" class="display table table-striped table-bordered table-hover" cellspacing="0" width="100%">
-									<thead>
-										<tr>
-										<th>#</th>
-												<th>Brand Name</th>
-											<th>Creation Date</th>
-											<th>Updation date</th>
-										
-											<th>Action</th>
-										</tr>
-									</thead>
-									<tfoot>
-										<tr>
-										<th>#</th>
-											<th>Brand Name</th>
-											<th>Creation Date</th>
-											<th>Updation date</th>
-										
-										<th>Action</th>
-										</tr>
-									</tfoot>
-									<tbody>
-
-									<?php $sql = "SELECT * from  tblbrands ";
-$query = $dbh -> prepare($sql);
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-$cnt=1;
-if($query->rowCount() > 0)
-{
-foreach($results as $result)
-{				?>	
-										<tr>
-											<td><?php echo htmlentities($cnt);?></td>
-											<td><?php echo htmlentities($result->BrandName);?></td>
-											<td><?php echo htmlentities($result->CreationDate);?></td>
-											<td><?php echo htmlentities($result->UpdationDate);?></td>
-<td><a href="edit-brand.php?id=<?php echo htmlentities($result->id);?>"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
-<form method="post" class="inline-action" onsubmit="return confirm('Do you want to delete');"><?php echo csrf_field(); ?><input type="hidden" name="del" value="<?php echo htmlentities($result->id);?>"><button type="submit" class="link-action"><i class="fa fa-close"></i></button></form></td>
-										</tr>
-										<?php $cnt=$cnt+1; }} ?>
-										
-									</tbody>
-								</table>
-
-						
-
-							</div>
-						</div>
-
-					
-
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-	<!-- Loading Scripts -->
-	<script src="js/jquery.min.js"></script>
-	<script src="js/bootstrap-select.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/jquery.dataTables.min.js"></script>
-	<script src="js/dataTables.bootstrap.min.js"></script>
-	<script src="js/Chart.min.js"></script>
-	<script src="js/fileinput.js"></script>
-	<script src="js/chartData.js"></script>
-	<script src="js/main.js"></script>
-</body>
-</html>
-<?php } ?>
+admin_page_start('Manage Brands', 'manage-brands.php', [['Brands', 'manage-brands.php']], [
+  'libs' => ['datatables'],
+  'lead' => count($brands) . ' brands.',
+  'actions' => '<a class="btn btn-primary" href="create-brand.php"><i class="fa fa-plus" aria-hidden="true"></i>Create brand</a>',
+]);
+?>
+<section class="a-card">
+  <div class="a-table-wrap">
+    <table class="table a-table" data-a-table data-search-placeholder="Search brands" data-empty="No brands yet" data-order='[[1,"asc"]]'>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th data-priority="1">Brand</th>
+          <th>Vehicles</th>
+          <th>Created</th>
+          <th>Updated</th>
+          <th class="no-sort" data-priority="1">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($brands as $brand) { ?>
+          <tr>
+            <td class="a-muted"><?php echo (int)$brand->id; ?></td>
+            <td class="a-strong"><?php echo h($brand->BrandName); ?></td>
+            <td><?php echo (int)$brand->vehicles; ?></td>
+            <?php echo admin_date_cell($brand->CreationDate); ?>
+            <?php echo admin_date_cell($brand->UpdationDate); ?>
+            <td>
+              <div class="a-actions">
+                <?php echo admin_icon_link('../car-listing?brand=' . (int)$brand->id, 'fa-eye', 'View cars on website'); ?>
+                <?php echo admin_icon_link('edit-brand.php?id=' . (int)$brand->id, 'fa-pen', 'Edit brand', 'primary'); ?>
+                <?php if ((int)$brand->vehicles > 0) { ?>
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Used by vehicles, so it can't be deleted"><button type="button" class="a-icon-btn" disabled aria-label="Delete (not possible: used by vehicles)"><i class="fa fa-trash" aria-hidden="true"></i></button></span>
+                <?php } else {
+                  echo admin_action_button(['del' => $brand->id], 'fa-trash', 'Delete brand', 'danger', 'Delete the brand ' . $brand->BrandName . '?');
+                } ?>
+              </div>
+            </td>
+          </tr>
+        <?php } ?>
+      </tbody>
+    </table>
+  </div>
+</section>
+<?php admin_page_end(); ?>
