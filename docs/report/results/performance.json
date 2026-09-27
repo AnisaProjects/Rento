@@ -1,0 +1,71 @@
+{
+  "base_url": "http://localhost:8888/Rento",
+  "requests_each": 30,
+  "date": "2026-09-27",
+  "server": "MAMP on macOS (Apache 2.4.62, PHP 8.3.14, MySQL 8.0.40), same machine as the client",
+  "results": {
+    "GET api/price-quote.php (3 days)": {
+      "median_ms": 2.0,
+      "p95_ms": 4.2,
+      "max_ms": 4.9,
+      "status": [
+        200
+      ],
+      "bytes": 1268
+    },
+    "GET api/price-calendar.php (1 month)": {
+      "median_ms": 3.1,
+      "p95_ms": 5.0,
+      "max_ms": 30.4,
+      "status": [
+        200
+      ],
+      "bytes": 5088
+    },
+    "GET api/recommend.php (trip text)": {
+      "median_ms": 2.6,
+      "p95_ms": 3.4,
+      "max_ms": 4.8,
+      "status": [
+        200
+      ],
+      "bytes": 1761
+    },
+    "GET / (home page)": {
+      "median_ms": 5.2,
+      "p95_ms": 8.9,
+      "max_ms": 11.1,
+      "status": [
+        200
+      ],
+      "bytes": 48310
+    },
+    "GET car-listing": {
+      "median_ms": 3.8,
+      "p95_ms": 5.6,
+      "max_ms": 7.4,
+      "status": [
+        200
+      ],
+      "bytes": 35910
+    },
+    "GET car/toyota-fortuner-7": {
+      "median_ms": 4.2,
+      "p95_ms": 6.0,
+      "max_ms": 6.7,
+      "status": [
+        200
+      ],
+      "bytes": 39235
+    },
+    "GET car-recommendation": {
+      "median_ms": 1.9,
+      "p95_ms": 4.4,
+      "max_ms": 4.6,
+      "status": [
+        200
+      ],
+      "bytes": 24492
+    }
+  }
+}

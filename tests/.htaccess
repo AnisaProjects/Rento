@@ -1,0 +1,2 @@
+# Tests only: nothing in this folder is served to browsers.
+Require all denied
