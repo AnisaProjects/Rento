@@ -6,10 +6,10 @@ features, balances the dataset with synthetic low-demand examples,
 fits a GradientBoostingClassifier inside a preprocessing Pipeline, and
 persists the whole pipeline to disk for `predict_price.py` to use.
 
-Usage:
-    python pricing_model.py \
-        --db-host=localhost --db-user=root --db-pass=secret \
-        --db-name=carrental --negative-samples=3 --minimum-rows=20
+Disabled until there are enough real bookings (admin -> Smart Pricing, default 200).
+
+Usage (database settings from RENTO_DB_* environment variables, see rento_db.py):
+    .venv/bin/python pricing_model.py --negative-samples=3 --minimum-rows=20
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sqlalchemy import create_engine
+from rento_db import sqlalchemy_engine
 
 from pricing_utils import (
     ALL_FEATURES,
@@ -46,11 +46,6 @@ MODEL_PATH = MODEL_DIR / "demand_model.pkl"
 
 def parse_args(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train the dynamic pricing demand model.")
-    parser.add_argument("--db-host", required=True)
-    parser.add_argument("--db-user", required=True)
-    parser.add_argument("--db-pass", required=True)
-    parser.add_argument("--db-name", required=True)
-    parser.add_argument("--db-port", type=int, default=3306)
     parser.add_argument(
         "--negative-samples", type=int, default=3,
         help="Synthetic low-demand rows generated per vehicle.",
@@ -64,11 +59,9 @@ def parse_args(argv=None) -> argparse.Namespace:
 
 
 def build_engine(args: argparse.Namespace):
-    uri = (
-        f"mysql+pymysql://{args.db_user}:{args.db_pass}"
-        f"@{args.db_host}:{args.db_port}/{args.db_name}"
-    )
-    return create_engine(uri)
+    # Database settings come from the environment or RENTO_DB_CONFIG (see rento_db.py),
+    # never from command-line arguments.
+    return sqlalchemy_engine()
 
 
 def fetch_raw_data(engine) -> pd.DataFrame:

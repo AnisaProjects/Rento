@@ -7,11 +7,8 @@ requested vehicle/date range, predicts the demand probability, and
 prints ONE line of JSON with the recommended price. PHP reads that
 line and decodes it with json_decode().
 
-Usage:
-    python predict_price.py \
-        --vehicle-id=3 --start-date=2025-12-01 --end-date=2025-12-05 \
-        --base-price=50.0 --db-host=localhost --db-user=root \
-        --db-pass=secret --db-name=carrental
+Usage (database settings from RENTO_DB_* environment variables, see rento_db.py):
+    .venv/bin/python predict_price.py --vehicle-id=3 --start-date=2025-12-01 --end-date=2025-12-05
 """
 
 from __future__ import annotations
@@ -23,7 +20,7 @@ from pathlib import Path
 
 import joblib
 import pandas as pd
-from sqlalchemy import create_engine
+from rento_db import sqlalchemy_engine
 
 from pricing_utils import PriceAdjustment, enrich_temporal_columns
 
@@ -36,21 +33,14 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--start-date", required=True)
     parser.add_argument("--end-date", required=True)
     parser.add_argument("--base-price", type=float, default=None)
-    parser.add_argument("--db-host", required=True)
-    parser.add_argument("--db-user", required=True)
-    parser.add_argument("--db-pass", required=True)
-    parser.add_argument("--db-name", required=True)
-    parser.add_argument("--db-port", type=int, default=3306)
     parser.add_argument("--model-path", default=str(DEFAULT_MODEL_PATH))
     return parser.parse_args(argv)
 
 
 def build_engine(args: argparse.Namespace):
-    uri = (
-        f"mysql+pymysql://{args.db_user}:{args.db_pass}"
-        f"@{args.db_host}:{args.db_port}/{args.db_name}"
-    )
-    return create_engine(uri)
+    # Database settings come from the environment or RENTO_DB_CONFIG (see rento_db.py),
+    # never from command-line arguments.
+    return sqlalchemy_engine()
 
 
 def fetch_vehicle(engine, vehicle_id: int):

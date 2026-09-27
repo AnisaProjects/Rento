@@ -24,8 +24,9 @@ define('RATE_LIMIT_EMAIL_CHECKS', 20);
 // Python model is never called. Phase 4 turns this back on with proper data.
 define('PRICING_ENABLED', false);
 
-// Python used by includes/dynamic_pricing.php. It must have the packages in ml/requirements.txt.
-define('PRICING_PYTHON_BIN', '/opt/homebrew/bin/python3');
+// Python for the pricing scripts: the dedicated venv (Python 3.12, ml/requirements.txt).
+// Scripts get the DB settings from environment variables set by includes/forecast.php.
+define('PRICING_PYTHON_BIN', __DIR__ . '/../ml/.venv/bin/python');
 
 // Never show PHP errors on the page; they go to MAMP's log (/Applications/MAMP/logs/php_error.log).
 // Dev mode logs everything, including notices and deprecations (site and admin alike).
