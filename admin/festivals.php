@@ -103,6 +103,7 @@ admin_page_start('Festivals & Travel Peaks', 'festivals.php', [], [
           <th>Days</th>
           <th>Demand</th>
           <th>Checked</th>
+          <th data-priority="5">Notes</th>
           <th>Source</th>
           <th class="no-sort" data-priority="1">Actions</th>
         </tr>
@@ -114,14 +115,12 @@ admin_page_start('Festivals & Travel Peaks', 'festivals.php', [], [
           $now = !$past && $f->StartDate <= $today;
           $variant = ['official' => 'success', 'two sources' => 'info', 'disagreement' => 'danger', 'unverified' => 'warning', 'guidance' => 'neutral'][$f->Verification] ?? 'neutral'; ?>
           <tr<?php echo $past ? ' class="opacity-50"' : ''; ?>>
-            <td>
-              <span class="a-strong d-block"><?php echo h($f->FestivalName); ?><?php echo $now ? ' ' . admin_badge('Now', 'primary') : ''; ?></span>
-              <?php if ($f->Notes) { ?><span class="a-muted a-clip" title="<?php echo h($f->Notes); ?>"><?php echo h($f->Notes); ?></span><?php } ?>
-            </td>
+            <td><span class="a-strong"><?php echo h($f->FestivalName); ?></span><?php echo $now ? ' ' . admin_badge('Now', 'primary') : ''; ?></td>
             <td data-order="<?php echo h($f->StartDate); ?>" class="text-nowrap"><?php echo admin_date($f->StartDate); ?><?php echo $f->EndDate !== $f->StartDate ? ' – ' . admin_date($f->EndDate) : ''; ?></td>
             <td><?php echo $days; ?></td>
             <td data-order="<?php echo $f->DemandLevel === 'high' ? 2 : 1; ?>"><?php echo $f->DemandLevel === 'high' ? admin_badge('High', 'primary', 'fa-fire') : admin_badge('Medium'); ?></td>
             <td><?php echo admin_badge(FESTIVAL_VERIFICATION[$f->Verification] ?? $f->Verification, $variant); ?></td>
+            <td><?php echo $f->Notes ? '<span class="a-muted a-clip" title="' . h($f->Notes) . '">' . h($f->Notes) . '</span>' : '<span class="a-muted">–</span>'; ?></td>
             <td><?php echo $f->SourceUrl ? '<a href="' . h($f->SourceUrl) . '" target="_blank" rel="noopener noreferrer">' . h(parse_url($f->SourceUrl, PHP_URL_HOST)) . '</a>' : '<span class="a-muted">None</span>'; ?></td>
             <td>
               <div class="a-actions">
