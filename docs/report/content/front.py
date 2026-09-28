@@ -29,7 +29,7 @@ DECLARATION = [
     "and documentation assistant. It helped to write and refactor source code, automated tests and diagrams, and to "
     "draft and edit parts of this report. I directed the work, set the requirements and design decisions, reviewed, "
     "tested and verified all outputs, and I take full responsibility for the system and for the content of this report. "
-    "Every commit produced with this assistance is marked as co-authored in the project's Git history. This use of AI "
+    "The commits produced with this assistance are marked as co-authored in the project's Git history. This use of AI "
     "tools is in line with the policy of Lincoln University College: [INSERT statement on the college's AI policy].",
     "This report has not been submitted, in whole or in part, for any other degree or qualification at this or any "
     "other institution.",

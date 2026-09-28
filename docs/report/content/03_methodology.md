@@ -64,7 +64,7 @@ An artificial-intelligence assistant, Claude (Anthropic), was used throughout th
 
 The student directed this work. The student defined the goals and scope of every phase and set rules that the assistant had to follow, including that database changes must be additive only and preceded by a backup, that existing URLs, file names and form field names must be kept unless a change was explicitly approved, that each logical change must be committed separately, that no credential may be changed without the student's permission, and that no numbers, features or references may be invented in the documentation. At the end of each phase the assistant produced a report listing every changed file, the test results and the open issues, and the student reviewed and tested the result before approving the next phase. The student is responsible for the system and for the content of this report.
 
-The use of the assistant is recorded openly in the version control history: every commit carries a "Co-Authored-By" line naming the assistant. The assistant also explains the pace of development shown in Section 3.2.4. This use of AI tools is in line with the policy of Lincoln University College: [INSERT statement on the college's AI policy].
+The use of the assistant is recorded openly in the version control history: every commit carries a "Co-Authored-By" line naming the assistant, except for one automatic merge commit (8bd13fa) created without the line; the history was not rewritten to add it. The assistant also explains the pace of development shown in Section 3.2.4. This use of AI tools is in line with the policy of Lincoln University College: [INSERT statement on the college's AI policy].
 
 ### 3.2.4 Version Control and Project Timeline
 
