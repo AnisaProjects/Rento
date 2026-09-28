@@ -20,6 +20,7 @@ Content markup (docs/report/content/*.md, processed in file-name order):
   > text                           indented note paragraph           [[PAGEBREAK]]
   %% comment                       ignored                            {{REFERENCES}} references list
   $$ p = b(1 + x) $$ (2.1)         numbered equation (matplotlib mathtext, rendered to an image)
+  ```Figure 5.1 Caption            code excerpt up to the closing ``` (captioned as a figure)
 """
 from __future__ import annotations
 
@@ -277,6 +278,36 @@ def add_figure(doc, caption, path, width_in=6.0):
     para(doc, caption, style="Figure Caption")
 
 
+def add_code(doc, code_lines, caption):
+    """Code excerpt in a shaded single-cell table (Courier New 8.5 pt), captioned as a figure below."""
+    table = doc.add_table(rows=1, cols=1)
+    table.style = "Table Grid"
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    cell = table.cell(0, 0)
+    set_cell_background(cell, "F6F6F6")
+    cell.text = ""
+    for n, text in enumerate(code_lines):
+        p = cell.paragraphs[0] if n == 0 else cell.add_paragraph()
+        p.paragraph_format.line_spacing = 1.0
+        p.paragraph_format.space_after = Pt(0)
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.keep_with_next = True
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        r = p.add_run(text if text else " ")
+        r.font.name = "Courier New"
+        r._element.rPr.rFonts.set(qn("w:eastAsia"), "Courier New")
+        r.font.size = Pt(8.5)
+    tblpr = table._tbl.tblPr
+    mar = OxmlElement("w:tblCellMar")
+    for side, w in (("top", 80), ("bottom", 80), ("left", 120), ("right", 120)):
+        el = OxmlElement(f"w:{side}"); el.set(qn("w:w"), str(w)); el.set(qn("w:type"), "dxa"); mar.append(el)
+    tblpr.append(mar)
+    row = table.rows[0]._tr.get_or_add_trPr()
+    row.append(OxmlElement("w:cantSplit"))
+    if caption:
+        para(doc, caption, style="Figure Caption")
+
+
 # ------------------------------------------------------------------ equations
 
 EQ_DIR = HERE / "figures" / "equations"
@@ -353,6 +384,14 @@ def render_markdown(doc, text, refs):
             doc.add_paragraph(line[4:].strip(), style="Heading 3")
         elif line.startswith("## "):
             doc.add_paragraph(line[3:].strip(), style="Heading 2")
+        elif line.startswith("```"):
+            caption = line[3:].strip()
+            code = []
+            i += 1
+            while i < len(lines) and not lines[i].startswith("```"):
+                code.append(lines[i].rstrip())
+                i += 1
+            add_code(doc, code, caption)
         elif line.startswith("$$"):
             m = re.match(r"\$\$(.+?)\$\$\s*(\(\d+\.\d+\))", line)
             add_equation(doc, m.group(1).strip(), m.group(2))
@@ -379,7 +418,7 @@ def render_markdown(doc, text, refs):
         else:
             # join wrapped lines into one paragraph
             buf = [line.strip()]
-            while i + 1 < len(lines) and lines[i + 1].strip() and not re.match(r"^(#|!\[|Table: |- |\d+\. |> |\[\[|\{\{|%%|\|)", lines[i + 1].strip()):
+            while i + 1 < len(lines) and lines[i + 1].strip() and not re.match(r"^(#|!\[|Table: |- |\d+\. |> |\[\[|\{\{|%%|\||```|\$\$)", lines[i + 1].strip()):
                 i += 1
                 buf.append(lines[i].strip())
             para(doc, " ".join(buf))
