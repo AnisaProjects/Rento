@@ -60,7 +60,9 @@ Best: **Random Forest**.
 ## Experiment 2: day price from scraped Sajilo Rental listings
 
 1,640 listings; 192 vehicle models; 32 manufacturers. The target
-`scaling_1day` has only 7 distinct values (Rs 7,360 to 12,800).
+`scaling_1day` is the prototype's derived day price, not the listed day price: the 4-hour hourly rate
+rounded up × 24 × the median ratio of the listed day and 4-hour hourly rates (`python/preprocessing.py`).
+It has only 7 distinct values (Rs 7,360 to 12,800).
 The split is the existing PyTorch model's 70/15/15 split (the same 246 test rows:
 True). 15 test rows are vehicle models not seen in training.
 

@@ -44,7 +44,7 @@ Fourth, a simple, explained recommendation model can be useful with a small flee
 The study has the following limitations, several of which were introduced in Section 1.6 and confirmed by the testing.
 
 - **No real demand data.** Rento has only four real bookings. The pricing percentages were chosen by judgement and from the market survey, and their effect on revenue and occupancy could not be measured. The occupancy and demand factors and the learned pricer have not yet been used live.
-- **External data for the experiments.** The demand dataset is not Nepali booking data, and the price dataset consists of listed prices from one marketplace with only seven distinct price levels. The experimental results show how the models behave but cannot be transferred directly to Rento.
+- **External data for the experiments.** The demand dataset is not Nepali booking data, and the price target is a day price derived by the prototype from the four-hour prices listed on one marketplace, with only seven distinct levels. The experimental results show how the models behave but cannot be transferred directly to Rento.
 - **Single market benchmark.** Only one operator published self-drive prices, so the base prices and the "below market" comparison rest on a single source.
 - **Keyword-based trip understanding.** The trip parser recognises a fixed set of words and place names. It does not understand other phrasings, spelling mistakes or Nepali text, and it has no concept of luxury or prestige.
 - **Small evaluation sets.** The recommendation engine was evaluated on twelve scenarios and eight active cars, with relevance judged by the developer.

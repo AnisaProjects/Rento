@@ -68,7 +68,7 @@ Academically, the project applies revenue-management and recommender-system conc
 The study has the following limitations:
 
 - **Limited booking data.** The system holds only four real bookings, two of them confirmed. The machine-learning models could not be trained on Rento's own data and were evaluated on external datasets; the occupancy and demand pricing factors remain switched off until 50 confirmed bookings exist, and the learned pricer until about 200.
-- **External datasets.** The demand dataset is an external hourly rental dataset and not Nepali booking data, and the price dataset consists of publicly listed prices collected by scraping one marketplace. Results from these datasets indicate how the models behave but cannot be transferred directly to Rento.
+- **External datasets.** The demand dataset is an external hourly rental dataset and not Nepali booking data, and the price dataset consists of publicly listed prices collected by scraping one marketplace, from which the prototype derived the day price used as the target. Results from these datasets indicate how the models behave but cannot be transferred directly to Rento.
 - **Market benchmarks.** Only one published self-drive rate card was found, so the market price used for comparison is based on a single source.
 - **Festival calendar.** Nepali festivals follow the lunar calendar and move every year. The dates must be checked each year; the BS 2084 dates in the system are provisional until the government publishes its official holiday list.
 - **Deployment.** The system runs on a local server only. A deployment guide and an automated production check were prepared, but the system has not been deployed publicly.

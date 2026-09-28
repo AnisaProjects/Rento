@@ -80,7 +80,7 @@ EXECUTIVE_SUMMARY = [
     "Evaluation showed that all 480 forecast prices respected the caps and rounding rules, and that the recommendation "
     "engine reached a normalised precision@3 of 0.94 and a hit rate of 0.91 on twelve test trips. Among the models "
     "compared, a Random Forest explained 49% of daily demand variance on an external rental dataset and 98% of price "
-    "variance on 1,640 scraped Nepali listings. Fifty-four PHPUnit and forty-six pytest tests passed, and page weight "
+    "variance on 1,640 scraped Nepali listings (a day price derived from the listed four-hour price). Fifty-four PHPUnit and forty-six pytest tests passed, and page weight "
     "fell by up to 80% compared with the original template. Because Rento has only four real bookings, the live site "
     "uses the rule-based pricer; the learned models are ready to be switched on once about 200 bookings exist.",
 ]

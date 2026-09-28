@@ -184,7 +184,7 @@ models would perform once there is data. It uses **external data, not Rento book
 |---|---|---|---|---|---|
 | 1 Hourly demand | 18,247 hourly rows (public dataset), chronological split | Gradient Boosting | 30.5 | 38.1 | 0.285 |
 | 1b Daily demand | 654 days, chronological split | Random Forest | 251 | 327 | 0.489 |
-| 2 Day price | 1,640 scraped Sajilo listings, the MLP's held-out split | Random Forest | Rs 101 | Rs 251 | 0.981 |
+| 2 Day price (derived by the prototype from the listed 4-hour price) | 1,640 scraped Sajilo listings, the MLP's held-out split | Random Forest | Rs 101 | Rs 251 | 0.981 |
 
 The comparison includes Linear Regression, Random Forest, Gradient Boosting, the existing PyTorch MLP (Experiment 2)
 and baselines. There is also time-series cross-validation (demand) and GroupKFold on unseen vehicle models (price).
