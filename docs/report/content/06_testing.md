@@ -170,7 +170,7 @@ The usability of the system was assessed by the developer through the end-to-end
 
 Table 6.10 relates each requirement of Section 3.4 to the tests that provide evidence that it is met.
 
-Table: Table 6.10 Requirements and test evidence {widths=0.85,2.2,2.7}
+Table: Table 6.10 Requirements and test evidence {widths=1.05,2.0,2.7}
 | Requirement | Summary | Evidence |
 |---|---|---|
 | FR1 | Accounts and password reset | SecurityTest; SecurityHttpTest (login token); TC01 |

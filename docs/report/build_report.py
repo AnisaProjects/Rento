@@ -412,7 +412,15 @@ def render_markdown(doc, text, refs):
         elif re.match(r"^- ", line):
             add_text(doc.add_paragraph(style="List Bullet"), line[2:].strip())
         elif re.match(r"^\d+\. ", line):
-            add_text(doc.add_paragraph(style="List Number"), re.sub(r"^\d+\.\s+", "", line))
+            # Numbered lists restart at 1 each time: the number is written out with a hanging indent
+            # (Word's List Number style would continue one numbering across the whole document).
+            num = re.match(r"^(\d+)\.", line).group(1)
+            p = doc.add_paragraph(style="Normal")
+            p.paragraph_format.left_indent = Inches(0.35)
+            p.paragraph_format.first_line_indent = Inches(-0.3)
+            p.paragraph_format.tab_stops.add_tab_stop(Inches(0.35))
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            add_text(p, num + ".\t" + re.sub(r"^\d+\.\s+", "", line))
         elif line.startswith("> "):
             para(doc, line[2:].strip(), style="Note")
         else:
