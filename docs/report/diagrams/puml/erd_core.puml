@@ -1,0 +1,114 @@
+@startuml
+!include _style.iuml
+allowmixing
+hide circle
+skinparam linetype ortho
+skinparam defaultFontSize 13
+skinparam EntityFontSize 14
+skinparam EntityAttributeFontSize 13
+entity "tblusers" as tblusers {
+  * id : int <<PK>>
+  --
+  FullName : varchar
+  EmailId : varchar
+  ContactNo : char
+  .. 7 more columns ..
+}
+entity "tblbooking" as tblbooking {
+  * id : int <<PK>>
+  --
+  BookingNumber : bigint
+  userEmail : varchar <<FK>>
+  VehicleId : int <<FK>>
+  FromDate : varchar
+  ToDate : varchar
+  Status : int
+  quoted_price : int
+  pricing_details : text
+  .. 4 more columns ..
+}
+entity "tblvehicles" as tblvehicles {
+  * id : int <<PK>>
+  --
+  VehiclesTitle : varchar
+  VehiclesBrand : int <<FK>>
+  PricePerDay : int
+  FuelType : varchar
+  SeatingCapacity : int
+  CarType : varchar
+  IsActive : tinyint
+  DriverOnly : tinyint
+  Rugged : tinyint
+  .. 22 more columns ..
+}
+entity "tblbrands" as tblbrands {
+  * id : int <<PK>>
+  --
+  BrandName : varchar
+  .. 3 more columns ..
+}
+entity "tbltestimonial" as tbltestimonial {
+  * id : int <<PK>>
+  --
+  UserEmail : varchar <<FK>>
+  Testimonial : text
+  status : int
+  .. 1 more column ..
+}
+entity "tbl_price_forecast" as tbl_price_forecast {
+  * VehicleId : int <<PK>>
+  * ForecastDate : date <<PK>>
+  --
+  BasePrice : int
+  Multiplier : decimal
+  Price : int
+  Reasons : text
+  IsAvailable : tinyint
+  RunId : int <<FK>>
+  .. 1 more column ..
+}
+entity "tbl_forecast_runs" as tbl_forecast_runs {
+  * id : int <<PK>>
+  --
+  TriggerReason : varchar
+  Status : varchar
+  RequestedAt : timestamp
+  FinishedAt : datetime
+  .. 4 more columns ..
+}
+entity "tbl_price_overrides" as tbl_price_overrides {
+  * id : int <<PK>>
+  --
+  VehicleId : int <<FK>>
+  FromDate : date
+  ToDate : date
+  Price : int
+  Note : varchar
+  .. 2 more columns ..
+}
+entity "tblfestivals" as tblfestivals {
+  * id : int <<PK>>
+  --
+  FestivalName : varchar
+  StartDate : date
+  EndDate : date
+  TravelFrom : date
+  TravelTo : date
+  TravelPct : decimal
+  DemandLevel : varchar
+  .. 5 more columns ..
+}
+entity "tblsettings" as tblsettings {
+  * SettingKey : varchar <<PK>>
+  --
+  SettingValue : varchar
+  .. 1 more column ..
+}
+tblbrands ||..o{ tblvehicles : brand of
+tblvehicles ||..o{ tblbooking : books
+tblusers ||..o{ tblbooking : made by
+tblvehicles ||..o{ tbl_price_forecast : prices
+tbl_forecast_runs ||..o{ tbl_price_forecast : written by
+tblvehicles ||..o{ tbl_price_overrides : overrides
+tblusers ||..o{ tbltestimonial : written by
+@enduml

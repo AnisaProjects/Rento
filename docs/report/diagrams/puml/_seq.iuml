@@ -1,0 +1,10 @@
+!include _style.iuml
+skinparam defaultFontSize 15
+skinparam ArrowFontSize 15
+skinparam ParticipantFontSize 15
+skinparam ActorFontSize 15
+skinparam DatabaseFontSize 15
+skinparam maxMessageSize 130
+skinparam SequenceMessageAlignment left
+hide footbox
+autonumber

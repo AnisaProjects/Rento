@@ -1,0 +1,22 @@
+@startuml
+!include _seq.iuml
+actor Customer as U
+participant "Find My Car\npage" as F
+participant "trip-parser.php" as T
+participant "Recommendation\nengine" as E
+participant "pricing.php" as Q
+database "MySQL" as DB
+U -> F : POST "Mountain roads to Mustang, 5 people", budget, dates (csrf_token)
+F -> T : trip_understand(trip)
+T --> F : type SUV (inferred), mountain, 5 people
+F -> E : recommend(criteria, user)
+E -> DB : active cars and the user's past rentals
+loop for each car
+  E -> Q : price for the dates or 'from' price
+  E -> E : exclude: too few seats, not free,\nmore than 10% over budget
+  E -> E : weighted score and reasons
+end
+E -> E : sort, drop matches below 40%
+E --> F : matches with percent, reasons, cautions
+F --> U : result cards with reasons
+@enduml

@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="790" viewBox="0 0 860 790" font-family="Arial, Helvetica, sans-serif" font-size="14">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4f5362"/></marker></defs>
+<rect width="860" height="790" fill="white"/>
+<path d="M150.0,76.0 L330.0,76.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M150.0,206.0 L330.0,206.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M330.0,234.0 L150.0,234.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M150.0,336.0 L330.0,336.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M330.0,364.0 L150.0,364.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M150.0,466.0 L330.0,466.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M330.0,494.0 L150.0,494.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M150.0,596.0 L330.0,596.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M330.0,624.0 L150.0,624.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M150.0,718.0 L425.0,718.0 L425.0,645.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M425.0,515.0 L425.0,575.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M520.0,69.0 L640.0,62.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)" marker-start="url(#a)"/>
+<path d="M520.0,107.5 L640.0,118.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)" marker-start="url(#a)"/>
+<path d="M640.0,220.0 L520.0,220.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M640.0,232.6 L520.0,332.5" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M640.0,337.4 L520.0,244.5" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M640.0,350.0 L520.0,353.5" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M640.0,362.6 L520.0,462.5" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M640.0,532.4 L520.0,374.5" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M640.0,545.0 L520.0,497.5" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M520.0,596.0 L640.0,557.6" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)" marker-start="url(#a)"/>
+<path d="M520.0,627.5 L575.0,627.5 L575.0,687.0 L640.0,687.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M463.0,55.0 L463.0,20.0 L848.0,20.0 L848.0,705.0 L830.0,705.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<rect x="20" y="40" width="130" height="600" fill="white" stroke="#101114" stroke-width="1.6"/>
+<text x="85.0" y="336.5" text-anchor="middle" font-weight="bold">Customer /</text>
+<text x="85.0" y="353.5" text-anchor="middle" font-weight="bold">guest</text>
+<rect x="20" y="690" width="130" height="56" fill="white" stroke="#101114" stroke-width="1.6"/>
+<text x="85.0" y="723.0" text-anchor="middle" font-weight="bold">Administrator</text>
+<rect x="330" y="55" width="190" height="70" rx="14" fill="#fff0eb" stroke="#d23f1c" stroke-width="1.4"/>
+<text x="425.0" y="78.0" text-anchor="middle" font-weight="bold">1.0</text>
+<text x="425.0" y="95.0" text-anchor="middle">Authenticate and</text>
+<text x="425.0" y="112.0" text-anchor="middle">manage account</text>
+<rect x="330" y="185" width="190" height="70" rx="14" fill="#fff0eb" stroke="#d23f1c" stroke-width="1.4"/>
+<text x="425.0" y="216.5" text-anchor="middle" font-weight="bold">2.0</text>
+<text x="425.0" y="233.5" text-anchor="middle">Browse and search</text>
+<rect x="330" y="315" width="190" height="70" rx="14" fill="#fff0eb" stroke="#d23f1c" stroke-width="1.4"/>
+<text x="425.0" y="346.5" text-anchor="middle" font-weight="bold">3.0</text>
+<text x="425.0" y="363.5" text-anchor="middle">Recommend cars</text>
+<rect x="330" y="445" width="190" height="70" rx="14" fill="#fff0eb" stroke="#d23f1c" stroke-width="1.4"/>
+<text x="425.0" y="476.5" text-anchor="middle" font-weight="bold">4.0</text>
+<text x="425.0" y="493.5" text-anchor="middle">Quote prices</text>
+<rect x="330" y="575" width="190" height="70" rx="14" fill="#fff0eb" stroke="#d23f1c" stroke-width="1.4"/>
+<text x="425.0" y="606.5" text-anchor="middle" font-weight="bold">5.0</text>
+<text x="425.0" y="623.5" text-anchor="middle">Book and invoice</text>
+<rect x="640" y="44" width="190" height="36" fill="#f1f2f4" stroke="none"/>
+<path d="M830,44 L640,44 L640,80 L830,80" fill="none" stroke="#4f5362" stroke-width="1.4"/>
+<path d="M678,44 L678,80" stroke="#4f5362" stroke-width="1.2"/>
+<text x="659" y="67.0" text-anchor="middle" font-weight="bold">D1</text>
+<text x="686" y="67.0" text-anchor="start">tblusers, admin</text>
+<rect x="640" y="100" width="190" height="36" fill="#f1f2f4" stroke="none"/>
+<path d="M830,100 L640,100 L640,136 L830,136" fill="none" stroke="#4f5362" stroke-width="1.4"/>
+<path d="M678,100 L678,136" stroke="#4f5362" stroke-width="1.2"/>
+<text x="659" y="123.0" text-anchor="middle" font-weight="bold">D7</text>
+<text x="686" y="123.0" text-anchor="start">resets, rate limits</text>
+<rect x="640" y="202" width="190" height="36" fill="#f1f2f4" stroke="none"/>
+<path d="M830,202 L640,202 L640,238 L830,238" fill="none" stroke="#4f5362" stroke-width="1.4"/>
+<path d="M678,202 L678,238" stroke="#4f5362" stroke-width="1.2"/>
+<text x="659" y="225.0" text-anchor="middle" font-weight="bold">D2</text>
+<text x="686" y="225.0" text-anchor="start">vehicles, brands</text>
+<rect x="640" y="332" width="190" height="36" fill="#f1f2f4" stroke="none"/>
+<path d="M830,332 L640,332 L640,368 L830,368" fill="none" stroke="#4f5362" stroke-width="1.4"/>
+<path d="M678,332 L678,368" stroke="#4f5362" stroke-width="1.2"/>
+<text x="659" y="355.0" text-anchor="middle" font-weight="bold">D4</text>
+<text x="686" y="355.0" text-anchor="start">tbl_price_forecast</text>
+<rect x="640" y="527" width="190" height="36" fill="#f1f2f4" stroke="none"/>
+<path d="M830,527 L640,527 L640,563 L830,563" fill="none" stroke="#4f5362" stroke-width="1.4"/>
+<path d="M678,527 L678,563" stroke="#4f5362" stroke-width="1.2"/>
+<text x="659" y="550.0" text-anchor="middle" font-weight="bold">D3</text>
+<text x="686" y="550.0" text-anchor="start">tblbooking</text>
+<rect x="640" y="660" width="190" height="90" rx="14" fill="#fff0eb" stroke="#d23f1c" stroke-width="1.4"/>
+<text x="735.0" y="693.0" text-anchor="middle" font-weight="bold">8.0 Forecast prices,</text>
+<text x="735.0" y="710.0" text-anchor="middle">9.0 Send email</text>
+<text x="735.0" y="727.0" text-anchor="middle">(Figure part B)</text>
+<rect x="201.5" y="52.0" width="77.0" height="20" fill="white" opacity="0.92"/>
+<text x="240.0" y="67.0" text-anchor="middle" font-size="13" fill="#30333d">credentials</text>
+<rect x="219.0" y="182.0" width="42.0" height="20" fill="white" opacity="0.92"/>
+<text x="240.0" y="197.0" text-anchor="middle" font-size="13" fill="#30333d">filters</text>
+<rect x="206.5" y="238.0" width="67.0" height="20" fill="white" opacity="0.92"/>
+<text x="240.0" y="253.0" text-anchor="middle" font-size="13" fill="#30333d">car cards</text>
+<rect x="189.5" y="312.0" width="101.0" height="20" fill="white" opacity="0.92"/>
+<text x="240.0" y="327.0" text-anchor="middle" font-size="13" fill="#30333d">trip description</text>
+<rect x="169.0" y="368.0" width="142.0" height="20" fill="white" opacity="0.92"/>
+<text x="240.0" y="383.0" text-anchor="middle" font-size="13" fill="#30333d">ranked cars, reasons</text>
+<rect x="204.5" y="442.0" width="71.0" height="20" fill="white" opacity="0.92"/>
+<text x="240.0" y="457.0" text-anchor="middle" font-size="13" fill="#30333d">car, dates</text>
+<rect x="174.0" y="498.0" width="132.0" height="20" fill="white" opacity="0.92"/>
+<text x="240.0" y="513.0" text-anchor="middle" font-size="13" fill="#30333d">day prices, reasons</text>
+<rect x="185.0" y="572.0" width="110.0" height="20" fill="white" opacity="0.92"/>
+<text x="240.0" y="587.0" text-anchor="middle" font-size="13" fill="#30333d">booking request</text>
+<rect x="191.0" y="628.0" width="98.0" height="20" fill="white" opacity="0.92"/>
+<text x="240.0" y="643.0" text-anchor="middle" font-size="13" fill="#30333d">status, invoice</text>
+<rect x="236.0" y="722.0" width="108.0" height="20" fill="white" opacity="0.92"/>
+<text x="290.0" y="737.0" text-anchor="middle" font-size="13" fill="#30333d">confirm / cancel</text>
+<rect x="431.0" y="535.0" width="88.0" height="20" fill="white" opacity="0.92"/>
+<text x="475.0" y="550.0" text-anchor="middle" font-size="13" fill="#30333d">server quote</text>
+<rect x="562.5" y="202.0" width="35.0" height="20" fill="white" opacity="0.92"/>
+<text x="580.0" y="217.0" text-anchor="middle" font-size="13" fill="#30333d">fleet</text>
+<rect x="523.5" y="280.0" width="85.0" height="20" fill="white" opacity="0.92"/>
+<text x="566.0" y="295.0" text-anchor="middle" font-size="13" fill="#30333d">&#x27;from&#x27; prices</text>
+<rect x="577.0" y="329.0" width="46.0" height="20" fill="white" opacity="0.92"/>
+<text x="600.0" y="344.0" text-anchor="middle" font-size="13" fill="#30333d">prices</text>
+<rect x="559.5" y="422.0" width="73.0" height="20" fill="white" opacity="0.92"/>
+<text x="596.0" y="437.0" text-anchor="middle" font-size="13" fill="#30333d">day prices</text>
+<rect x="525.0" y="390.0" width="90.0" height="20" fill="white" opacity="0.92"/>
+<text x="570.0" y="405.0" text-anchor="middle" font-size="13" fill="#30333d">rental history</text>
+<rect x="549.5" y="510.0" width="73.0" height="20" fill="white" opacity="0.92"/>
+<text x="586.0" y="525.0" text-anchor="middle" font-size="13" fill="#30333d">availability</text>
+<rect x="549.0" y="566.0" width="58.0" height="20" fill="white" opacity="0.92"/>
+<text x="578.0" y="581.0" text-anchor="middle" font-size="13" fill="#30333d">booking</text>
+<rect x="509.0" y="637.0" width="132.0" height="36" fill="white" opacity="0.92"/>
+<text x="575.0" y="652.0" text-anchor="middle" font-size="13" fill="#30333d">recompute request,</text>
+<text x="575.0" y="668.0" text-anchor="middle" font-size="13" fill="#30333d">booking emails</text>
+<rect x="667.5" y="10.0" width="65.0" height="20" fill="white" opacity="0.92"/>
+<text x="700.0" y="25.0" text-anchor="middle" font-size="13" fill="#30333d">reset link</text>
+</svg>

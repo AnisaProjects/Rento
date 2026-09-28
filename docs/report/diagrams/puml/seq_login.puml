@@ -1,0 +1,32 @@
+@startuml
+!include _seq.iuml
+actor Customer as U
+participant "Browser" as B
+participant "security.php" as S
+participant "login.php" as L
+participant "rate\nlimit" as R
+database "MySQL" as DB
+U -> B : email and password
+B -> S : POST login form with csrf_token
+S -> S : csrf_is_valid()
+alt token missing or wrong
+  S --> B : rejected, no login
+end
+S -> L : handle login
+L -> R : rate_limit_exceeded('login', email)
+R -> DB : count recent failures
+alt too many attempts
+  L --> B : redirect, "Too many attempts"
+end
+L -> DB : SELECT user by email (prepared)
+L -> L : password_check_and_upgrade()\n(bcrypt; an old MD5 hash is re-hashed once)
+alt password valid
+  L -> DB : store new bcrypt hash (after an MD5 login only)
+  L -> R : rate_limit_clear()
+  L -> L : session_login_regenerate()
+  L --> B : redirect, "Welcome back"
+else password invalid
+  L -> R : rate_limit_record()
+  L --> B : redirect, login form reopened with error
+end
+@enduml

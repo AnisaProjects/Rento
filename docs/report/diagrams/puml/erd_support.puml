@@ -1,0 +1,91 @@
+@startuml
+!include _style.iuml
+allowmixing
+hide circle
+skinparam linetype ortho
+skinparam defaultFontSize 13
+skinparam EntityFontSize 14
+skinparam EntityAttributeFontSize 13
+entity "admin" as admin {
+  * id : int <<PK>>
+  --
+  UserName : varchar
+  Email : varchar
+  .. 2 more columns ..
+}
+entity "tblusers" as tblusers {
+  * id : int <<PK>>
+  --
+  FullName : varchar
+  EmailId : varchar
+  ContactNo : char
+  .. 7 more columns ..
+}
+entity "tblpasswordresets" as tblpasswordresets {
+  * id : int <<PK>>
+  --
+  UserId : int <<FK>>
+  AccountType : varchar
+  TokenHash : char <<UK>>
+  ExpiresAt : datetime
+  UsedAt : datetime
+  .. 1 more column ..
+}
+entity "tblpackages" as tblpackages {
+  * id : int <<PK>>
+  --
+  CategoryId : int <<FK>>
+  Title : varchar
+  Slug : varchar
+  StartingPrice : int
+  FestivalPricing : tinyint
+  IsActive : tinyint
+  .. 14 more columns ..
+}
+entity "tblpackagecategories" as tblpackagecategories {
+  * id : int <<PK>>
+  --
+  CategoryName : varchar
+  Slug : varchar <<UK>>
+  .. 4 more columns ..
+}
+entity "tblpackageimages" as tblpackageimages {
+  * id : int <<PK>>
+  --
+  PackageId : int <<FK>>
+  ImagePath : varchar
+  .. 1 more column ..
+}
+entity "tblpackageenquiries" as tblpackageenquiries {
+  * id : int <<PK>>
+  --
+  PackageId : int <<FK>>
+  VehicleId : int <<FK>>
+  FullName : varchar
+  Phone : varchar
+  TravelDate : date
+  Status : varchar
+  .. 9 more columns ..
+}
+entity "tblvehicles" as tblvehicles {
+  * id : int <<PK>>
+  --
+  VehiclesTitle : varchar
+  VehiclesBrand : int <<FK>>
+  PricePerDay : int
+  FuelType : varchar
+  SeatingCapacity : int
+  CarType : varchar
+  IsActive : tinyint
+  DriverOnly : tinyint
+  Rugged : tinyint
+  .. 22 more columns ..
+}
+tblusers |o..o{ tblpasswordresets : resets (AccountType=user)
+admin |o..o{ tblpasswordresets : resets (AccountType=admin)
+tblpackagecategories |o..o{ tblpackages : in category
+tblpackages ||..o{ tblpackageimages : photo of
+tblpackages |o..o{ tblpackageenquiries : about package
+tblvehicles |o..o{ tblpackageenquiries : about driver-only car
+rectangle "Standalone tables (no relationships)\n----\ntblratelimits (5 columns)\ntblpages (7 columns)\ntblsitecontent (3 columns)\ntblmailsettings (3 columns)\ntblcontactusinfo (4 columns)\ntblcontactusquery (7 columns)\ntblsubscribers (3 columns)" as standalone_list
+@enduml

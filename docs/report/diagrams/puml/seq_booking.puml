@@ -1,0 +1,25 @@
+@startuml
+!include _seq.iuml
+actor Customer as U
+participant "Car page" as V
+participant "pricing.php" as P
+database "MySQL" as DB
+actor Admin as A
+participant "batch_\nforecast.py" as Py
+U -> V : POST booking: dates, message, csrf_token
+V -> V : logged in? dates valid?
+V -> DB : overlapping booking for the car?
+V -> P : public_quote()\n(browser prices ignored)
+P -> DB : forecast day prices
+P --> V : total, per-day prices, reasons
+V -> DB : INSERT booking with quoted_price, pricing_details
+V -> P : request recompute
+P ->> Py : start in background
+V -> V : "request received" email\n(mailer.php, if SMTP set up)
+V --> U : "Booking request sent"
+A -> DB : confirm: clash check, status confirmed
+A -> A : "confirmed" email (mailer.php)
+U -> V : GET invoice (owner only)
+V -> DB : booking with stored price and day details
+V --> U : printable invoice at the stored price
+@enduml

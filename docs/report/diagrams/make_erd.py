@@ -1,5 +1,5 @@
 """
-Builds the ERD sources (Mermaid) and schema.json from the live schema export.
+Builds the ERD sources (PlantUML, puml/erd_*.puml) and schema.json from the live schema export.
   schema.tsv   information_schema.COLUMNS (table, column, type, nullable, key, default, extra)
   indexes.tsv  secondary indexes
 Refresh the exports (MySQL admin account), then run:  python3 docs/report/diagrams/make_erd.py
@@ -60,20 +60,70 @@ def entity(t, compact):
     return "\n".join(lines)
 
 
-def erd(tables, title, compact=True):
-    out = ["---", f"title: \"{title}\"", "---", "erDiagram"]
-    out += [entity(t, compact) for t in tables]
+# Columns shown in the printed ERD besides PK/FK/UK (the full list is in schema.json and the data dictionary).
+KEYCOLS = {
+    "tblusers": ["FullName", "EmailId", "ContactNo"],
+    "tblbooking": ["BookingNumber", "FromDate", "ToDate", "Status", "quoted_price", "pricing_details"],
+    "tblvehicles": ["VehiclesTitle", "PricePerDay", "FuelType", "SeatingCapacity", "CarType", "IsActive", "DriverOnly", "Rugged"],
+    "tblbrands": ["BrandName"],
+    "tbl_price_forecast": ["ForecastDate", "BasePrice", "Multiplier", "Price", "Reasons", "IsAvailable"],
+    "tbl_forecast_runs": ["TriggerReason", "Status", "RequestedAt", "FinishedAt"],
+    "tbl_price_overrides": ["FromDate", "ToDate", "Price", "Note"],
+    "tblfestivals": ["FestivalName", "StartDate", "EndDate", "TravelFrom", "TravelTo", "TravelPct", "DemandLevel"],
+    "tblsettings": ["SettingKey", "SettingValue"],
+    "tbltestimonial": ["Testimonial", "status"],
+    "admin": ["UserName", "Email"],
+    "tblpasswordresets": ["AccountType", "TokenHash", "ExpiresAt", "UsedAt"],
+    "tblpackages": ["Title", "Slug", "StartingPrice", "FestivalPricing", "IsActive"],
+    "tblpackagecategories": ["CategoryName", "Slug"],
+    "tblpackageimages": ["ImagePath"],
+    "tblpackageenquiries": ["FullName", "Phone", "TravelDate", "Status"],
+}
+PUML_CARD = {"}o--||": ("||", "o{"), "}o--o|": ("|o", "o{")}  # (parent end, child end)
+
+
+def puml_entity(t):
+    fk = {c for (ct, c, *_rest) in RELS if ct == t}
+    rows, shown = [], 0
+    for c in cols[t]:
+        name, key = c["column"], c["key"]
+        tag = "PK" if key == "PRI" else ("FK" if name in fk else ("UK" if key == "UNI" else ""))
+        if tag or name in KEYCOLS.get(t, []):
+            rows.append((tag, name, mtype(c["type"])))
+            shown += 1
+    pk = [r for r in rows if r[0] == "PK"]
+    rest = [r for r in rows if r[0] != "PK"]
+    out = [f'entity "{t}" as {t} {{']
+    out += [f'  * {n} : {ty} <<PK>>' for _, n, ty in pk]
+    out.append("  --")
+    out += [f'  {n} : {ty}' + (f' <<{tag}>>' if tag else "") for tag, n, ty in rest]
+    hidden = len(cols[t]) - shown
+    if hidden:
+        out.append(f'  .. {hidden} more column{"s" if hidden > 1 else ""} ..')
+    out.append("}")
+    return "\n".join(out)
+
+
+def puml_erd(tables, lists=None):
+    out = ["@startuml", "!include _style.iuml", "allowmixing", "hide circle", "skinparam linetype ortho", "skinparam defaultFontSize 13",
+           "skinparam EntityFontSize 14", "skinparam EntityAttributeFontSize 13"]
+    out += [puml_entity(t) for t in tables]
     for ct, cc, pt, pc, card, label in RELS:
         if ct in tables and pt in tables:
-            left, right = card.split("--")
-            # Mermaid: PARENT ||--o{ CHILD : "label"
-            rev = {"}o": "o{", "||": "||", "o|": "|o"}
-            out.append(f'    {pt} {rev.get(right[::-1], right[::-1])}..{rev.get(left, left)} {ct} : "{label} (logical, {ct}.{cc})"')
+            pe, ce = PUML_CARD[card]
+            out.append(f'{pt} {pe}..{ce} {ct} : {label}')
+    for name, members in (lists or {}).items():
+        body = "\\n".join(f"{m} ({len(cols[m])} columns)" for m in members)
+        out.append(f'rectangle "{name}\\n----\\n{body}" as {name.split()[0].lower()}_list')
+    out.append("@enduml")
     return "\n".join(out) + "\n"
 
 
-(HERE / "erd_core.mmd").write_text(erd(CORE, "Rento ERD (1/2): bookings, fleet and smart pricing. Dotted lines = logical relationships (no FK constraints)"))
-(HERE / "erd_support.mmd").write_text(erd(SUPPORT, "Rento ERD (2/2): accounts, security, packages and content. Dotted lines = logical relationships"))
+(HERE / "puml" / "erd_core.puml").write_text(puml_erd(
+    ["tblusers", "tblbooking", "tblvehicles", "tblbrands", "tbltestimonial", "tbl_price_forecast", "tbl_forecast_runs", "tbl_price_overrides", "tblfestivals", "tblsettings"]))
+(HERE / "puml" / "erd_support.puml").write_text(puml_erd(
+    ["admin", "tblusers", "tblpasswordresets", "tblpackages", "tblpackagecategories", "tblpackageimages", "tblpackageenquiries", "tblvehicles"],
+    {"Standalone tables (no relationships)": ["tblratelimits", "tblpages", "tblsitecontent", "tblmailsettings", "tblcontactusinfo", "tblcontactusquery", "tblsubscribers"]}))
 json.dump({"tables": cols, "indexes": indexes, "relationships": [dict(zip(["child", "child_column", "parent", "parent_column", "cardinality", "label"], r)) for r in RELS],
            "note": "No foreign-key constraints exist in the database; relationships are logical (enforced in PHP)."},
           open(HERE / "schema.json", "w"), indent=1)

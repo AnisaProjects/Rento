@@ -1,0 +1,45 @@
+@startuml
+!include _style.iuml
+skinparam defaultFontSize 14
+skinparam ArrowFontSize 13
+|Customer|
+start
+:Find a car (search or
+trip description);
+repeat
+  :Pick dates on the
+  price calendar;
+  if (Logged in?) then (no)
+    :Log in or register;
+  endif
+  :Send booking request;
+  |Rento|
+  if (CSRF token valid?) then (no)
+    :Reject;
+    stop
+  endif
+repeat while (Dates valid and\ncar free?) is (no: error) not (yes)
+:Quote on the server
+and store the booking
+with quoted_price;
+:Request recompute and
+email if SMTP is set up;
+|Administrator|
+:Review the booking;
+if (Decision?) then (cancel)
+  :Cancelled;
+  stop
+else (confirm)
+  if (Clash with a
+  confirmed booking?) then (yes)
+    :Cancel one first;
+    stop
+  endif
+  :Confirmed: email,
+  recompute;
+endif
+|Customer|
+:Print the invoice
+at the stored price;
+stop
+@enduml

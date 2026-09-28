@@ -1,0 +1,19 @@
+@startuml
+!include _seq.iuml
+actor Customer as U
+participant "Browser" as B
+participant "car-listing" as P
+participant "price-\ninsights" as I
+database "MySQL" as DB
+U -> B : choose type, brand, fuel,\nbudget and sort order
+B -> P : GET ?type=SUV&max=7500\n&sort=price_asc
+P -> P : accept only listed values\nfor every parameter
+P -> DB : SELECT active cars JOIN brands\n(prepared, bound values)
+loop for each car
+  P -> I : car_price_info(id)
+end
+I -> DB : forecast rows for the next 30 days\n(once per request)
+I --> P : 'from' price and badges
+P -> P : budget filter, price sort, paging
+P --> B : car cards "from Rs X/day"
+@enduml

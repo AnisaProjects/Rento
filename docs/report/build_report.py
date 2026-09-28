@@ -269,8 +269,8 @@ def add_figure(doc, caption, path, width_in=6.0):
         from PIL import Image  # noqa: WPS433 (matplotlib dependency)
         with Image.open(full) as im:
             w, h = im.size
-        # fit inside 6.0" x 7.8" (text area is 6.27" x 9.69")
-        width = min(width_in, 7.8 * w / h)
+        # fit inside the requested width and 9.0" height (text area is 5.77" x 9.69", less the caption)
+        width = min(width_in, 9.0 * w / h)
         p.add_run().add_picture(str(full), width=Inches(width))
     else:
         add_text(p, f"[INSERT FIGURE: {path}]", italic=True)

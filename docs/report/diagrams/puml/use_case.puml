@@ -1,0 +1,46 @@
+@startuml
+!include _style.iuml
+left to right direction
+skinparam packageStyle rectangle
+actor "Guest" as Guest
+actor "Registered\ncustomer" as Customer
+actor "Administrator" as Admin
+actor "Scheduler\n(launchd)" as Sched
+actor "SMTP mail\nserver" as Mail
+Guest <|-- Customer
+rectangle "Rento system" {
+  usecase "Browse, filter and\nsort cars" as UC1
+  usecase "View car page and\nprice calendar" as UC2
+  usecase "Find My Car\n(trip recommendation)" as UC3
+  usecase "Register, log in,\nreset password" as UC4
+  usecase "Send package or\ndriver enquiry" as UC7
+  usecase "Read FAQs, contact,\npost testimonial" as UC8
+  usecase "Request a booking" as UC5
+  usecase "My Bookings and\ninvoice" as UC6
+  usecase "Confirm or cancel\nbookings" as UC9
+  usecase "Manage fleet, packages\nand content" as UC10
+  usecase "Manage festivals and\npricing settings" as UC11
+  usecase "AI Insights: apply or\noverride prices" as UC12
+  usecase "Recompute price\nforecast" as UC13
+  usecase "Send notification\nemail" as UC15
+}
+Guest -- UC1
+Guest -- UC2
+Guest -- UC3
+Guest -- UC4
+Guest -- UC7
+Guest -- UC8
+Customer -- UC5
+Customer -- UC6
+UC9 -- Admin
+UC10 -- Admin
+UC11 -- Admin
+UC12 -- Admin
+UC13 -- Admin
+UC13 -- Sched
+UC15 -- Mail
+UC5 ..> UC2 : <<include>>
+UC5 ..> UC15 : <<include>>
+UC9 ..> UC15 : <<include>>
+UC11 ..> UC13 : <<include>>
+@enduml

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="400" viewBox="0 0 860 400" font-family="Arial, Helvetica, sans-serif" font-size="14">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#4f5362"/></marker></defs>
+<rect width="860" height="400" fill="white"/>
+<path d="M170.0,59.6 L389.0,60.0 L389.2,150.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M345.0,179.7 L95.0,180.0 L95.0,110.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M95.0,290.0 L95.0,230.0 L345.0,230.3" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M389.2,260.0 L389.0,340.0 L170.0,339.7" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M690.0,75.0 L471.0,75.0 L470.8,150.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M515.0,240.2 L610.0,240.0 L610.0,325.0 L690.0,325.0" fill="none" stroke="#4f5362" stroke-width="1.4" marker-end="url(#a)"/>
+<rect x="20" y="40" width="150" height="70" fill="white" stroke="#101114" stroke-width="1.6"/>
+<text x="95.0" y="71.5" text-anchor="middle" font-weight="bold">Customer /</text>
+<text x="95.0" y="88.5" text-anchor="middle" font-weight="bold">guest</text>
+<rect x="20" y="290" width="150" height="70" fill="white" stroke="#101114" stroke-width="1.6"/>
+<text x="95.0" y="330.0" text-anchor="middle" font-weight="bold">Administrator</text>
+<rect x="345" y="150" width="170" height="110" rx="14" fill="#fff0eb" stroke="#d23f1c" stroke-width="1.4"/>
+<text x="430.0" y="193.0" text-anchor="middle" font-weight="bold">0</text>
+<text x="430.0" y="210.0" text-anchor="middle">Rento car rental</text>
+<text x="430.0" y="227.0" text-anchor="middle">system</text>
+<rect x="690" y="40" width="150" height="70" fill="white" stroke="#101114" stroke-width="1.6"/>
+<text x="765.0" y="71.5" text-anchor="middle" font-weight="bold">Scheduler</text>
+<text x="765.0" y="88.5" text-anchor="middle" font-weight="bold">(nightly 02:30)</text>
+<rect x="690" y="290" width="150" height="70" fill="white" stroke="#101114" stroke-width="1.6"/>
+<text x="765.0" y="321.5" text-anchor="middle" font-weight="bold">SMTP mail</text>
+<text x="765.0" y="338.5" text-anchor="middle" font-weight="bold">server</text>
+<rect x="150.5" y="18.0" width="223.0" height="36" fill="white" opacity="0.92"/>
+<text x="262.0" y="33.0" text-anchor="middle" font-size="13" fill="#30333d">search criteria, trip description,</text>
+<text x="262.0" y="49.0" text-anchor="middle" font-size="13" fill="#30333d">booking request, enquiry, account</text>
+<rect x="112.0" y="184.0" width="220.0" height="36" fill="white" opacity="0.92"/>
+<text x="222.0" y="199.0" text-anchor="middle" font-size="13" fill="#30333d">car lists, day prices and reasons,</text>
+<text x="222.0" y="215.0" text-anchor="middle" font-size="13" fill="#30333d">recommendations, status, invoice</text>
+<rect x="128.0" y="234.0" width="188.0" height="36" fill="white" opacity="0.92"/>
+<text x="222.0" y="249.0" text-anchor="middle" font-size="13" fill="#30333d">fleet, festivals, settings,</text>
+<text x="222.0" y="265.0" text-anchor="middle" font-size="13" fill="#30333d">booking decisions, overrides</text>
+<rect x="169.5" y="346.0" width="201.0" height="36" fill="white" opacity="0.92"/>
+<text x="270.0" y="361.0" text-anchor="middle" font-size="13" fill="#30333d">dashboard figures, AI Insights,</text>
+<text x="270.0" y="377.0" text-anchor="middle" font-size="13" fill="#30333d">model health</text>
+<rect x="499.0" y="50.0" width="166.0" height="20" fill="white" opacity="0.92"/>
+<text x="582.0" y="65.0" text-anchor="middle" font-size="13" fill="#30333d">nightly recompute trigger</text>
+<rect x="551.0" y="188.0" width="130.0" height="36" fill="white" opacity="0.92"/>
+<text x="616.0" y="203.0" text-anchor="middle" font-size="13" fill="#30333d">reset links, booking</text>
+<text x="616.0" y="219.0" text-anchor="middle" font-size="13" fill="#30333d">and enquiry emails</text>
+</svg>

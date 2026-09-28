@@ -1,0 +1,31 @@
+@startuml
+!include _style.iuml
+skinparam defaultFontSize 14
+skinparam ArrowFontSize 13
+start
+:Trigger: nightly at 02:30, admin Recompute, or a change to
+bookings, festivals, settings, base prices or overrides;
+:Queue a row in tbl_forecast_runs;
+if (Another run holds the lock?) then (yes)
+  :Wait up to 300 s, then take all queued rows together;
+endif
+:Load active cars, festivals, bookings, overrides and settings;
+if (At least 50 confirmed bookings?) then (yes)
+  :Occupancy and demand factors on;
+else (no)
+  :Occupancy and demand factors off;
+endif
+repeat :Take the next car-day (every active car x next 60 days);
+  :Add the factors: weekend, festival or travel days,
+  season, lead time, occupancy, demand;
+  :Cap the sum at -15% / +25%, round to Rs 50, keep the reasons;
+  if (Manual override for this day?) then (yes)
+    :Use the override price (rule reasons kept);
+  else (no)
+    :Use the rule price;
+  endif
+repeat while (More car-days?) is (yes) not (no)
+:Replace tbl_price_forecast in one transaction;
+:Mark the runs done with a summary;
+stop
+@enduml

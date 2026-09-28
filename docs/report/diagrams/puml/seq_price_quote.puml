@@ -1,0 +1,24 @@
+@startuml
+!include _seq.iuml
+actor Customer as U
+participant "Browser\n(calendar)" as B
+participant "api/\nprice-quote" as A
+participant "rate\nlimit" as R
+participant "pricing.php" as P
+database "MySQL" as DB
+U -> B : pick pickup and return days
+B -> A : GET ?car=7&from=...&to=...
+A -> A : api_require_get() (else 405)
+A -> R : api_rate_limit()\n(120 per 15 min)
+alt over the limit
+  A --> B : 429 Too Many Requests
+end
+A -> A : validate car and dates\n(from today, at most 90 days)
+A -> P : public_quote(car, from, to)
+P -> DB : forecast rows for the car and dates
+P -> P : sum day prices, merge reasons;\nbase price beyond the forecast
+P -> DB : vehicle_is_free()
+P --> A : total, per-day prices, reasons, available
+A --> B : JSON (NPR)
+B -> B : show total, reasons and savings hint
+@enduml

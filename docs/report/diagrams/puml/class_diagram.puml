@@ -1,0 +1,94 @@
+@startuml
+!include _style.iuml
+skinparam defaultFontSize 13
+skinparam ClassFontSize 14
+skinparam ClassAttributeFontSize 13
+hide empty members
+hide circle
+skinparam packageStyle rectangle
+package "PHP application (includes/, api/)" {
+  class CarRecommendationEngine <<class>> {
+    +WEIGHTS : array
+    +ROAD_NOT_RUGGED = 0.6
+    -dbh : PDO
+    +recommend(trip, userEmail, limit) : array
+    +scoreCars(cars, trip, userEmail) : array
+    +getUserPreferences(email) : array
+    -dailyPrice(car, from, to) : array
+  }
+  class TripParser <<module>> {
+    +trip_understand(text) : array
+    +trip_amount(raw) : int
+  }
+  class Pricing <<module>> {
+    +pricing_quote(car, from, to) : array
+    +public_quote(car, from, to) : array
+    +vehicle_is_free(id, from, to) : bool
+    +booking_price_record(quote) : array
+    +forecast_request_recompute(reason) : int
+    +forecast_start() : bool
+    +pricing_health() : array
+  }
+  class PriceInsights <<module>> {
+    +car_price_infos() : array
+    +market_category(car) : string
+    +vehicle_price_suggestion(id, base) : array
+  }
+  class Api <<module>> {
+    +api_require_get()
+    +api_rate_limit(action, max)
+    +api_car() : object
+    +api_json(data)
+  }
+  class Security <<module>> {
+    +csrf_token() : string
+    +csrf_is_valid() : bool
+    +password_check_and_upgrade(plain, stored) : bool
+    +session_login_regenerate()
+    +clean_cms_html(html) : string
+  }
+  class RateLimit <<module>> {
+    +rate_limit_exceeded(action, email, max) : bool
+    +rate_limit_record(action, email)
+  }
+  class Mailer <<module>> {
+    +mail_configured() : bool
+    +mail_send(to, subject, html, text) : bool
+    +mail_booking_received(id) : bool
+  }
+}
+package "Python pricer (ml/)" {
+  class BatchForecast <<module>> {
+    +main() : int
+    +compute(cur, settings, today) : tuple
+    +claim_runs(cur) : list
+    +finish_runs(cur, ids, status)
+  }
+  class PricingRules <<module>> {
+    +price_for_day(day, today, car, festivals, s) : dict
+  }
+  class Festival <<dataclass>> {
+    +name, start, end, demand
+    +is_season, travel_from, travel_to, travel_pct
+  }
+  class CarContext <<dataclass>> {
+    +base_price : int
+    +occupancy : float
+    +recent_requests : int
+    +booked_days : set
+  }
+}
+Api ..> Pricing
+Api ..> CarRecommendationEngine
+Api ..> RateLimit
+CarRecommendationEngine ..> TripParser : trip criteria
+CarRecommendationEngine ..> Pricing : quotes
+CarRecommendationEngine ..> PriceInsights : 'from' price
+PriceInsights ..> Pricing
+Security ..> RateLimit : login, reset
+Mailer ..> Pricing : booking total
+Pricing ..> BatchForecast : starts (proc_open)
+BatchForecast ..> PricingRules
+PricingRules ..> Festival
+PricingRules ..> CarContext
+@enduml

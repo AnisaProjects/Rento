@@ -44,3 +44,5 @@
 - World Wide Web Consortium. (2023). *Web Content Accessibility Guidelines (WCAG) 2.2* (W3C Recommendation). https://www.w3.org/TR/WCAG22/
 - Consumer Protection Act, 2075 (2018). Government of Nepal. [VERIFY official source and URL]
 - Individual Privacy Act, 2075 (2018). Government of Nepal. [VERIFY official source and URL]
+- Gane, C., & Sarson, T. (1979). *Structured systems analysis: Tools and techniques*. Prentice-Hall.
+- Object Management Group. (2017). *OMG Unified Modeling Language (OMG UML), version 2.5.1* (formal/17-12-05). https://www.omg.org/spec/UML/2.5.1/
