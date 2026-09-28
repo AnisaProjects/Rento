@@ -1,0 +1,42 @@
+<!doctype html>
+<!-- Figure 3.2 (system architecture, layered). size: 860x682 -->
+<html><head><meta charset="utf-8"><style>
+body{margin:0;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#101114}
+#d{padding:14px 18px;width:824px}
+h1{font-size:19px;font-weight:normal;text-align:center;margin:0 0 12px}
+.layer{display:flex;border:1px solid #c9ccd3;border-radius:6px;margin:0}
+.name{width:118px;flex:none;background:#f1f2f4;border-right:1px solid #c9ccd3;border-radius:6px 0 0 6px;font-weight:bold;font-size:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px}
+.name small{display:block;font-weight:normal;font-size:13px;color:#4f5362;margin-top:4px}
+.items{display:flex;gap:8px;padding:8px;flex:1;flex-wrap:wrap}
+.b{flex:1;min-width:0;border:1px solid #d23f1c;background:#fff0eb;border-radius:4px;padding:6px;font-size:15px;line-height:1.28;text-align:center}
+.b b{display:block;font-size:16px;margin-bottom:2px}
+.g{border-color:#4f5362;background:#fff}
+.db{border-color:#4f5362;background:#f1f2f4;border-radius:14px}
+.link{display:flex;justify-content:center;font-size:14px;color:#4f5362;padding:3px 0 3px 118px;text-align:center}
+.link span:before{content:"\2195  ";font-size:18px;color:#4f5362}
+</style></head><body><div id="d">
+<h1>Rento system architecture (local deployment on MAMP)</h1>
+<div class="layer"><div class="name">Presentation<small>browser, desktop and mobile</small></div><div class="items">
+ <div class="b"><b>Public pages</b>home, car listing, car page with price calendar, Find My Car, packages, My Bookings, invoice</div>
+ <div class="b"><b>Admin area</b>dashboard, fleet, bookings, packages, festivals, Smart Pricing, AI Insights, content, email, system check</div>
+ <div class="b g"><b>Front end</b>HTML, Bootstrap 5.3, design tokens, dark mode; JavaScript: price calendar, trip search, theme</div>
+</div></div>
+<div class="link"><span>HTTP(S) requests and HTML / JSON responses</span></div>
+<div class="layer"><div class="name">Application<small>Apache 2.4 + PHP 8.3</small></div><div class="items">
+ <div class="b g"><b>Web server rules</b>.htaccess: clean URLs, blocked internal folders, no scripts in upload folders</div>
+ <div class="b"><b>JSON API</b>price-quote, price-calendar, recommend (GET, rate-limited)</div>
+ <div class="b"><b>Shared PHP modules</b>security (sessions, CSRF, rate limits), pricing, price insights, recommendation engine, trip parser, SEO, mailer (PHPMailer, optional SMTP)</div>
+</div></div>
+<div class="link"><span>PHP starts the forecast with proc_open (settings in environment variables)</span></div>
+<div class="layer"><div class="name">Intelligence<small>Python 3.12 virtual environment</small></div><div class="items">
+ <div class="b"><b>Live pricer</b>pricing_rules.py + batch_forecast.py: 60-day forecast for every active car</div>
+ <div class="b g"><b>Scheduler</b>launchd nightly at 02:30 (tools/run-forecast.php), plus a run after every relevant change</div>
+ <div class="b g" style="border-style:dashed"><b>Offline ML</b>train_evaluate.py: Linear Regression, Random Forest, Gradient Boosting, MLP on external datasets (not live)</div>
+</div></div>
+<div class="link"><span>PHP: PDO prepared statements &nbsp;&middot;&nbsp; Python: PyMySQL (reads fleet, festivals, bookings; writes forecast)</span></div>
+<div class="layer"><div class="name">Data<small>MySQL 8.0, least-privilege user</small></div><div class="items">
+ <div class="b db"><b>Core tables</b>vehicles, brands, bookings (with stored quoted price), users, admin</div>
+ <div class="b db"><b>Pricing tables</b>price forecast, forecast runs, price overrides, festivals, settings</div>
+ <div class="b db"><b>Content and support</b>pages, site content, packages and enquiries, testimonials, queries, resets, rate limits, mail settings</div>
+</div></div>
+</div></body></html>

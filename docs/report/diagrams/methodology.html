@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- Figure 3.1 (phased iterative methodology). size: 860x584 -->
+<html><head><meta charset="utf-8"><style>
+body{margin:0;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#101114}
+#d{padding:16px 20px;width:820px}
+h1{font-size:19px;font-weight:normal;text-align:center;margin:0 0 12px}
+.row{display:grid;grid-template-columns:236px 36px 236px 36px 236px;align-items:center}
+.p{min-height:74px;box-sizing:border-box;border:1px solid #d23f1c;background:#fff0eb;border-radius:4px;padding:6px 8px;text-align:center;font-size:16px;line-height:1.28;display:flex;flex-direction:column;justify-content:center}
+.p b{font-size:17px}
+.base{background:#f1f2f4;border-color:#4f5362}
+.a{text-align:center;font-size:22px;color:#4f5362}
+.v{display:grid;grid-template-columns:236px 36px 236px 36px 236px;font-size:22px;color:#4f5362;text-align:center;height:26px;line-height:26px}
+.loop{border:1px dashed #4f5362;border-radius:6px;padding:10px 12px 10px;margin-top:14px}
+.loop h2{font-size:17px;margin:0 0 8px;text-align:center}
+.lr{display:grid;grid-template-columns:1fr 30px 1fr 30px 1fr;align-items:center;margin-bottom:6px}
+.s{border:1px solid #4f5362;background:#fff;border-radius:4px;padding:7px 8px;font-size:16px;text-align:center}
+.q{border-color:#d23f1c}
+.note{text-align:center;font-size:14px;color:#4f5362;margin-top:6px}
+</style></head><body><div id="d">
+<h1>Phased iterative development of Rento</h1>
+<div class="row">
+ <div class="p base"><b>Baseline</b>Car Rental Portal template + August ML prototype</div><div class="a">&#10132;</div>
+ <div class="p"><b>Phase 0</b>Stabilise and secure</div><div class="a">&#10132;</div>
+ <div class="p"><b>Phase 1</b>Foundation: layout, Bootstrap 5, clean URLs</div>
+</div>
+<div class="v"><span></span><span></span><span></span><span></span><span>&#11015;</span></div>
+<div class="row">
+ <div class="p"><b>Phase 4</b>AI engine: pricing rules, forecast, APIs, recommendations</div><div class="a">&#11013;</div>
+ <div class="p"><b>Phase 3</b>Admin redesign, content, research</div><div class="a">&#11013;</div>
+ <div class="p"><b>Phase 2</b>Public site redesign</div>
+</div>
+<div class="v"><span>&#11015;</span><span></span><span></span><span></span><span></span></div>
+<div class="row">
+ <div class="p"><b>Phase 5</b>AI in the interface: price calendar, badges, AI Insights</div><div class="a">&#10132;</div>
+ <div class="p"><b>Phase 6</b>Polish: accessibility, SEO, dark mode, email, deployment</div><div class="a">&#10132;</div>
+ <div class="p"><b>Phase 7</b>Evaluation, tests, diagrams, report</div>
+</div>
+<div class="loop"><h2>Inside every phase</h2>
+ <div class="lr"><div class="s">Plan the phase and its scope</div><div class="a">&#10132;</div><div class="s">Back up database, create branch</div><div class="a">&#10132;</div><div class="s">Build, one commit per step</div></div>
+ <div class="v" style="grid-template-columns:1fr 30px 1fr 30px 1fr"><span></span><span></span><span></span><span></span><span>&#11015;</span></div>
+ <div class="lr"><div class="s q">Student review and approval</div><div class="a">&#11013;</div><div class="s">Phase report</div><div class="a">&#11013;</div><div class="s">Automated and manual tests</div></div>
+ <div class="note">If a phase is not approved, the work is revised. The next phase starts only after approval; problems found later are handled as follow-up fixes.</div>
+</div>
+</div></body></html>

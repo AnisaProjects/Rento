@@ -34,3 +34,13 @@
 - Tintarev, N., & Masthoff, J. (2015). Explaining recommendations: Design and evaluation. In F. Ricci, L. Rokach, & B. Shapira (Eds.), *Recommender systems handbook* (2nd ed., pp. 353–382). Springer. https://doi.org/10.1007/978-1-4899-7637-6_10
 - Willmott, C. J., & Matsuura, K. (2005). Advantages of the mean absolute error (MAE) over the root mean square error (RMSE) in assessing average model performance. *Climate Research, 30*(1), 79–82. https://doi.org/10.3354/cr030079
 - Xia, L., Monroe, K. B., & Cox, J. L. (2004). The price is unfair! A conceptual framework of price fairness perceptions. *Journal of Marketing, 68*(4), 1–15. https://doi.org/10.1509/jmkg.68.4.1.42733
+- IEEE. (1998). *IEEE recommended practice for software requirements specifications* (IEEE Std 830-1998). Institute of Electrical and Electronics Engineers. https://doi.org/10.1109/IEEESTD.1998.88286
+- International Organization for Standardization. (2011). *Systems and software engineering – Systems and software Quality Requirements and Evaluation (SQuaRE) – System and software quality models* (ISO/IEC 25010:2011). ISO.
+- Larman, C., & Basili, V. R. (2003). Iterative and incremental development: A brief history. *Computer, 36*(6), 47–56. https://doi.org/10.1109/MC.2003.1204375
+- Ministry of Home Affairs. (n.d.). *Government and public holidays in 2083*. Government of Nepal. Retrieved September 27, 2026, from https://www.moha.gov.np/page/government-and-public-holidays-in-2083
+- OWASP Foundation. (2021). *OWASP Top 10:2021*. https://owasp.org/Top10/
+- Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A., Cournapeau, D., Brucher, M., Perrot, M., & Duchesnay, É. (2011). Scikit-learn: Machine learning in Python. *Journal of Machine Learning Research, 12*, 2825–2830.
+- Sommerville, I. (2016). *Software engineering* (10th ed.). Pearson.
+- World Wide Web Consortium. (2023). *Web Content Accessibility Guidelines (WCAG) 2.2* (W3C Recommendation). https://www.w3.org/TR/WCAG22/
+- Consumer Protection Act, 2075 (2018). Government of Nepal. [VERIFY official source and URL]
+- Individual Privacy Act, 2075 (2018). Government of Nepal. [VERIFY official source and URL]

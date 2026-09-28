@@ -1,0 +1,85 @@
+{
+  "head": "9151b7b",
+  "phases": [
+    {
+      "phase": "Phase 0: stabilise and secure",
+      "first": "278f52a",
+      "last": "1b226cf",
+      "start": "2026-09-26T20:24:38+05:45",
+      "end": "2026-09-26T21:03:12+05:45",
+      "commits": 21
+    },
+    {
+      "phase": "Phase 1: foundation",
+      "first": "08b18e8",
+      "last": "6a7a044",
+      "start": "2026-09-26T21:10:11+05:45",
+      "end": "2026-09-26T22:24:34+05:45",
+      "commits": 13
+    },
+    {
+      "phase": "Phase 2: public redesign",
+      "first": "3d3c673",
+      "last": "4daa61d",
+      "start": "2026-09-27T07:43:20+05:45",
+      "end": "2026-09-27T09:17:56+05:45",
+      "commits": 12
+    },
+    {
+      "phase": "Phase 3: admin redesign",
+      "first": "b604802",
+      "last": "3d24921",
+      "start": "2026-09-27T09:24:10+05:45",
+      "end": "2026-09-27T09:54:11+05:45",
+      "commits": 8
+    },
+    {
+      "phase": "Phase 3: content, festivals, packages",
+      "first": "5e8b6c6",
+      "last": "b2019de",
+      "start": "2026-09-27T12:49:35+05:45",
+      "end": "2026-09-27T13:12:24+05:45",
+      "commits": 6
+    },
+    {
+      "phase": "Phase 4: AI engine",
+      "first": "c428671",
+      "last": "20a3c36",
+      "start": "2026-09-27T13:32:33+05:45",
+      "end": "2026-09-27T13:52:44+05:45",
+      "commits": 9
+    },
+    {
+      "phase": "Phase 5: AI in the interface",
+      "first": "d8c736f",
+      "last": "93da222",
+      "start": "2026-09-27T14:35:46+05:45",
+      "end": "2026-09-27T17:53:16+05:45",
+      "commits": 13
+    },
+    {
+      "phase": "Phase 6: polish",
+      "first": "8ef7f0f",
+      "last": "200ce12",
+      "start": "2026-09-27T18:07:09+05:45",
+      "end": "2026-09-27T20:59:20+05:45",
+      "commits": 11
+    },
+    {
+      "phase": "Phase 7: evaluation, tests, diagrams",
+      "first": "a16a20d",
+      "last": "13e2cd5",
+      "start": "2026-09-27T21:18:44+05:45",
+      "end": "2026-09-27T22:32:54+05:45",
+      "commits": 6
+    },
+    {
+      "phase": "Phase 7: report (to Chapter 2)",
+      "first": "fe77255",
+      "last": "9151b7b",
+      "start": "2026-09-27T22:49:07+05:45",
+      "end": "2026-09-27T23:13:54+05:45",
+      "commits": 2
+    }
+  ]
+}
