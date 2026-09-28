@@ -20,6 +20,11 @@ Search the report for `[INSERT` to find each one.
 | 6f | `[INSERT demand dataset name and URL]` and `[INSERT citation]` (same source as item 5) | Section 3.3 |
 | 7 | Business details in admin → Contact info ("J&K Block, Laxmi Nagar" is template data; it appears on the invoice screenshot) | Chapter 5 screenshots |
 
+## Promised in the text (to deliver in the appendices)
+
+- Full data dictionary of all 23 tables (Section 4.4.1) — generate from docs/report/diagrams/schema.json.
+- Market research summary (note under Table 2.2).
+
 ## Checks before submission
 
 - Confirm each reference (authors, year, title, pages, DOI) against the original source; the DOIs were taken from memory of the publications and must be checked.
