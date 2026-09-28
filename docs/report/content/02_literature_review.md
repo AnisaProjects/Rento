@@ -88,7 +88,7 @@ Table: Table 2.2 Feature comparison of existing platforms and Rento {widths=0.98
 | Online payment | Yes | – | – | No | – | No | No |
 | Stored quote and invoice | – | – | – | – | – | No | Yes |
 
-> Sources: market survey of 27 September 2026 (see Section 2.2.4 and Appendix [INSERT appendix letter]). A dash (–) means that the feature was not described on the pages reviewed; "chat apps" refers to WhatsApp or Viber; "Not observed" means that the published prices showed no such variation.
+> Sources: market survey of 27 September 2026 (see Section 2.2.4 and Appendix F). A dash (–) means that the feature was not described on the pages reviewed; "chat apps" refers to WhatsApp or Viber; "Not observed" means that the published prices showed no such variation.
 
 ## 2.3 Theoretical Framework
 

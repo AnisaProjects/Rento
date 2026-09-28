@@ -13,7 +13,6 @@ Search the report for `[INSERT` to find each one.
 | 5 | `[INSERT demand dataset name + URL]` | Chapter 5 and References (later) |
 | 6 | Template source: name, author and URL of the "Car Rental Portal" template that was downloaded | Chapter 3 and References (later) |
 | 6a | `[INSERT template citation]` (same source as item 6) | Chapter 2, Section 2.2.4 |
-| 6b | `[INSERT appendix letter]` for the market research summary | Chapter 2, note under Table 2.2 (fill in once the appendices are numbered) |
 | 6c | Chapter 3 timeline: `[INSERT dates]` for the proposal/approval and the submission/presentation, `[INSERT submission date]`, `[INSERT]` evidence | Table 3.3 |
 | 6d | `[INSERT licence, e.g. student licence]` for Microsoft Word and `[INSERT estimated annual hosting and domain cost]` | Section 3.6.3 |
 | 6e | `[INSERT editor used]` (for example Visual Studio Code or Cursor) | Table 3.6 |
@@ -23,8 +22,7 @@ Search the report for `[INSERT` to find each one.
 
 ## Promised in the text (to deliver in the appendices)
 
-- Full data dictionary of all 23 tables (Section 4.4.1) — generate from docs/report/diagrams/schema.json.
-- Market research summary (note under Table 2.2).
+- Done: data dictionary (Appendix D) and market research summary (Appendix F). Regenerate A, D, E and G with `ml/.venv/bin/python docs/report/make_appendices.py` before the final build so the commit history is complete.
 
 ## Checks before submission
 

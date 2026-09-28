@@ -279,7 +279,18 @@ def add_figure(doc, caption, path, width_in=6.0):
 
 
 def add_code(doc, code_lines, caption):
-    """Code excerpt in a shaded single-cell table (Courier New 8.5 pt), captioned as a figure below."""
+    """Code excerpt in a shaded single-cell table (Courier New 8.5 pt), captioned as a figure below.
+    Long listings are split into chunks of 52 lines so each chunk fits on a page."""
+    chunks = [code_lines[i:i + 52] for i in range(0, len(code_lines), 52)] or [[]]
+    for n, chunk in enumerate(chunks):
+        _code_table(doc, chunk)
+        if n < len(chunks) - 1:
+            para(doc, "", after=0)
+    if caption:
+        para(doc, caption, style="Figure Caption")
+
+
+def _code_table(doc, code_lines):
     table = doc.add_table(rows=1, cols=1)
     table.style = "Table Grid"
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -291,7 +302,7 @@ def add_code(doc, code_lines, caption):
         p.paragraph_format.line_spacing = 1.0
         p.paragraph_format.space_after = Pt(0)
         p.paragraph_format.space_before = Pt(0)
-        p.paragraph_format.keep_with_next = True
+        p.paragraph_format.keep_with_next = len(code_lines) < 30
         p.alignment = WD_ALIGN_PARAGRAPH.LEFT
         r = p.add_run(text if text else " ")
         r.font.name = "Courier New"
@@ -302,10 +313,9 @@ def add_code(doc, code_lines, caption):
     for side, w in (("top", 80), ("bottom", 80), ("left", 120), ("right", 120)):
         el = OxmlElement(f"w:{side}"); el.set(qn("w:w"), str(w)); el.set(qn("w:type"), "dxa"); mar.append(el)
     tblpr.append(mar)
-    row = table.rows[0]._tr.get_or_add_trPr()
-    row.append(OxmlElement("w:cantSplit"))
-    if caption:
-        para(doc, caption, style="Figure Caption")
+    if len(code_lines) < 30:  # short excerpts stay in one piece; long chunks may start on the current page
+        row = table.rows[0]._tr.get_or_add_trPr()
+        row.append(OxmlElement("w:cantSplit"))
 
 
 # ------------------------------------------------------------------ equations
