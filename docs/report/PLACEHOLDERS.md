@@ -18,6 +18,7 @@ Search the report for `[INSERT` to find each one.
 | 6d | `[INSERT licence, e.g. student licence]` for Microsoft Word and `[INSERT estimated annual hosting and domain cost]` | Section 3.6.3 |
 | 6e | `[INSERT editor used]` (for example Visual Studio Code or Cursor) | Table 3.6 |
 | 6f | `[INSERT demand dataset name and URL]` and `[INSERT citation]` (same source as item 5) | Section 3.3 |
+| 6g | `[INSERT results of user acceptance testing, if carried out before submission.]` — optional: remove the sentence if no test is done | Section 6.9 |
 | 7 | Business details in admin → Contact info ("J&K Block, Laxmi Nagar" is template data; it appears on the invoice screenshot) | Chapter 5 screenshots |
 
 ## Promised in the text (to deliver in the appendices)

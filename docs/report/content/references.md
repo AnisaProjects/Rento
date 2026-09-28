@@ -46,3 +46,4 @@
 - Individual Privacy Act, 2075 (2018). Government of Nepal. [VERIFY official source and URL]
 - Gane, C., & Sarson, T. (1979). *Structured systems analysis: Tools and techniques*. Prentice-Hall.
 - Object Management Group. (2017). *OMG Unified Modeling Language (OMG UML), version 2.5.1* (formal/17-12-05). https://www.omg.org/spec/UML/2.5.1/
+- Deque Systems. (n.d.). *axe-core: Accessibility engine for automated Web UI testing* [Computer software]. GitHub. Retrieved September 27, 2026, from https://github.com/dequelabs/axe-core
